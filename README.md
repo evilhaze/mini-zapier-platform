@@ -1,6 +1,6 @@
 # FlowForge — MVP Automation Platform (mini-Zapier)
 
-Запуск за 2 дня: визуальный редактор workflow, триггеры, действия, очередь задач, логи и Dashboard.
+
 
 ## Требования
 
