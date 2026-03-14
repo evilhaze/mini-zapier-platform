@@ -5,6 +5,17 @@
 :root {
   --sidebar-w: 16rem;
   --topbar-h: 3.5rem;
+  /* Page container & spacing */
+  --container-max-w: 80rem;
+  --page-x: 1.5rem;
+  --page-y: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --page-x: 2rem;
+    --page-y: 2rem;
+  }
 }
 
 body {

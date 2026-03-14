@@ -1,15 +1,31 @@
 'use client';
 
-export function Topbar() {
+import { Menu } from 'lucide-react';
+
+type TopbarProps = {
+  onMenuClick: () => void;
+};
+
+export function Topbar({ onMenuClick }: TopbarProps) {
   return (
     <header
-      className="flex h-[var(--topbar-h)] shrink-0 items-center justify-between border-b border-slate-200 bg-white px-6"
+      className="flex h-[var(--topbar-h)] shrink-0 items-center justify-between gap-4 border-b border-slate-200 bg-white px-4 md:px-6"
       role="banner"
     >
-      <div className="text-sm text-slate-500">
+      <button
+        type="button"
+        aria-label="Open menu"
+        onClick={onMenuClick}
+        className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 md:hidden"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      <div className="flex-1 text-center text-sm text-slate-500 md:text-left">
         Automation Platform — workflows, triggers, executions
       </div>
-      <div className="flex items-center gap-4">
+
+      <div className="flex items-center gap-2 md:gap-4">
         <a
           href="/api-docs"
           target="_blank"
@@ -18,6 +34,8 @@ export function Topbar() {
         >
           API Docs
         </a>
+        {/* Spacer on mobile so center text is centered */}
+        <span className="w-9 md:hidden" aria-hidden />
       </div>
     </header>
   );
