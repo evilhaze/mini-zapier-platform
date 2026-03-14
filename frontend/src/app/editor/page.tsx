@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { API_BASE } from '@/lib/api';
-import { PencilSquare } from 'lucide-react';
+import { PenSquare } from 'lucide-react';
 
 type Workflow = { id: string; name: string; status: string; isPaused: boolean };
 
@@ -28,7 +28,7 @@ export default async function EditorLandingPage() {
 
       {workflows.length === 0 ? (
         <div className="rounded-xl border border-slate-200 bg-white p-12 text-center text-slate-500">
-          <PencilSquare className="mx-auto h-12 w-12 text-slate-300" />
+          <PenSquare className="mx-auto h-12 w-12 text-slate-300" />
           <p className="mt-4">No workflows yet</p>
           <Link href="/workflows" className="mt-2 inline-block text-sm font-medium text-accent hover:text-accent-dark">
             Create workflow →
@@ -42,7 +42,7 @@ export default async function EditorLandingPage() {
                 href={`/editor/${w.id}`}
                 className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-card transition-shadow hover:border-accent/30 hover:shadow-card-hover"
               >
-                <PencilSquare className="h-5 w-5 shrink-0 text-slate-400" />
+                <PenSquare className="h-5 w-5 shrink-0 text-slate-400" />
                 <span className="font-medium text-slate-900">{w.name}</span>
               </Link>
             </li>

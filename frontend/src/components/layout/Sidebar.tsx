@@ -6,7 +6,7 @@ import {
   LayoutDashboard,
   GitBranch,
   ListChecks,
-  PencilSquare,
+  PenSquare,
   PlayCircle,
   X,
 } from 'lucide-react';
@@ -15,7 +15,7 @@ const nav = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/workflows', label: 'Workflows', icon: GitBranch },
   { href: '/executions', label: 'Executions', icon: ListChecks },
-  { href: '/editor', label: 'Editor', icon: PencilSquare },
+  { href: '/editor', label: 'Editor', icon: PenSquare },
 ] as const;
 
 type SidebarProps = {

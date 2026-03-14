@@ -18,7 +18,7 @@ const styles: Record<string, string> = {
 
 export function TriggerBadge({ trigger }: { trigger: string }) {
   const key = trigger?.toLowerCase() || '—';
-  const label = labels[key] ?? trigger || '—';
+  const label = labels[key] ?? (trigger || '—');
   const className = styles[key] ?? styles['—'];
   return (
     <span
