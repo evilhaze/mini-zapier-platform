@@ -118,6 +118,23 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
+      '/statistics/overview': {
+        get: {
+          summary: 'Dashboard overview statistics',
+          description: 'Aggregate counts for workflows, executions, success rate, and recent executions (last 24h).',
+          tags: ['Statistics'],
+          responses: {
+            200: {
+              description: 'Overview stats',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/StatisticsOverview' },
+                },
+              },
+            },
+          },
+        },
+      },
       '/executions': {
         get: {
           summary: 'List executions',
@@ -249,6 +266,21 @@ const options: swaggerJsdoc.Options = {
             status: { type: 'string', enum: ['draft', 'active', 'archived'] },
             isPaused: { type: 'boolean' },
             definitionJson: { type: 'object' },
+          },
+        },
+        StatisticsOverview: {
+          type: 'object',
+          description: 'Dashboard overview statistics',
+          properties: {
+            totalWorkflows: { type: 'integer' },
+            activeWorkflows: { type: 'integer', description: 'Workflows with status active' },
+            pausedWorkflows: { type: 'integer', description: 'Workflows with isPaused true' },
+            totalExecutions: { type: 'integer' },
+            successfulExecutions: { type: 'integer' },
+            failedExecutions: { type: 'integer' },
+            pausedExecutions: { type: 'integer' },
+            successRate: { type: 'number', description: 'successfulExecutions / totalExecutions, 0-1' },
+            recentExecutionsCount: { type: 'integer', description: 'Executions started in last 24h' },
           },
         },
         WebhookPayload: {
