@@ -80,32 +80,56 @@ export const workflowService = {
     workflowId: string,
     inputPayload?: Prisma.InputJsonValue
   ): Promise<{ executionId: string; status: 'queued' }> {
-    const workflow = await prisma.workflow.findUnique({
-      where: { id: workflowId },
-      select: { id: true },
-    });
-    if (!workflow) {
-      const notFound = new Error('Workflow not found') as Error & { code?: string };
-      notFound.code = 'WORKFLOW_NOT_FOUND';
-      throw notFound;
-    }
+    return enqueueExecution(workflowId, 'manual', inputPayload);
+  },
 
-    const execution = await prisma.execution.create({
-      data: {
-        workflowId,
-        triggerType: 'manual',
-        status: 'pending',
-        inputPayload: inputPayload ?? undefined,
-      },
-      select: { id: true },
-    });
-
-    await addWorkflowRunJob({
-      executionId: execution.id,
-      workflowId,
-      triggerType: 'manual',
-      inputPayload: inputPayload ?? undefined,
-    });
-    return { executionId: execution.id, status: 'queued' };
+  /**
+   * Webhook trigger: create Execution with inputPayload, enqueue job.
+   * Throws WORKFLOW_NOT_FOUND if workflow missing, WORKFLOW_PAUSED if isPaused.
+   */
+  async triggerByWebhook(
+    workflowId: string,
+    inputPayload: Prisma.InputJsonValue
+  ): Promise<{ executionId: string; status: 'queued' }> {
+    return enqueueExecution(workflowId, 'webhook', inputPayload);
   },
 };
+
+async function enqueueExecution(
+  workflowId: string,
+  triggerType: 'manual' | 'webhook',
+  inputPayload?: Prisma.InputJsonValue
+): Promise<{ executionId: string; status: 'queued' }> {
+  const workflow = await prisma.workflow.findUnique({
+    where: { id: workflowId },
+    select: { id: true, isPaused: true },
+  });
+  if (!workflow) {
+    const notFound = new Error('Workflow not found') as Error & { code?: string };
+    notFound.code = 'WORKFLOW_NOT_FOUND';
+    throw notFound;
+  }
+  if (triggerType === 'webhook' && workflow.isPaused) {
+    const paused = new Error('Workflow is paused') as Error & { code?: string };
+    paused.code = 'WORKFLOW_PAUSED';
+    throw paused;
+  }
+
+  const execution = await prisma.execution.create({
+    data: {
+      workflowId,
+      triggerType,
+      status: 'pending',
+      inputPayload: inputPayload ?? undefined,
+    },
+    select: { id: true },
+  });
+
+  await addWorkflowRunJob({
+    executionId: execution.id,
+    workflowId,
+    triggerType,
+    inputPayload: inputPayload ?? undefined,
+  });
+  return { executionId: execution.id, status: 'queued' };
+}

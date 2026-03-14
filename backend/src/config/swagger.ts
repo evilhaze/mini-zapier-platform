@@ -118,6 +118,49 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
+      '/triggers/webhook/{workflowId}': {
+        post: {
+          summary: 'Webhook trigger',
+          description: 'Trigger a workflow by webhook. Creates an Execution with the request body as inputPayload and enqueues it. Use this URL as the webhook endpoint for external services.',
+          tags: ['Triggers'],
+          parameters: [
+            {
+              name: 'workflowId',
+              in: 'path',
+              required: true,
+              schema: { type: 'string', format: 'uuid' },
+              description: 'Workflow ID (from GET /workflows)',
+            },
+          ],
+          requestBody: {
+            description: 'Any JSON payload. Stored as execution inputPayload and passed to the workflow.',
+            content: {
+              'application/json': {
+                schema: { $ref: '#/components/schemas/WebhookPayload' },
+                example: {
+                  event: 'order.created',
+                  timestamp: '2025-03-14T12:00:00Z',
+                  data: { id: 'ord_123', amount: 99.99 },
+                },
+              },
+            },
+          },
+          responses: {
+            202: {
+              description: 'Execution accepted and queued',
+              content: {
+                'application/json': {
+                  schema: { $ref: '#/components/schemas/WebhookTriggerResponse' },
+                },
+              },
+            },
+            400: { description: 'Invalid workflow id' },
+            404: { description: 'Workflow not found' },
+            423: { description: 'Workflow is paused' },
+            503: { description: 'Queue unavailable' },
+          },
+        },
+      },
     },
     components: {
       schemas: {
@@ -150,6 +193,19 @@ const options: swaggerJsdoc.Options = {
             status: { type: 'string', enum: ['draft', 'active', 'archived'] },
             isPaused: { type: 'boolean' },
             definitionJson: { type: 'object' },
+          },
+        },
+        WebhookPayload: {
+          type: 'object',
+          description: 'Arbitrary JSON. Example: event payload from external service.',
+          additionalProperties: true,
+        },
+        WebhookTriggerResponse: {
+          type: 'object',
+          required: ['executionId', 'status'],
+          properties: {
+            executionId: { type: 'string', format: 'uuid', description: 'Created execution id' },
+            status: { type: 'string', enum: ['queued'], description: 'Execution is in queue' },
           },
         },
       },
