@@ -44,3 +44,20 @@ export const NODE_LABELS: Record<string, string> = {
   db: 'Database',
   transform: 'Transform',
 };
+
+/** One-line description for trigger cards. */
+export const TRIGGER_DESCRIPTIONS: Record<string, string> = {
+  webhook: 'Starts when an HTTP request is received',
+  schedule: 'Runs on a cron schedule',
+  email: 'Starts when an email arrives',
+  manual: 'Runs when you click Run',
+};
+
+/** One-line description for action cards. */
+export const ACTION_DESCRIPTIONS: Record<string, string> = {
+  http: 'Send HTTP request to any URL',
+  email: 'Send an email',
+  telegram: 'Send a Telegram message',
+  db: 'Save data to the workflow store',
+  transform: 'Map or transform JSON data',
+};
