@@ -33,12 +33,20 @@ export const workflowController = {
    *   get:
    *     summary: List all workflows
    *     tags: [Workflows]
+   *     parameters:
+   *       - name: stats
+   *         in: query
+   *         schema: { type: 'string', enum: ['1', 'true'] }
+   *         description: Include execution stats (triggerType, lastRunAt, executionCount, successRate)
    *     responses:
    *       200:
    *         description: List of workflows
    */
-  async list(_req: Request, res: Response) {
-    const workflows = await workflowService.findAll();
+  async list(req: Request, res: Response) {
+    const withStats = req.query.stats === '1' || req.query.stats === 'true';
+    const workflows = withStats
+      ? await workflowService.findAllWithStats()
+      : await workflowService.findAll();
     res.status(200).json(workflows);
   },
 

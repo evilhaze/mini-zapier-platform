@@ -26,11 +26,70 @@ export type WorkflowUpdateInput = {
   definitionJson?: Prisma.InputJsonValue;
 };
 
+type DefinitionJson = { nodes?: { type: string }[] };
+
+function getTriggerType(definitionJson: unknown): string {
+  const def = definitionJson as DefinitionJson | null;
+  const nodes = def?.nodes ?? [];
+  const trigger = nodes.find((n) =>
+    ['webhook', 'schedule', 'manual', 'email'].includes(String(n.type))
+  );
+  return trigger ? String(trigger.type) : '—';
+}
+
+export type WorkflowWithStats = Awaited<ReturnType<typeof prisma.workflow.findMany>>[number] & {
+  triggerType: string;
+  lastRunAt: string | null;
+  executionCount: number;
+  successRate: number;
+};
+
 export const workflowService = {
   async findAll() {
     return prisma.workflow.findMany({
       select: workflowSelect,
       orderBy: { updatedAt: 'desc' },
+    });
+  },
+
+  async findAllWithStats(): Promise<WorkflowWithStats[]> {
+    const workflows = await prisma.workflow.findMany({
+      select: workflowSelect,
+      orderBy: { updatedAt: 'desc' },
+    });
+    if (workflows.length === 0) return [];
+    const ids = workflows.map((w) => w.id);
+    const executions = await prisma.execution.findMany({
+      where: { workflowId: { in: ids } },
+      select: { workflowId: true, status: true, finishedAt: true },
+    });
+    const byId = new Map<
+      string,
+      { total: number; success: number; lastRun: Date | null }
+    >();
+    for (const e of executions) {
+      const cur = byId.get(e.workflowId) ?? {
+        total: 0,
+        success: 0,
+        lastRun: null as Date | null,
+      };
+      cur.total += 1;
+      if (e.status === 'success') cur.success += 1;
+      if (e.finishedAt && (!cur.lastRun || e.finishedAt > cur.lastRun))
+        cur.lastRun = e.finishedAt;
+      byId.set(e.workflowId, cur);
+    }
+    return workflows.map((w) => {
+      const s = byId.get(w.id);
+      const total = s?.total ?? 0;
+      const success = s?.success ?? 0;
+      return {
+        ...w,
+        triggerType: getTriggerType(w.definitionJson),
+        lastRunAt: s?.lastRun?.toISOString() ?? null,
+        executionCount: total,
+        successRate: total > 0 ? Math.round((success / total) * 100) / 100 : 0,
+      };
     });
   },
 
