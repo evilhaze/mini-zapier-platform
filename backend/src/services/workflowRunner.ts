@@ -1,17 +1,19 @@
 import { prisma } from '../utils/prisma.js';
 import type { Prisma } from '@prisma/client';
 import { executionLogService } from './executionLog.service.js';
+import { onExecutionFailed } from './notification.service.js';
 import { dispatchAction } from '../modules/actions/index.js';
 
 const TRIGGER_TYPES = ['webhook', 'schedule', 'email'] as const;
 const ACTION_TYPES = ['http', 'email', 'telegram', 'db', 'transform'] as const;
 
-const MAX_RETRIES = 3;
+const DEFAULT_RETRY_COUNT = 3;
+const MAX_RETRY_LIMIT = 10;
 
 type Node = {
   id: string;
   type: string;
-  config?: Record<string, unknown>;
+  config?: Record<string, unknown> & { retryCount?: number; pauseOnError?: boolean };
   name?: string;
 };
 
@@ -22,6 +24,14 @@ type WorkflowDefinition = {
   edges: Edge[];
   pauseOnError?: boolean;
 };
+
+function getNodeRetryCount(node: Node): number {
+  const n = node.config?.retryCount;
+  if (n === undefined || n === null) return DEFAULT_RETRY_COUNT;
+  const v = Number(n);
+  if (!Number.isInteger(v) || v < 0) return DEFAULT_RETRY_COUNT;
+  return Math.min(v, MAX_RETRY_LIMIT);
+}
 
 function isTrigger(type: string): boolean {
   return TRIGGER_TYPES.includes(type as (typeof TRIGGER_TYPES)[number]);
@@ -79,7 +89,7 @@ export async function runWorkflowExecution(params: {
   const [workflow, execution] = await Promise.all([
     prisma.workflow.findUnique({
       where: { id: workflowId },
-      select: { id: true, definitionJson: true, isPaused: true },
+      select: { id: true, name: true, definitionJson: true, isPaused: true },
     }),
     prisma.execution.findUnique({
       where: { id: executionId },
@@ -96,7 +106,6 @@ export async function runWorkflowExecution(params: {
   const def = workflow.definitionJson as WorkflowDefinition;
   const nodes = def?.nodes ?? [];
   const edges = def?.edges ?? [];
-  const pauseOnError = def?.pauseOnError === true;
 
   const trigger = getTriggerNode(nodes);
   if (!trigger) {
@@ -111,6 +120,10 @@ export async function runWorkflowExecution(params: {
 
   for (let stepIndex = 0; stepIndex < actionNodes.length; stepIndex++) {
     const node = actionNodes[stepIndex];
+    const maxRetries = getNodeRetryCount(node);
+    const pauseOnError =
+      def?.pauseOnError === true || node.config?.pauseOnError === true;
+
     const step = await executionLogService.createStep(executionId, {
       nodeId: node.id,
       nodeName: node.name,
@@ -121,7 +134,7 @@ export async function runWorkflowExecution(params: {
     let lastError: Error | null = null;
     let retryCount = 0;
 
-    while (retryCount <= MAX_RETRIES) {
+    while (retryCount <= maxRetries) {
       try {
         const output = await executeAction(node, previousOutput, { workflowId, executionId });
         await executionLogService.completeStepSuccess(step.id, {
@@ -134,7 +147,7 @@ export async function runWorkflowExecution(params: {
       } catch (err) {
         lastError = err instanceof Error ? err : new Error(String(err));
         retryCount++;
-        if (retryCount > MAX_RETRIES) {
+        if (retryCount > maxRetries) {
           await executionLogService.completeStepFailure(step.id, {
             errorMessage: lastError.message,
             retryCount,
@@ -142,13 +155,14 @@ export async function runWorkflowExecution(params: {
         } else {
           await executionLogService.updateStepRetry(step.id, retryCount);
         }
-        if (retryCount > MAX_RETRIES) break;
+        if (retryCount > maxRetries) break;
       }
     }
 
     if (lastError) {
+      const status = pauseOnError ? 'paused' : 'failed';
       await executionLogService.finishExecution(executionId, {
-        status: pauseOnError ? 'paused' : 'failed',
+        status,
         errorMessage: lastError.message,
       });
       if (pauseOnError) {
@@ -157,6 +171,14 @@ export async function runWorkflowExecution(params: {
           data: { isPaused: true },
         });
       }
+      await onExecutionFailed({
+        workflowId,
+        workflowName: workflow.name,
+        executionId,
+        status,
+        errorMessage: lastError.message,
+        definitionJson: def,
+      });
       return;
     }
   }
