@@ -7,12 +7,65 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// --- Workflow: описание сценария автоматизации ---
 model Workflow {
-  id          String   @id @default(uuid())
-  name        String
-  description String?
-  definition  String
-  enabled     Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id             String    @id @default(uuid())
+  name           String
+  status         String    @default("draft")   // draft | active | archived
+  isPaused       Boolean   @default(false)
+  definitionJson Json      // nodes + edges (визуальный граф)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  executions   Execution[]
+  dataRecords  DataRecord[]
+}
+
+// --- Execution: один запуск workflow ---
+model Execution {
+  id             String    @id @default(uuid())
+  workflowId     String
+  triggerType    String    // webhook | schedule | manual | email
+  status         String    // running | success | failed
+  inputPayload   Json?     // вход триггера
+  outputPayload  Json?     // итоговый вывод
+  errorMessage   String?
+  startedAt      DateTime  @default(now())
+  finishedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  workflow   Workflow       @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  steps      ExecutionStep[]
+  dataRecords DataRecord[]
+}
+
+// --- ExecutionStep: лог одного шага (узла) в запуске ---
+model ExecutionStep {
+  id           String   @id @default(uuid())
+  executionId  String
+  nodeId       String   // id узла в графе
+  nodeName     String?
+  nodeType     String   // http | email | telegram | db | transform | ...
+  status       String   // running | success | failed
+  inputData    Json?    // вход шага
+  outputData   Json?    // выход шага
+  errorMessage String?
+  retryCount   Int      @default(0)
+  startedAt    DateTime @default(now())
+  finishedAt   DateTime?
+  createdAt    DateTime @default(now())
+
+  execution Execution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+}
+
+// --- DataRecord: произвольные данные, привязанные к workflow/execution ---
+model DataRecord {
+  id           String    @id @default(uuid())
+  workflowId   String
+  executionId  String?
+  payload      Json      // произвольные данные
+  createdAt    DateTime  @default(now())
+
+  workflow  Workflow   @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  execution Execution? @relation(fields: [executionId], references: [id], onDelete: SetNull)
 }
