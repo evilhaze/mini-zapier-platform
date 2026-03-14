@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { workflowController } from '../controllers/workflow.controller.js';
+import { executionController } from '../controllers/execution.controller.js';
 
 /**
  * @openapi
@@ -11,6 +12,7 @@ export const workflowsRouter = Router();
 
 workflowsRouter.get('/', workflowController.list);
 workflowsRouter.post('/', workflowController.create);
+workflowsRouter.get('/:id/executions', executionController.listByWorkflow);
 workflowsRouter.post('/:id/run', workflowController.run);
 workflowsRouter.get('/:id', workflowController.getById);
 workflowsRouter.put('/:id', workflowController.update);

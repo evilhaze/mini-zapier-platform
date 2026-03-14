@@ -118,6 +118,62 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
+      '/executions': {
+        get: {
+          summary: 'List executions',
+          description: 'Paginated list with optional filter by workflowId and status.',
+          tags: ['Executions'],
+          parameters: [
+            { name: 'workflowId', in: 'query', schema: { type: 'string', format: 'uuid' }, description: 'Filter by workflow' },
+            { name: 'status', in: 'query', schema: { type: 'string', enum: ['pending', 'running', 'success', 'failed', 'paused'] } },
+            { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1 }, description: 'Page (default 1)' },
+            { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100 }, description: 'Items per page (default 20)' },
+          ],
+          responses: {
+            200: {
+              description: 'Paginated list',
+              content: { 'application/json': { schema: { $ref: '#/components/schemas/ExecutionListResult' } } },
+            },
+            400: { description: 'Validation error' },
+          },
+        },
+      },
+      '/executions/{id}': {
+        get: {
+          summary: 'Get execution details',
+          description: 'Execution with steps and workflow basic info.',
+          tags: ['Executions'],
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: {
+            200: {
+              description: 'Execution with steps and workflow',
+              content: { 'application/json': { schema: { $ref: '#/components/schemas/ExecutionDetail' } } },
+            },
+            400: { description: 'Invalid id' },
+            404: { description: 'Execution not found' },
+          },
+        },
+      },
+      '/workflows/{id}/executions': {
+        get: {
+          summary: 'List executions for a workflow',
+          description: 'Paginated list of executions for the given workflow. Same as GET /executions?workflowId=:id.',
+          tags: ['Workflows', 'Executions'],
+          parameters: [
+            { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } },
+            { name: 'status', in: 'query', schema: { type: 'string', enum: ['pending', 'running', 'success', 'failed', 'paused'] } },
+            { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1 } },
+            { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100 } },
+          ],
+          responses: {
+            200: {
+              description: 'Paginated list',
+              content: { 'application/json': { schema: { $ref: '#/components/schemas/ExecutionListResult' } } },
+            },
+            400: { description: 'Validation error' },
+          },
+        },
+      },
       '/triggers/webhook/{workflowId}': {
         post: {
           summary: 'Webhook trigger',
@@ -206,6 +262,75 @@ const options: swaggerJsdoc.Options = {
           properties: {
             executionId: { type: 'string', format: 'uuid', description: 'Created execution id' },
             status: { type: 'string', enum: ['queued'], description: 'Execution is in queue' },
+          },
+        },
+        Execution: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            workflowId: { type: 'string', format: 'uuid' },
+            triggerType: { type: 'string', enum: ['manual', 'webhook', 'schedule', 'email'] },
+            status: { type: 'string', enum: ['pending', 'running', 'success', 'failed', 'paused'] },
+            inputPayload: { type: 'object' },
+            outputPayload: { type: 'object' },
+            errorMessage: { type: 'string' },
+            startedAt: { type: 'string', format: 'date-time' },
+            finishedAt: { type: 'string', format: 'date-time', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        ExecutionStep: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            executionId: { type: 'string', format: 'uuid' },
+            nodeId: { type: 'string' },
+            nodeName: { type: 'string', nullable: true },
+            nodeType: { type: 'string' },
+            status: { type: 'string', enum: ['running', 'success', 'failed'] },
+            inputData: { type: 'object', nullable: true },
+            outputData: { type: 'object', nullable: true },
+            errorMessage: { type: 'string', nullable: true },
+            retryCount: { type: 'integer' },
+            startedAt: { type: 'string', format: 'date-time' },
+            finishedAt: { type: 'string', format: 'date-time', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+          },
+        },
+        WorkflowBasic: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            name: { type: 'string' },
+            status: { type: 'string' },
+            isPaused: { type: 'boolean' },
+          },
+        },
+        ExecutionDetail: {
+          type: 'object',
+          description: 'Execution with steps and workflow basic info',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            workflowId: { type: 'string', format: 'uuid' },
+            triggerType: { type: 'string' },
+            status: { type: 'string' },
+            inputPayload: { type: 'object' },
+            outputPayload: { type: 'object' },
+            errorMessage: { type: 'string' },
+            startedAt: { type: 'string', format: 'date-time' },
+            finishedAt: { type: 'string', format: 'date-time', nullable: true },
+            createdAt: { type: 'string', format: 'date-time' },
+            steps: { type: 'array', items: { $ref: '#/components/schemas/ExecutionStep' } },
+            workflow: { $ref: '#/components/schemas/WorkflowBasic' },
+          },
+        },
+        ExecutionListResult: {
+          type: 'object',
+          properties: {
+            data: { type: 'array', items: { $ref: '#/components/schemas/Execution' } },
+            total: { type: 'integer', description: 'Total count' },
+            page: { type: 'integer' },
+            limit: { type: 'integer' },
           },
         },
       },
