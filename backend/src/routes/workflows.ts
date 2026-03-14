@@ -13,6 +13,8 @@ export const workflowsRouter = Router();
 workflowsRouter.get('/', workflowController.list);
 workflowsRouter.post('/', workflowController.create);
 workflowsRouter.get('/:id/executions', executionController.listByWorkflow);
+workflowsRouter.post('/:id/pause', workflowController.pause);
+workflowsRouter.post('/:id/resume', workflowController.resume);
 workflowsRouter.post('/:id/run', workflowController.run);
 workflowsRouter.get('/:id', workflowController.getById);
 workflowsRouter.put('/:id', workflowController.update);

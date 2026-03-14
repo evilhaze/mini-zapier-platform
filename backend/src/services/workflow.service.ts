@@ -72,6 +72,24 @@ export const workflowService = {
     });
   },
 
+  /** Set workflow to paused. Scheduler should be unregistered by caller. */
+  async pause(id: string) {
+    return prisma.workflow.update({
+      where: { id },
+      data: { isPaused: true },
+      select: workflowSelect,
+    });
+  },
+
+  /** Set workflow to resumed (not paused). Caller should re-register scheduler if needed. */
+  async resume(id: string) {
+    return prisma.workflow.update({
+      where: { id },
+      data: { isPaused: false },
+      select: workflowSelect,
+    });
+  },
+
   /**
    * Create pending Execution, enqueue job, return executionId and status.
    * Throws if workflow not found (caller should map to 404).

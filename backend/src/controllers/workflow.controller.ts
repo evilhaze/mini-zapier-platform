@@ -200,6 +200,42 @@ export const workflowController = {
     }
   },
 
+  async pause(req: Request, res: Response) {
+    const parsed = idParamSchema.safeParse(req.params);
+    if (!parsed.success) {
+      return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
+    }
+    try {
+      scheduler.unregister(parsed.data.id);
+      const workflow = await workflowService.pause(parsed.data.id);
+      res.status(200).json(workflow);
+    } catch (e: unknown) {
+      const err = e as { code?: string };
+      if (err.code === 'P2025') {
+        return res.status(404).json({ error: 'Workflow not found' });
+      }
+      throw e;
+    }
+  },
+
+  async resume(req: Request, res: Response) {
+    const parsed = idParamSchema.safeParse(req.params);
+    if (!parsed.success) {
+      return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
+    }
+    try {
+      const workflow = await workflowService.resume(parsed.data.id);
+      await scheduler.register(parsed.data.id);
+      res.status(200).json(workflow);
+    } catch (e: unknown) {
+      const err = e as { code?: string };
+      if (err.code === 'P2025') {
+        return res.status(404).json({ error: 'Workflow not found' });
+      }
+      throw e;
+    }
+  },
+
   /**
    * @openapi
    * /workflows/{id}/run:

@@ -78,6 +78,32 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
+      '/workflows/{id}/pause': {
+        post: {
+          summary: 'Pause workflow',
+          description: 'Sets isPaused to true. Stops schedule trigger; webhook and manual run will reject while paused.',
+          tags: ['Workflows'],
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: {
+            200: { description: 'Workflow paused', content: { 'application/json': { schema: { $ref: '#/components/schemas/Workflow' } } } },
+            400: { description: 'Invalid id' },
+            404: { description: 'Workflow not found' },
+          },
+        },
+      },
+      '/workflows/{id}/resume': {
+        post: {
+          summary: 'Resume workflow',
+          description: 'Sets isPaused to false. Re-registers schedule trigger if workflow has a schedule node.',
+          tags: ['Workflows'],
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          responses: {
+            200: { description: 'Workflow resumed', content: { 'application/json': { schema: { $ref: '#/components/schemas/Workflow' } } } },
+            400: { description: 'Invalid id' },
+            404: { description: 'Workflow not found' },
+          },
+        },
+      },
       '/workflows/{id}/run': {
         post: {
           summary: 'Run workflow manually',
