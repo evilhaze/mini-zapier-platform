@@ -5,6 +5,6 @@ export const config = {
   port: Number(process.env.PORT) || 3001,
   redis: {
     host: process.env.REDIS_HOST ?? 'localhost',
-    port: Number(process.env.REDIS_PORT) ?? 6379,
+    port: Number(process.env.REDIS_PORT) || 6379,
   },
 } as const;

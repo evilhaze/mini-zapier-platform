@@ -26,7 +26,7 @@ model Execution {
   id             String    @id @default(uuid())
   workflowId     String
   triggerType    String    // webhook | schedule | manual | email
-  status         String    // running | success | failed
+  status         String    // pending | running | success | failed | paused
   inputPayload   Json?     // вход триггера
   outputPayload  Json?     // итоговый вывод
   errorMessage   String?

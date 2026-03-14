@@ -15,7 +15,11 @@ async function start() {
     process.exit(1);
   }
 
-  await schedulerRegisterAll();
+  try {
+    await schedulerRegisterAll();
+  } catch (e) {
+    console.error('Scheduler registerAll failed (server will still start):', (e as Error).message);
+  }
 
   const worker = getWorker(async (job) => {
     await runWorkflowExecution({
