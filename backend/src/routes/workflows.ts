@@ -10,7 +10,8 @@ import { workflowController } from '../controllers/workflow.controller.js';
 export const workflowsRouter = Router();
 
 workflowsRouter.get('/', workflowController.list);
-workflowsRouter.get('/:id', workflowController.getById);
 workflowsRouter.post('/', workflowController.create);
+workflowsRouter.post('/:id/run', workflowController.run);
+workflowsRouter.get('/:id', workflowController.getById);
 workflowsRouter.put('/:id', workflowController.update);
 workflowsRouter.delete('/:id', workflowController.delete);

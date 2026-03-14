@@ -78,6 +78,46 @@ const options: swaggerJsdoc.Options = {
           },
         },
       },
+      '/workflows/{id}/run': {
+        post: {
+          summary: 'Run workflow manually',
+          description: 'Creates a pending Execution, enqueues a job to BullMQ, returns executionId and status queued.',
+          tags: ['Workflows'],
+          parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' } }],
+          requestBody: {
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    inputPayload: { type: 'object', description: 'Optional trigger input (JSON)' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            202: {
+              description: 'Execution queued',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    required: ['executionId', 'status'],
+                    properties: {
+                      executionId: { type: 'string', format: 'uuid' },
+                      status: { type: 'string', example: 'queued' },
+                    },
+                  },
+                },
+              },
+            },
+            400: { description: 'Invalid id or request body' },
+            404: { description: 'Workflow not found' },
+            503: { description: 'Queue unavailable (e.g. Redis down)' },
+          },
+        },
+      },
     },
     components: {
       schemas: {

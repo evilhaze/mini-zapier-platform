@@ -21,6 +21,10 @@ const idParamSchema = z.object({
   id: z.string().uuid('invalid workflow id'),
 });
 
+const runBodySchema = z.object({
+  inputPayload: z.record(z.unknown()).optional(),
+});
+
 export const workflowController = {
   /**
    * @openapi
@@ -187,6 +191,61 @@ export const workflowController = {
       const err = e as { code?: string };
       if (err.code === 'P2025') {
         return res.status(404).json({ error: 'Workflow not found' });
+      }
+      throw e;
+    }
+  },
+
+  /**
+   * @openapi
+   * /workflows/{id}/run:
+   *   post:
+   *     summary: Run workflow manually
+   *     tags: [Workflows]
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         required: true
+   *         schema: { type: string, format: uuid }
+   *     requestBody:
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               inputPayload: { type: object, description: optional trigger input }
+   *     responses:
+   *       202:
+   *         description: Execution queued
+   *       400:
+   *         description: Invalid id or body
+   *       404:
+   *         description: Workflow not found
+   *       503:
+   *         description: Queue unavailable
+   */
+  async run(req: Request, res: Response) {
+    const paramParsed = idParamSchema.safeParse(req.params);
+    if (!paramParsed.success) {
+      return res.status(400).json({ error: paramParsed.error.flatten().fieldErrors });
+    }
+    const bodyParsed = runBodySchema.safeParse(req.body ?? {});
+    if (!bodyParsed.success) {
+      return res.status(400).json({ error: bodyParsed.error.flatten().fieldErrors });
+    }
+    try {
+      const result = await workflowService.runWorkflow(
+        paramParsed.data.id,
+        bodyParsed.data.inputPayload as Prisma.InputJsonValue | undefined
+      );
+      res.status(202).json(result);
+    } catch (e: unknown) {
+      const err = e as Error & { code?: string };
+      if (err.code === 'WORKFLOW_NOT_FOUND') {
+        return res.status(404).json({ error: 'Workflow not found' });
+      }
+      if (err.message?.includes('ECONNREFUSED') || err.message?.includes('Redis')) {
+        return res.status(503).json({ error: 'Queue unavailable' });
       }
       throw e;
     }

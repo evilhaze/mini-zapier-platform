@@ -1,5 +1,6 @@
 import { prisma } from '../utils/prisma.js';
 import type { Prisma } from '@prisma/client';
+import { addWorkflowRunJob } from '../queue/index.js';
 
 const workflowSelect = {
   id: true,
@@ -69,5 +70,42 @@ export const workflowService = {
     return prisma.workflow.delete({
       where: { id },
     });
+  },
+
+  /**
+   * Create pending Execution, enqueue job, return executionId and status.
+   * Throws if workflow not found (caller should map to 404).
+   */
+  async runWorkflow(
+    workflowId: string,
+    inputPayload?: Prisma.InputJsonValue
+  ): Promise<{ executionId: string; status: 'queued' }> {
+    const workflow = await prisma.workflow.findUnique({
+      where: { id: workflowId },
+      select: { id: true },
+    });
+    if (!workflow) {
+      const notFound = new Error('Workflow not found') as Error & { code?: string };
+      notFound.code = 'WORKFLOW_NOT_FOUND';
+      throw notFound;
+    }
+
+    const execution = await prisma.execution.create({
+      data: {
+        workflowId,
+        triggerType: 'manual',
+        status: 'pending',
+        inputPayload: inputPayload ?? undefined,
+      },
+      select: { id: true },
+    });
+
+    await addWorkflowRunJob({
+      executionId: execution.id,
+      workflowId,
+      triggerType: 'manual',
+      inputPayload: inputPayload ?? undefined,
+    });
+    return { executionId: execution.id, status: 'queued' };
   },
 };

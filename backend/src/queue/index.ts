@@ -7,18 +7,37 @@ const connection = {
   maxRetriesPerRequest: null as number | null,
 };
 
-export const workflowQueue = new Queue('workflow-execution', {
+/** Job name for workflow run */
+export const WORKFLOW_RUN_JOB_NAME = 'run';
+
+/** Payload for a workflow execution job (consumer will load workflow + execution from DB) */
+export type WorkflowRunJobPayload = {
+  executionId: string;
+  workflowId: string;
+  triggerType: 'manual' | 'webhook' | 'schedule' | 'email';
+  inputPayload?: unknown;
+};
+
+export const workflowQueue = new Queue<WorkflowRunJobPayload>('workflow-execution', {
   connection,
   defaultJobOptions: {
     attempts: 3,
     backoff: { type: 'exponential', delay: 1000 },
+    removeOnComplete: { count: 1000 },
+    removeOnFail: { count: 500 },
   },
 });
 
-export function getWorker<T = unknown>(
-  processor: (job: Job<T>) => Promise<void>
+export function addWorkflowRunJob(data: WorkflowRunJobPayload) {
+  return workflowQueue.add(WORKFLOW_RUN_JOB_NAME, data, {
+    jobId: `${data.executionId}`,
+  });
+}
+
+export function getWorker(
+  processor: (job: Job<WorkflowRunJobPayload>) => Promise<void>
 ) {
-  return new Worker<T>('workflow-execution', processor, {
+  return new Worker<WorkflowRunJobPayload>('workflow-execution', processor, {
     connection,
     concurrency: 5,
   });
