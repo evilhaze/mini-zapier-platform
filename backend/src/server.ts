@@ -3,6 +3,7 @@ import { config } from './config/index.js';
 import { prisma } from './utils/prisma.js';
 import { getWorker } from './queue/index.js';
 import { runWorkflowExecution } from './services/workflowRunner.js';
+import { registerAll as schedulerRegisterAll } from './services/scheduler.service.js';
 
 async function start() {
   const app = createApp();
@@ -13,6 +14,8 @@ async function start() {
     console.error('DB connect failed:', e);
     process.exit(1);
   }
+
+  await schedulerRegisterAll();
 
   const worker = getWorker(async (job) => {
     await runWorkflowExecution({

@@ -93,11 +93,18 @@ export const workflowService = {
   ): Promise<{ executionId: string; status: 'queued' }> {
     return enqueueExecution(workflowId, 'webhook', inputPayload);
   },
+
+  /**
+   * Schedule trigger: create Execution, enqueue job. Call only when workflow is not paused.
+   */
+  async triggerBySchedule(workflowId: string): Promise<{ executionId: string; status: 'queued' }> {
+    return enqueueExecution(workflowId, 'schedule', undefined);
+  },
 };
 
 async function enqueueExecution(
   workflowId: string,
-  triggerType: 'manual' | 'webhook',
+  triggerType: 'manual' | 'webhook' | 'schedule',
   inputPayload?: Prisma.InputJsonValue
 ): Promise<{ executionId: string; status: 'queued' }> {
   const workflow = await prisma.workflow.findUnique({
@@ -110,6 +117,11 @@ async function enqueueExecution(
     throw notFound;
   }
   if (triggerType === 'webhook' && workflow.isPaused) {
+    const paused = new Error('Workflow is paused') as Error & { code?: string };
+    paused.code = 'WORKFLOW_PAUSED';
+    throw paused;
+  }
+  if (triggerType === 'schedule' && workflow.isPaused) {
     const paused = new Error('Workflow is paused') as Error & { code?: string };
     paused.code = 'WORKFLOW_PAUSED';
     throw paused;

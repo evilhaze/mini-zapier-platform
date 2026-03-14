@@ -2,6 +2,7 @@ import type { Request, Response } from 'express';
 import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
 import { workflowService, type WorkflowUpdateInput } from '../services/workflow.service.js';
+import * as scheduler from '../services/scheduler.service.js';
 
 const createBodySchema = z.object({
   name: z.string().min(1, 'name is required').max(255),
@@ -103,6 +104,7 @@ export const workflowController = {
       ...parsed.data,
       definitionJson: parsed.data.definitionJson as Prisma.InputJsonValue,
     });
+    await scheduler.register(workflow.id);
     res.status(201).json(workflow);
   },
 
@@ -150,6 +152,7 @@ export const workflowController = {
         definitionJson: bodyParsed.data.definitionJson as Prisma.InputJsonValue | undefined,
       };
       const workflow = await workflowService.update(paramParsed.data.id, updateData);
+      await scheduler.register(paramParsed.data.id);
       res.status(200).json(workflow);
     } catch (e: unknown) {
       const err = e as { code?: string };
@@ -185,6 +188,7 @@ export const workflowController = {
       return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
     }
     try {
+      scheduler.unregister(parsed.data.id);
       await workflowService.delete(parsed.data.id);
       res.status(204).send();
     } catch (e: unknown) {
