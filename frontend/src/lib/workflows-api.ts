@@ -3,6 +3,7 @@ import { API_BASE } from './api';
 export type WorkflowWithStats = {
   id: string;
   name: string;
+  description?: string | null;
   status: string;
   isPaused: boolean;
   definitionJson: unknown;

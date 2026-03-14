@@ -6,6 +6,7 @@ import * as scheduler from '../services/scheduler.service.js';
 
 const createBodySchema = z.object({
   name: z.string().min(1, 'name is required').max(255),
+  description: z.string().max(2000).optional().nullable(),
   status: z.enum(['draft', 'active', 'archived']).optional().default('draft'),
   isPaused: z.boolean().optional().default(false),
   definitionJson: z.record(z.unknown()),
@@ -13,6 +14,7 @@ const createBodySchema = z.object({
 
 const updateBodySchema = z.object({
   name: z.string().min(1).max(255).optional(),
+  description: z.string().max(2000).optional().nullable(),
   status: z.enum(['draft', 'active', 'archived']).optional(),
   isPaused: z.boolean().optional(),
   definitionJson: z.record(z.unknown()).optional(),

@@ -11,6 +11,7 @@ datasource db {
 model Workflow {
   id             String    @id @default(uuid())
   name           String
+  description    String?   // optional description
   status         String    @default("draft")   // draft | active | archived
   isPaused       Boolean   @default(false)
   definitionJson Json      // nodes + edges (визуальный граф)

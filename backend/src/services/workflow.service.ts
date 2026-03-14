@@ -5,6 +5,7 @@ import { addWorkflowRunJob } from '../queue/index.js';
 const workflowSelect = {
   id: true,
   name: true,
+  description: true,
   status: true,
   isPaused: true,
   definitionJson: true,
@@ -14,6 +15,7 @@ const workflowSelect = {
 
 export type WorkflowCreateInput = {
   name: string;
+  description?: string | null;
   status?: string;
   isPaused?: boolean;
   definitionJson: Prisma.InputJsonValue;
@@ -21,6 +23,7 @@ export type WorkflowCreateInput = {
 
 export type WorkflowUpdateInput = {
   name?: string;
+  description?: string | null;
   status?: string;
   isPaused?: boolean;
   definitionJson?: Prisma.InputJsonValue;
@@ -104,6 +107,7 @@ export const workflowService = {
     return prisma.workflow.create({
       data: {
         name: data.name,
+        description: data.description ?? null,
         status: data.status ?? 'draft',
         isPaused: data.isPaused ?? false,
         definitionJson: data.definitionJson,
@@ -117,6 +121,7 @@ export const workflowService = {
       where: { id },
       data: {
         ...(data.name !== undefined && { name: data.name }),
+        ...(data.description !== undefined && { description: data.description }),
         ...(data.status !== undefined && { status: data.status }),
         ...(data.isPaused !== undefined && { isPaused: data.isPaused }),
         ...(data.definitionJson !== undefined && { definitionJson: data.definitionJson }),

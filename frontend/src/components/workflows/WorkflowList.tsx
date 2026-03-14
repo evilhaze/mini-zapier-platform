@@ -24,6 +24,7 @@ import {
 } from '@/lib/workflows-api';
 import { StatusBadge } from './StatusBadge';
 import { TriggerBadge } from './TriggerBadge';
+import { CreateWorkflowModal } from './CreateWorkflowModal';
 
 const STATUS_FILTERS = [
   { value: 'all', label: 'All' },
@@ -57,6 +58,7 @@ export function WorkflowList() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [actionId, setActionId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -147,13 +149,14 @@ export function WorkflowList() {
             Create and manage automation workflows
           </p>
         </div>
-        <Link
-          href="/workflows/new"
+        <button
+          type="button"
+          onClick={() => setCreateModalOpen(true)}
           className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-card hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
         >
           <Plus className="h-4 w-4" />
           Create workflow
-        </Link>
+        </button>
       </div>
 
       {/* Search + Filters */}
@@ -210,13 +213,14 @@ export function WorkflowList() {
               : 'Try a different search or filter.'}
           </p>
           {workflows.length === 0 && (
-            <Link
-              href="/workflows/new"
+            <button
+              type="button"
+              onClick={() => setCreateModalOpen(true)}
               className="mt-6 inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-dark"
             >
               <Plus className="h-4 w-4" />
               Create workflow
-            </Link>
+            </button>
           )}
         </div>
       ) : (
@@ -425,6 +429,12 @@ export function WorkflowList() {
           </div>
         </>
       )}
+
+      <CreateWorkflowModal
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onCreated={load}
+      />
     </div>
   );
 }
