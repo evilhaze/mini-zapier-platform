@@ -1,5 +1,7 @@
 import { prisma } from '../utils/prisma.js';
 import type { Prisma } from '@prisma/client';
+import { executionLogService } from './executionLog.service.js';
+import { dispatchAction } from '../modules/actions/index.js';
 
 const TRIGGER_TYPES = ['webhook', 'schedule', 'email'] as const;
 const ACTION_TYPES = ['http', 'email', 'telegram', 'db', 'transform'] as const;
@@ -57,8 +59,6 @@ function getOrderedActionNodes(nodes: Node[], edges: Edge[], triggerId: string):
   return ordered;
 }
 
-import { dispatchAction } from '../modules/actions/index.js';
-
 function executeAction(
   node: Node,
   input: unknown,
@@ -89,10 +89,7 @@ export async function runWorkflowExecution(params: {
 
   if (!workflow || !execution) return;
   if (workflow.isPaused) {
-    await prisma.execution.update({
-      where: { id: executionId },
-      data: { status: 'failed', errorMessage: 'Workflow is paused', finishedAt: new Date() },
-    });
+    await executionLogService.failExecutionEarly(executionId, 'Workflow is paused');
     return;
   }
 
@@ -103,33 +100,22 @@ export async function runWorkflowExecution(params: {
 
   const trigger = getTriggerNode(nodes);
   if (!trigger) {
-    await prisma.execution.update({
-      where: { id: executionId },
-      data: { status: 'failed', errorMessage: 'No trigger node in workflow', finishedAt: new Date() },
-    });
+    await executionLogService.failExecutionEarly(executionId, 'No trigger node in workflow');
     return;
   }
 
   const actionNodes = getOrderedActionNodes(nodes, edges, trigger.id);
-  await prisma.execution.update({
-    where: { id: executionId },
-    data: { status: 'running' },
-  });
+  await executionLogService.startExecution(executionId);
 
   let previousOutput: unknown = inputPayload ?? {};
 
   for (let stepIndex = 0; stepIndex < actionNodes.length; stepIndex++) {
     const node = actionNodes[stepIndex];
-    const step = await prisma.executionStep.create({
-      data: {
-        executionId,
-        nodeId: node.id,
-        nodeName: node.name ?? undefined,
-        nodeType: node.type,
-        status: 'running',
-        inputData: previousOutput as Prisma.InputJsonValue,
-        retryCount: 0,
-      },
+    const step = await executionLogService.createStep(executionId, {
+      nodeId: node.id,
+      nodeName: node.name,
+      nodeType: node.type,
+      inputData: previousOutput as Prisma.InputJsonValue,
     });
 
     let lastError: Error | null = null;
@@ -138,14 +124,9 @@ export async function runWorkflowExecution(params: {
     while (retryCount <= MAX_RETRIES) {
       try {
         const output = await executeAction(node, previousOutput, { workflowId, executionId });
-        await prisma.executionStep.update({
-          where: { id: step.id },
-          data: {
-            status: 'success',
-            outputData: output as Prisma.InputJsonValue,
-            finishedAt: new Date(),
-            retryCount,
-          },
+        await executionLogService.completeStepSuccess(step.id, {
+          outputData: output as Prisma.InputJsonValue,
+          retryCount,
         });
         previousOutput = output;
         lastError = null;
@@ -153,31 +134,22 @@ export async function runWorkflowExecution(params: {
       } catch (err) {
         lastError = err instanceof Error ? err : new Error(String(err));
         retryCount++;
-        await prisma.executionStep.update({
-          where: { id: step.id },
-          data: {
+        if (retryCount > MAX_RETRIES) {
+          await executionLogService.completeStepFailure(step.id, {
+            errorMessage: lastError.message,
             retryCount,
-            ...(retryCount > MAX_RETRIES
-              ? {
-                  status: 'failed',
-                  errorMessage: lastError.message,
-                  finishedAt: new Date(),
-                }
-              : {}),
-          },
-        });
+          });
+        } else {
+          await executionLogService.updateStepRetry(step.id, retryCount);
+        }
         if (retryCount > MAX_RETRIES) break;
       }
     }
 
     if (lastError) {
-      await prisma.execution.update({
-        where: { id: executionId },
-        data: {
-          status: 'failed',
-          errorMessage: lastError.message,
-          finishedAt: new Date(),
-        },
+      await executionLogService.finishExecution(executionId, {
+        status: pauseOnError ? 'paused' : 'failed',
+        errorMessage: lastError.message,
       });
       if (pauseOnError) {
         await prisma.workflow.update({
@@ -189,12 +161,8 @@ export async function runWorkflowExecution(params: {
     }
   }
 
-  await prisma.execution.update({
-    where: { id: executionId },
-    data: {
-      status: 'success',
-      outputPayload: previousOutput as Prisma.InputJsonValue,
-      finishedAt: new Date(),
-    },
+  await executionLogService.finishExecution(executionId, {
+    status: 'success',
+    outputPayload: previousOutput as Prisma.InputJsonValue,
   });
 }
