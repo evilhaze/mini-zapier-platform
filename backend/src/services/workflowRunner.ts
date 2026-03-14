@@ -57,75 +57,14 @@ function getOrderedActionNodes(nodes: Node[], edges: Edge[], triggerId: string):
   return ordered;
 }
 
-// --- Action executors (MVP: minimal impl) ---
+import { dispatchAction } from '../modules/actions/index.js';
 
-async function runHttp(config: Record<string, unknown>, input: unknown): Promise<Record<string, unknown>> {
-  const url = (config.url as string) ?? '';
-  const method = ((config.method as string) ?? 'GET').toUpperCase();
-  const headers = (config.headers as Record<string, string>) ?? {};
-  const res = await fetch(url, {
-    method,
-    headers: { 'Content-Type': 'application/json', ...headers },
-    body: config.body != null ? JSON.stringify(config.body) : undefined,
-  });
-  const text = await res.text();
-  let data: unknown;
-  try {
-    data = JSON.parse(text);
-  } catch {
-    data = { raw: text };
-  }
-  return { status: res.status, data };
-}
-
-async function runEmail(_config: Record<string, unknown>, _input: unknown): Promise<Record<string, unknown>> {
-  return { sent: true };
-}
-
-async function runTelegram(config: Record<string, unknown>, _input: unknown): Promise<Record<string, unknown>> {
-  const token = config.botToken as string;
-  const chatId = config.chatId as string;
-  const text = (config.text as string) ?? '';
-  if (!token || !chatId) return { ok: false, error: 'Missing botToken or chatId' };
-  const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text }),
-  });
-  const data = (await res.json()) as Record<string, unknown>;
-  return { ok: data.ok === true, ...data };
-}
-
-async function runDb(_config: Record<string, unknown>, _input: unknown): Promise<Record<string, unknown>> {
-  return { rows: [], rowCount: 0 };
-}
-
-async function runTransform(config: Record<string, unknown>, input: unknown): Promise<Record<string, unknown>> {
-  const mode = (config.mode as string) ?? 'pass';
-  const inp = input as Record<string, unknown>;
-  if (mode === 'map' && config.mapping && typeof config.mapping === 'object') {
-    const mapping = config.mapping as Record<string, string>;
-    const out: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(mapping)) {
-      out[k] = v.startsWith('$.') && inp && typeof inp === 'object' ? (inp as Record<string, unknown>)[v.slice(2)] : v;
-    }
-    return out;
-  }
-  return inp && typeof inp === 'object' ? { ...(inp as Record<string, unknown>) } : {};
-}
-
-const actionRunners: Record<string, (config: Record<string, unknown>, input: unknown) => Promise<Record<string, unknown>>> = {
-  http: runHttp,
-  email: runEmail,
-  telegram: runTelegram,
-  db: runDb,
-  transform: runTransform,
-};
-
-async function executeAction(node: Node, input: unknown): Promise<Record<string, unknown>> {
-  const run = actionRunners[node.type];
-  if (!run) throw new Error(`Unknown action type: ${node.type}`);
-  return run(node.config ?? {}, input);
+function executeAction(
+  node: Node,
+  input: unknown,
+  context: { workflowId: string; executionId: string }
+): Promise<Record<string, unknown>> {
+  return dispatchAction(node.type, node.config ?? {}, input, context);
 }
 
 /** Run workflow for given execution: load workflow + execution, run steps, update DB. */
@@ -198,7 +137,7 @@ export async function runWorkflowExecution(params: {
 
     while (retryCount <= MAX_RETRIES) {
       try {
-        const output = await executeAction(node, previousOutput);
+        const output = await executeAction(node, previousOutput, { workflowId, executionId });
         await prisma.executionStep.update({
           where: { id: step.id },
           data: {
