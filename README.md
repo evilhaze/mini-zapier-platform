@@ -165,7 +165,7 @@ Main groups:
 - **Workflows** — `GET/POST /workflows`, `GET/PUT/DELETE /workflows/:id`, `POST /workflows/:id/run`, `POST /workflows/:id/pause`, `POST /workflows/:id/resume`, `GET /workflows/:id/executions`
 - **Executions** — `GET /executions` (list with `workflowId`, `status`, `page`, `limit`), `GET /executions/:id`, `GET /executions/:id/steps`
 - **Statistics** — `GET /statistics/overview` (dashboard stats)
-- **Webhooks** — `POST /webhooks/:workflowId` (trigger by webhook)
+- **Webhooks** — `POST /triggers/webhook/:workflowId` (trigger by webhook; full URL: `POST /api/triggers/webhook/:workflowId`)
 
 ---
 
@@ -178,7 +178,7 @@ Main groups:
    Add a Schedule trigger (cron), e.g. every hour. Save and wait, or run manually; executions appear in **Execution history**. Filter by workflow to see only this workflow’s runs.
 
 3. **Webhook**  
-   Create a workflow with Webhook trigger. Call `POST /api/webhooks/:workflowId` with optional body; execution is queued and processed. Check execution detail for trigger input and step logs.
+   Create a workflow with Webhook trigger. Call `POST /api/triggers/webhook/:workflowId` with optional body; execution is queued and processed. Check execution detail for trigger input and step logs.
 
 4. **Pause / Resume**  
    From workflow detail or list, use **Pause** then **Resume**. Schedule (and future runs) respect pause; run history and stats remain available.

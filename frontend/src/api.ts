@@ -126,5 +126,5 @@ export async function getStats(workflowId?: string): Promise<Stats> {
 
 export function webhookUrl(workflowId: string): string {
   const base = typeof window !== 'undefined' ? window.location.origin : '';
-  return base + API + '/webhooks/' + workflowId;
+  return base + API + '/triggers/webhook/' + workflowId;
 }

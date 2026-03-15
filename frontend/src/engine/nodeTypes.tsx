@@ -30,7 +30,7 @@ function TriggerNodeInner({ data, type }: NodeProps) {
           <p className="font-medium text-surface-900 text-sm">{label}</p>
           <p className="text-xs text-surface-500 truncate max-w-[120px]">
             {t === 'schedule' && (data.config as { cron?: string })?.cron}
-            {t === 'webhook' && 'POST /api/webhooks/:id'}
+            {t === 'webhook' && 'POST /api/triggers/webhook/:id'}
             {t === 'email' && 'Inbound email'}
           </p>
         </div>

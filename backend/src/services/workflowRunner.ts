@@ -4,7 +4,7 @@ import { executionLogService } from './executionLog.service.js';
 import { onExecutionFailed } from './notification.service.js';
 import { dispatchAction } from '../modules/actions/index.js';
 
-const TRIGGER_TYPES = ['webhook', 'schedule', 'email'] as const;
+const TRIGGER_TYPES = ['webhook', 'schedule', 'manual', 'email'] as const;
 const ACTION_TYPES = ['http', 'email', 'telegram', 'db', 'transform'] as const;
 
 const DEFAULT_RETRY_COUNT = 3;
