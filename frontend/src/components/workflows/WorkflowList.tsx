@@ -27,6 +27,8 @@ import { StatusBadge } from './StatusBadge';
 import { TriggerBadge } from './TriggerBadge';
 import { CreateWorkflowModal } from './CreateWorkflowModal';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { TableSkeleton } from '@/components/ui/Skeleton';
 
 const STATUS_FILTERS = [
   { value: 'all', label: 'All' },
@@ -201,32 +203,46 @@ export function WorkflowList() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center rounded-xl border border-slate-200 bg-white py-16">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-400" aria-hidden />
-        </div>
+        <TableSkeleton
+          rows={6}
+          cols={8}
+          headerLabels={[
+            'Name',
+            'Trigger',
+            'Status',
+            'Last run',
+            'Created',
+            'Runs',
+            'Success',
+            'Actions',
+          ]}
+        />
       ) : filtered.length === 0 ? (
-        /* Empty state */
-        <div className="rounded-xl border border-slate-200 bg-white px-6 py-16 text-center">
-          <GitBranch className="mx-auto h-12 w-12 text-slate-300" aria-hidden />
-          <h2 className="mt-4 text-lg font-semibold text-slate-900">
-            {workflows.length === 0 ? 'No workflows yet' : 'No matching workflows'}
-          </h2>
-          <p className="mt-2 text-sm text-slate-500">
-            {workflows.length === 0
-              ? 'Create your first workflow to automate tasks.'
-              : 'Try a different search or filter.'}
-          </p>
-          {workflows.length === 0 && (
-            <button
-              type="button"
-              onClick={() => setCreateModalOpen(true)}
-              className="mt-6 inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-dark"
-            >
-              <Plus className="h-4 w-4" />
-              Create workflow
-            </button>
-          )}
-        </div>
+        <EmptyState
+          icon={<GitBranch className="h-6 w-6" />}
+          title={
+            workflows.length === 0
+              ? 'No workflows yet'
+              : 'No matching workflows'
+          }
+          description={
+            workflows.length === 0
+              ? 'Create your first workflow to connect apps and automate repetitive tasks.'
+              : 'Try a different search term or filter to find what you need.'
+          }
+          action={
+            workflows.length === 0 ? (
+              <button
+                type="button"
+                onClick={() => setCreateModalOpen(true)}
+                className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+              >
+                <Plus className="h-4 w-4" />
+                Create workflow
+              </button>
+            ) : undefined
+          }
+        />
       ) : (
         <>
           {/* Table (desktop) */}

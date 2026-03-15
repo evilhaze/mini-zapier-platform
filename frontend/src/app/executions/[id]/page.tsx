@@ -7,6 +7,7 @@ import { ErrorBlock } from '@/components/executions/ErrorBlock';
 import { StepCard } from '@/components/executions/StepCard';
 import type { StepData } from '@/components/executions/StepCard';
 import { CodePanel } from '@/components/executions/CodePanel';
+import { EmptyState } from '@/components/ui/EmptyState';
 import {
   ArrowLeft,
   Clock,
@@ -14,6 +15,7 @@ import {
   ListOrdered,
   Inbox,
   Outbox,
+  ListTree,
 } from 'lucide-react';
 
 type ExecutionDetail = {
@@ -157,9 +159,12 @@ export default async function ExecutionDetailPage({
         </div>
 
         {execution.steps.length === 0 ? (
-          <div className="rounded-xl border border-slate-200 border-dashed bg-slate-50/50 py-12 text-center text-slate-500">
-            No steps recorded for this execution.
-          </div>
+          <EmptyState
+            icon={<ListTree className="h-6 w-6" />}
+            title="No steps recorded"
+            description="This execution didn't record any step data. It may have been stopped early or the workflow has no steps."
+            compact
+          />
         ) : (
           <div className="space-y-0">
             {execution.steps.map((step, i) => (

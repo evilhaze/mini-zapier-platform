@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { API_BASE } from '@/lib/api';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { PenSquare } from 'lucide-react';
 
 type Workflow = { id: string; name: string; status: string; isPaused: boolean };
@@ -27,13 +28,19 @@ export default async function EditorLandingPage() {
       </div>
 
       {workflows.length === 0 ? (
-        <div className="rounded-xl border border-slate-200 bg-white p-12 text-center text-slate-500">
-          <PenSquare className="mx-auto h-12 w-12 text-slate-300" />
-          <p className="mt-4">No workflows yet</p>
-          <Link href="/workflows" className="mt-2 inline-block text-sm font-medium text-accent hover:text-accent-dark">
-            Create workflow →
-          </Link>
-        </div>
+        <EmptyState
+          icon={<PenSquare className="h-6 w-6" />}
+          title="No workflows to edit"
+          description="Create a workflow first, then open it here to design triggers and steps on the canvas."
+          action={
+            <Link
+              href="/workflows"
+              className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+            >
+              Create workflow
+            </Link>
+          }
+        />
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {workflows.map((w) => (

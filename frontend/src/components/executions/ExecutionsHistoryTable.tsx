@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { TriggerBadge } from '@/components/workflows/TriggerBadge';
 import { ExecutionStatusBadge } from '@/components/executions/ExecutionStatusBadge';
-import { ChevronRight } from 'lucide-react';
+import { EmptyState } from '@/components/ui/EmptyState';
+import { ListChecks, ChevronRight } from 'lucide-react';
 
 export type ExecutionRow = {
   id: string;
@@ -40,10 +41,20 @@ function formatDuration(startedAt: string, finishedAt: string | null): string {
 export function ExecutionsHistoryTable({ executions }: { executions: ExecutionRow[] }) {
   if (executions.length === 0) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white py-16 text-center">
-        <p className="text-slate-500">No executions match the current filters.</p>
-        <p className="mt-1 text-sm text-slate-400">Try changing filters or run a workflow.</p>
-      </div>
+      <EmptyState
+        icon={<ListChecks className="h-6 w-6" />}
+        title="No executions yet"
+        description="Run a workflow to see execution history here. You can also adjust filters to find specific runs."
+        action={
+          <Link
+            href="/workflows"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+          >
+            View workflows
+          </Link>
+        }
+        compact
+      />
     );
   }
 
