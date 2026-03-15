@@ -3,21 +3,18 @@ import { notFound } from 'next/navigation';
 import { API_BASE } from '@/lib/api';
 import { ExecutionStatusBadge } from '@/components/executions/ExecutionStatusBadge';
 import { TriggerBadge } from '@/components/workflows/TriggerBadge';
-import { ArrowLeft, Clock, FileCode, AlertCircle } from 'lucide-react';
-
-type Step = {
-  id: string;
-  nodeId: string;
-  nodeName: string | null;
-  nodeType: string;
-  status: string;
-  inputData: unknown;
-  outputData: unknown;
-  errorMessage: string | null;
-  retryCount: number;
-  startedAt: string;
-  finishedAt: string | null;
-};
+import { ErrorBlock } from '@/components/executions/ErrorBlock';
+import { StepCard } from '@/components/executions/StepCard';
+import type { StepData } from '@/components/executions/StepCard';
+import { CodePanel } from '@/components/executions/CodePanel';
+import {
+  ArrowLeft,
+  Clock,
+  Workflow,
+  ListOrdered,
+  Inbox,
+  Outbox,
+} from 'lucide-react';
 
 type ExecutionDetail = {
   id: string;
@@ -29,7 +26,7 @@ type ExecutionDetail = {
   errorMessage: string | null;
   startedAt: string;
   finishedAt: string | null;
-  steps: Step[];
+  steps: StepData[];
   workflow: { id: string; name: string; status: string; isPaused: boolean };
 };
 
@@ -52,13 +49,6 @@ function formatTs(s: string): string {
   });
 }
 
-function stepDuration(startedAt: string, finishedAt: string | null): string {
-  if (!finishedAt) return '—';
-  const ms = new Date(finishedAt).getTime() - new Date(startedAt).getTime();
-  if (ms < 1000) return `${ms}ms`;
-  return `${(ms / 1000).toFixed(2)}s`;
-}
-
 function execDuration(startedAt: string, finishedAt: string | null): string {
   if (!finishedAt) return '—';
   const ms = new Date(finishedAt).getTime() - new Date(startedAt).getTime();
@@ -77,8 +67,11 @@ export default async function ExecutionDetailPage({
   const execution = await getExecution(id);
   if (!execution) notFound();
 
+  const hasError = !!execution.errorMessage;
+  const failedStepIndex = execution.steps.findIndex((s) => s.status === 'failed');
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <Link
         href="/executions"
         className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900"
@@ -87,122 +80,131 @@ export default async function ExecutionDetailPage({
         Back to execution history
       </Link>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
+      {/* ——— Execution summary ——— */}
+      <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
         <div className="border-b border-slate-200 bg-slate-50/80 px-5 py-4">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div className="min-w-0">
-              <p className="font-mono text-sm text-slate-500 truncate" title={execution.id}>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Execution summary
+          </h2>
+        </div>
+        <div className="p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="space-y-3">
+              <p className="font-mono text-sm text-slate-500" title={execution.id}>
                 {execution.id}
               </p>
-              <h1 className="mt-0.5 text-lg font-semibold text-slate-900">
-                {execution.workflow.name}
-              </h1>
-              <div className="mt-2 flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
+                <Link
+                  href={`/workflows/${execution.workflowId}`}
+                  className="inline-flex items-center gap-1.5 font-semibold text-slate-900 hover:text-accent"
+                >
+                  <Workflow className="h-4 w-4" />
+                  {execution.workflow.name}
+                </Link>
                 <TriggerBadge trigger={execution.triggerType} />
                 <ExecutionStatusBadge status={execution.status} />
               </div>
+              <p className="text-sm text-slate-600">
+                Workflow status: {execution.workflow.isPaused ? 'Paused' : execution.workflow.status}
+              </p>
             </div>
-            <dl className="mt-2 sm:mt-0 flex flex-wrap gap-x-6 gap-y-1 text-sm text-slate-600">
-              <div className="flex items-center gap-1.5">
+            <dl className="grid grid-cols-1 gap-x-8 gap-y-2 text-sm sm:grid-cols-3">
+              <div className="flex items-center gap-2 text-slate-600">
                 <Clock className="h-4 w-4 shrink-0 text-slate-400" />
                 <span>Started {formatTs(execution.startedAt)}</span>
               </div>
               {execution.finishedAt && (
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-2 text-slate-600">
                   <Clock className="h-4 w-4 shrink-0 text-slate-400" />
                   <span>Finished {formatTs(execution.finishedAt)}</span>
                 </div>
               )}
-              <div className="font-mono text-slate-700">
+              <div className="font-mono font-medium text-slate-700">
                 Duration: {execDuration(execution.startedAt, execution.finishedAt)}
               </div>
             </dl>
           </div>
         </div>
+      </section>
 
-        {execution.errorMessage && (
-          <div className="border-b border-red-100 bg-red-50 px-5 py-4">
-            <div className="flex gap-2">
-              <AlertCircle className="h-5 w-5 shrink-0 text-red-600" aria-hidden />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-red-800">Execution error</p>
-                <pre className="mt-1 whitespace-pre-wrap break-words font-mono text-sm text-red-700">
-                  {execution.errorMessage}
-                </pre>
-              </div>
-            </div>
-          </div>
-        )}
+      {/* ——— Execution-level error ——— */}
+      {hasError && (
+        <section>
+          <ErrorBlock
+            title="Execution failed"
+            message={execution.errorMessage!}
+            subtitle={
+              failedStepIndex >= 0
+                ? `Failure at step ${failedStepIndex + 1}: ${execution.steps[failedStepIndex]?.nodeName || execution.steps[failedStepIndex]?.nodeId}`
+                : undefined
+            }
+          />
+        </section>
+      )}
 
-        <div className="px-5 py-3 border-b border-slate-200">
-          <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-slate-500">
-            <FileCode className="h-4 w-4" />
-            Step logs
+      {/* ——— Step timeline ——— */}
+      <section>
+        <div className="mb-4 flex items-center gap-2">
+          <ListOrdered className="h-5 w-5 text-slate-500" />
+          <h2 className="text-lg font-semibold text-slate-900">
+            Execution steps
+            {execution.steps.length > 0 && (
+              <span className="ml-2 text-sm font-normal text-slate-500">
+                ({execution.steps.length} step{execution.steps.length !== 1 ? 's' : ''})
+              </span>
+            )}
           </h2>
         </div>
-        <ul className="divide-y divide-slate-200">
-          {execution.steps.length === 0 ? (
-            <li className="px-5 py-10 text-center text-slate-500 text-sm">
-              No steps recorded.
-            </li>
-          ) : (
-            execution.steps.map((step, i) => (
-              <li key={step.id} className="px-5 py-4 hover:bg-slate-50/50">
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span className="font-mono text-xs text-slate-400">#{i + 1}</span>
-                  <span className="font-medium text-slate-800">
-                    {step.nodeName || step.nodeId}
-                  </span>
-                  <span className="text-slate-500 text-sm">({step.nodeType})</span>
-                  <ExecutionStatusBadge status={step.status} />
-                  <span className="text-xs text-slate-400 tabular-nums">
-                    {stepDuration(step.startedAt, step.finishedAt)}
-                  </span>
-                  {step.retryCount > 0 && (
-                    <span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-800">
-                      {step.retryCount} retries
-                    </span>
-                  )}
-                </div>
-                {step.errorMessage && (
-                  <p className="mt-2 text-sm text-red-600 font-mono">{step.errorMessage}</p>
-                )}
-                <details className="mt-2 group">
-                  <summary className="cursor-pointer text-xs font-medium text-slate-500 hover:text-slate-700">
-                    View input / output
-                  </summary>
-                  <pre className="mt-2 overflow-auto max-h-64 rounded-lg border border-slate-200 bg-slate-50 p-3 font-mono text-xs text-slate-700">
-                    {JSON.stringify(
-                      { input: step.inputData, output: step.outputData },
-                      null,
-                      2
-                    )}
-                  </pre>
-                </details>
-              </li>
-            ))
-          )}
-        </ul>
-      </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <details className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden group">
-          <summary className="cursor-pointer border-b border-slate-200 px-4 py-3 text-sm font-semibold uppercase tracking-wider text-slate-500 hover:bg-slate-50">
-            Trigger input
-          </summary>
-          <pre className="overflow-auto max-h-64 p-4 font-mono text-xs text-slate-700 bg-slate-50/50">
-            {JSON.stringify(execution.inputPayload ?? {}, null, 2)}
-          </pre>
-        </details>
-        <details className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden group">
-          <summary className="cursor-pointer border-b border-slate-200 px-4 py-3 text-sm font-semibold uppercase tracking-wider text-slate-500 hover:bg-slate-50">
-            Final output
-          </summary>
-          <pre className="overflow-auto max-h-64 p-4 font-mono text-xs text-slate-700 bg-slate-50/50">
-            {JSON.stringify(execution.outputPayload ?? {}, null, 2)}
-          </pre>
-        </details>
-      </div>
+        {execution.steps.length === 0 ? (
+          <div className="rounded-xl border border-slate-200 border-dashed bg-slate-50/50 py-12 text-center text-slate-500">
+            No steps recorded for this execution.
+          </div>
+        ) : (
+          <div className="space-y-0">
+            {execution.steps.map((step, i) => (
+              <StepCard
+                key={step.id}
+                step={step}
+                index={i}
+                isLast={i === execution.steps.length - 1}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ——— Input / Output payloads ——— */}
+      <section>
+        <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-slate-900">
+          <Inbox className="h-5 w-5 text-slate-500" />
+          Payloads
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <h3 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-600">
+              <Inbox className="h-4 w-4" />
+              Input (trigger)
+            </h3>
+            <CodePanel
+              title="Input payload"
+              content={JSON.stringify(execution.inputPayload ?? {}, null, 2)}
+              defaultOpen={true}
+            />
+          </div>
+          <div>
+            <h3 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-600">
+              <Outbox className="h-4 w-4" />
+              Output (result)
+            </h3>
+            <CodePanel
+              title="Output payload"
+              content={JSON.stringify(execution.outputPayload ?? {}, null, 2)}
+              defaultOpen={execution.status === 'success'}
+            />
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
