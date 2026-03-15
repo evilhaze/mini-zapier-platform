@@ -14,7 +14,7 @@ import {
   Workflow,
   ListOrdered,
   Inbox,
-  Outbox,
+  FileOutput,
   ListTree,
 } from 'lucide-react';
 
@@ -198,7 +198,7 @@ export default async function ExecutionDetailPage({
           </div>
           <div>
             <h3 className="mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-600">
-              <Outbox className="h-4 w-4" />
+              <FileOutput className="h-4 w-4" />
               Output (result)
             </h3>
             <CodePanel

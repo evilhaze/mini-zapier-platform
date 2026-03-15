@@ -21,8 +21,8 @@ export function ExecutionsHistoryView({
   page: initialPage,
 }: Props) {
   const searchParams = useSearchParams();
-  const status = searchParams.get('status') ?? '';
-  const workflowId = searchParams.get('workflowId') ?? '';
+  const status = searchParams?.get('status') ?? '';
+  const workflowId = searchParams?.get('workflowId') ?? '';
 
   const [executions, setExecutions] = useState<ExecutionRow[]>(initialExecutions);
   const [page, setPage] = useState(initialPage);

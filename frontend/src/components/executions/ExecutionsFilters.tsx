@@ -20,11 +20,11 @@ type Props = {
 export function ExecutionsFilters({ workflows }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const status = searchParams.get('status') ?? '';
-  const workflowId = searchParams.get('workflowId') ?? '';
+  const status = searchParams?.get('status') ?? '';
+  const workflowId = searchParams?.get('workflowId') ?? '';
 
   const setFilter = (key: string, value: string) => {
-    const next = new URLSearchParams(searchParams.toString());
+    const next = new URLSearchParams(searchParams?.toString() ?? '');
     if (value) next.set(key, value);
     else next.delete(key);
     next.delete('page');
