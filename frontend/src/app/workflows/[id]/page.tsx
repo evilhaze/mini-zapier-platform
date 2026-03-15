@@ -66,7 +66,7 @@ export default async function WorkflowDetailPage({
             <h1 className="text-2xl font-semibold text-slate-900">{workflow.name}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <StatusBadge status={status} />
-              <TriggerBadge triggerType={workflow.triggerType} />
+              <TriggerBadge trigger={workflow.triggerType} />
             </div>
             <dl className="mt-4 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
               <div className="flex items-center gap-2 text-slate-500">
@@ -88,7 +88,11 @@ export default async function WorkflowDetailPage({
               </div>
             </dl>
           </div>
-          <WorkflowDetailActions workflowId={workflow.id} isPaused={workflow.isPaused} />
+          <WorkflowDetailActions
+            workflowId={workflow.id}
+            workflowName={workflow.name}
+            isPaused={workflow.isPaused}
+          />
         </div>
       </div>
 

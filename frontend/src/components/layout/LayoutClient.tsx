@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Toaster } from 'sonner';
 import { Sidebar } from './Sidebar';
 import { Topbar } from './Topbar';
 
@@ -8,7 +9,16 @@ export function LayoutClient({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen">
+    <>
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+        toastOptions={{
+          style: { border: '1px solid var(--tw-slate-200, #e2e8f0)' },
+        }}
+      />
+      <div className="flex min-h-screen">
       <Sidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
@@ -22,5 +32,6 @@ export function LayoutClient({ children }: { children: React.ReactNode }) {
         </main>
       </div>
     </div>
+    </>
   );
 }

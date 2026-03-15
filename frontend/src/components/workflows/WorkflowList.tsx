@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import {
   Plus,
   Search,
@@ -25,6 +26,7 @@ import {
 import { StatusBadge } from './StatusBadge';
 import { TriggerBadge } from './TriggerBadge';
 import { CreateWorkflowModal } from './CreateWorkflowModal';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 const STATUS_FILTERS = [
   { value: 'all', label: 'All' },
@@ -57,17 +59,17 @@ export function WorkflowList() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [actionId, setActionId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
       const data = await fetchWorkflowsWithStats();
       setWorkflows(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load');
+      toast.error(e instanceof Error ? e.message : 'Failed to load workflows');
       setWorkflows([]);
     } finally {
       setLoading(false);
@@ -94,10 +96,10 @@ export function WorkflowList() {
     setActionId(id);
     try {
       const { executionId } = await runWorkflow(id);
+      toast.success('Execution started');
       router.push(`/executions/${executionId}`);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Run failed');
-    } finally {
+      toast.error(e instanceof Error ? e.message : 'Run failed');
       setActionId(null);
     }
   };
@@ -106,9 +108,10 @@ export function WorkflowList() {
     setActionId(id);
     try {
       await pauseWorkflow(id);
+      toast.success('Workflow paused');
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Pause failed');
+      toast.error(e instanceof Error ? e.message : 'Pause failed');
     } finally {
       setActionId(null);
     }
@@ -118,24 +121,31 @@ export function WorkflowList() {
     setActionId(id);
     try {
       await resumeWorkflow(id);
+      toast.success('Workflow resumed');
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Resume failed');
+      toast.error(e instanceof Error ? e.message : 'Resume failed');
     } finally {
       setActionId(null);
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (typeof window !== 'undefined' && !window.confirm(`Delete "${name}"? This cannot be undone.`)) return;
-    setActionId(id);
+  const handleDeleteClick = (id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) return;
+    setDeleteLoading(true);
     try {
-      await deleteWorkflow(id);
+      await deleteWorkflow(deleteTarget.id);
+      toast.success(`"${deleteTarget.name}" deleted`);
+      setDeleteTarget(null);
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Delete failed');
+      toast.error(e instanceof Error ? e.message : 'Delete failed');
     } finally {
-      setActionId(null);
+      setDeleteLoading(false);
     }
   };
 
@@ -189,12 +199,6 @@ export function WorkflowList() {
           ))}
         </div>
       </div>
-
-      {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
-          {error}
-        </div>
-      )}
 
       {loading ? (
         <div className="flex items-center justify-center rounded-xl border border-slate-200 bg-white py-16">
@@ -333,7 +337,7 @@ export function WorkflowList() {
                           )}
                           <button
                             type="button"
-                            onClick={() => handleDelete(w.id, w.name)}
+                            onClick={() => handleDeleteClick(w.id, w.name)}
                             disabled={busy}
                             className="rounded p-2 text-slate-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
                             title="Delete"
@@ -415,7 +419,7 @@ export function WorkflowList() {
                     )}
                     <button
                       type="button"
-                      onClick={() => handleDelete(w.id, w.name)}
+                      onClick={() => handleDeleteClick(w.id, w.name)}
                       disabled={busy}
                       className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
                     >
@@ -434,6 +438,21 @@ export function WorkflowList() {
         open={createModalOpen}
         onClose={() => setCreateModalOpen(false)}
         onCreated={load}
+      />
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteConfirm}
+        title="Delete workflow"
+        description={
+          deleteTarget
+            ? `Delete "${deleteTarget.name}"? This cannot be undone. All execution history for this workflow will be removed.`
+            : ''
+        }
+        confirmLabel="Delete"
+        variant="danger"
+        loading={deleteLoading}
       />
     </div>
   );
