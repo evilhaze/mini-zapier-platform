@@ -16,7 +16,8 @@ const icons: Record<string, React.ComponentType<{ className?: string }>> = {
 
 function ActionNode({ data, selected }: NodeProps<Node<FlowNodeData>>) {
   const Icon = icons[data.type] ?? Code;
-  const title = data.name || data.label || NODE_LABELS[data.type] || data.type;
+  const subtype = NODE_LABELS[data.type] || data.type;
+  const title = data.name || data.label || subtype;
   const description = ACTION_DESCRIPTIONS[data.type] ?? 'Process data in the workflow';
 
   return (
@@ -44,7 +45,7 @@ function ActionNode({ data, selected }: NodeProps<Node<FlowNodeData>>) {
           </div>
           <div className="min-w-0 flex-1 pt-0.5">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500">
-              Action
+              Action · {subtype}
             </p>
             <p className="mt-0.5 truncate text-sm font-semibold text-slate-900">{title}</p>
             <p className="mt-1 line-clamp-2 text-xs text-slate-500">{description}</p>

@@ -15,8 +15,8 @@ const icons: Record<string, React.ComponentType<{ className?: string }>> = {
 
 function TriggerNode({ data, selected }: NodeProps<Node<FlowNodeData>>) {
   const Icon = icons[data.type] ?? Zap;
-  const title = data.name || data.label || NODE_LABELS[data.type] || data.type;
-  const typeLabel = NODE_LABELS[data.type] || data.type;
+  const subtype = NODE_LABELS[data.type] || data.type;
+  const title = data.name || data.label || subtype;
   const description = TRIGGER_DESCRIPTIONS[data.type] ?? 'Starts the workflow';
 
   return (
@@ -44,7 +44,7 @@ function TriggerNode({ data, selected }: NodeProps<Node<FlowNodeData>>) {
           </div>
           <div className="min-w-0 flex-1 pt-0.5">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-violet-500">
-              Trigger
+              Trigger · {subtype}
             </p>
             <p className="mt-0.5 truncate text-sm font-semibold text-slate-900">{title}</p>
             <p className="mt-1 line-clamp-2 text-xs text-slate-500">{description}</p>
