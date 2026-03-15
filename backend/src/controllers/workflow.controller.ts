@@ -74,7 +74,10 @@ export const workflowController = {
     if (!parsed.success) {
       return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
     }
-    const workflow = await workflowService.findById(parsed.data.id);
+    const withStats = req.query.stats === '1' || req.query.stats === 'true';
+    const workflow = withStats
+      ? await workflowService.findByIdWithStats(parsed.data.id)
+      : await workflowService.findById(parsed.data.id);
     if (!workflow) {
       return res.status(404).json({ error: 'Workflow not found' });
     }

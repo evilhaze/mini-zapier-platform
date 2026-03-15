@@ -103,6 +103,11 @@ export const workflowService = {
     });
   },
 
+  async findByIdWithStats(id: string): Promise<WorkflowWithStats | null> {
+    const list = await this.findAllWithStats();
+    return list.find((w) => w.id === id) ?? null;
+  },
+
   async create(data: WorkflowCreateInput) {
     return prisma.workflow.create({
       data: {

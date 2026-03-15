@@ -24,6 +24,15 @@ export async function fetchWorkflowsWithStats(): Promise<WorkflowWithStats[]> {
   return res.json();
 }
 
+export async function fetchWorkflowWithStats(id: string): Promise<WorkflowWithStats | null> {
+  const res = await fetch(`${API_BASE}/workflows/${id}?stats=1`, {
+    cache: 'no-store',
+    headers: { Accept: 'application/json' },
+  });
+  if (!res.ok) return null;
+  return res.json();
+}
+
 export async function runWorkflow(
   id: string,
   inputPayload?: Record<string, unknown>
