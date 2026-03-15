@@ -43,6 +43,9 @@ export const executionService = {
         orderBy: { startedAt: 'desc' },
         skip,
         take: limit,
+        include: {
+          workflow: { select: { id: true, name: true } },
+        },
       }),
       prisma.execution.count({ where }),
     ]);
