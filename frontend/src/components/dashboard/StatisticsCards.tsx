@@ -15,43 +15,57 @@ export type OverviewStats = {
 const cards: {
   key: keyof OverviewStats;
   label: string;
+  subtitle?: string;
   suffix?: string;
   accent?: boolean;
 }[] = [
   { key: 'totalWorkflows', label: 'Total workflows' },
-  { key: 'activeWorkflows', label: 'Active' },
-  { key: 'pausedWorkflows', label: 'Paused' },
+  { key: 'activeWorkflows', label: 'Active', subtitle: 'workflows' },
+  { key: 'pausedWorkflows', label: 'Paused', subtitle: 'workflows' },
   { key: 'totalExecutions', label: 'Total executions' },
-  { key: 'successfulExecutions', label: 'Successful' },
-  { key: 'failedExecutions', label: 'Failed' },
-  { key: 'pausedExecutions', label: 'Paused (executions)' },
-  { key: 'successRate', label: 'Success rate', suffix: '%', accent: true },
-  { key: 'recentExecutionsCount', label: 'Last 24h' },
+  { key: 'successfulExecutions', label: 'Successful', subtitle: 'executions' },
+  { key: 'failedExecutions', label: 'Failed', subtitle: 'executions' },
+  { key: 'pausedExecutions', label: 'Paused', subtitle: 'executions' },
+  { key: 'successRate', label: 'Success rate', subtitle: 'of all runs', suffix: '%', accent: true },
+  { key: 'recentExecutionsCount', label: 'Last 24h', subtitle: 'executions' },
 ];
+
+function formatValue(value: number, key: string): string {
+  if (key === 'successRate') return (value * 100).toFixed(1);
+  return value >= 1000 ? value.toLocaleString() : String(value);
+}
 
 export function StatisticsCards({ stats }: { stats: OverviewStats }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {cards.map(({ key, label, suffix = '', accent }) => {
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {cards.map(({ key, label, subtitle, suffix = '', accent }) => {
         const value = stats[key];
-        const display =
-          typeof value === 'number' && key === 'successRate'
-            ? (value * 100).toFixed(1)
-            : String(value);
+        const display = typeof value === 'number' ? formatValue(value, key) : String(value);
         return (
           <div
             key={key}
-            className="rounded-xl border border-slate-200 bg-white p-5 shadow-card transition-shadow hover:shadow-card-hover"
+            className={`rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-card ${
+              accent
+                ? 'border-accent/20'
+                : 'border-slate-200/80'
+            }`}
           >
-            <p className="text-sm font-medium text-slate-500">{label}</p>
-            <p
-              className={`mt-1 text-2xl font-semibold tabular-nums ${
-                accent ? 'text-accent' : 'text-slate-900'
-              }`}
-            >
-              {display}
-              {suffix}
-            </p>
+            <div className="p-5">
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+                {label}
+              </p>
+              <p
+                className={`mt-2 text-2xl font-semibold tabular-nums tracking-tight ${
+                  accent ? 'text-accent' : 'text-slate-900'
+                }`}
+              >
+                {display}
+                {suffix}
+              </p>
+              {subtitle && (
+                <p className="mt-0.5 text-xs text-slate-400">{subtitle}</p>
+              )}
+            </div>
           </div>
         );
       })}
