@@ -3,12 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --sidebar-w: 16rem;
+  --sidebar-w: 15rem;
   --topbar-h: 3.5rem;
-  /* Page container & spacing */
-  --container-max-w: 80rem;
-  --page-x: 1.5rem;
+  --container-max-w: 76rem;
+  --page-x: 1.25rem;
   --page-y: 1.5rem;
+  --radius-card: 0.75rem;
+  --radius-button: 0.5rem;
+  --radius-input: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --page-x: 1.5rem;
+    --page-y: 1.75rem;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -19,7 +28,7 @@
 }
 
 body {
-  @apply bg-surface-50 text-slate-800 antialiased;
+  @apply bg-slate-50 text-slate-800 antialiased;
 }
 
 @layer utilities {

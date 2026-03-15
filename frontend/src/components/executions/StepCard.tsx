@@ -65,7 +65,7 @@ export function StepCard({ step, index, isLast }: Props) {
       {/* Card content */}
       <div className="flex-1 min-w-0 pb-8">
         <div
-          className={`rounded-xl border-2 bg-white shadow-sm overflow-hidden ${
+          className={`rounded-card border-2 bg-white shadow-soft overflow-hidden ${
             failed
               ? 'border-red-200'
               : success

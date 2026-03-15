@@ -76,15 +76,14 @@ export default async function ExecutionDetailPage({
     <div className="space-y-8">
       <Link
         href="/executions"
-        className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+        className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to execution history
       </Link>
 
-      {/* ——— Execution summary ——— */}
-      <section className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-        <div className="border-b border-slate-200 bg-slate-50/80 px-5 py-4">
+      <section className="rounded-card border border-slate-200/80 bg-white shadow-card overflow-hidden">
+        <div className="border-b border-slate-200/80 bg-slate-50/80 px-5 py-4">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
             Execution summary
           </h2>
@@ -148,7 +147,7 @@ export default async function ExecutionDetailPage({
       <section>
         <div className="mb-4 flex items-center gap-2">
           <ListOrdered className="h-5 w-5 text-slate-500" />
-          <h2 className="text-lg font-semibold text-slate-900">
+          <h2 className="text-lg font-semibold tracking-tight text-slate-900">
             Execution steps
             {execution.steps.length > 0 && (
               <span className="ml-2 text-sm font-normal text-slate-500">

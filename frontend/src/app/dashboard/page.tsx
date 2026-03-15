@@ -31,10 +31,10 @@ export default async function DashboardPage() {
   const stats = await getStats();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
-        <p className="mt-1 text-slate-500">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Dashboard</h1>
+        <p className="mt-1.5 text-sm text-slate-500">
           Overview of workflows and execution statistics
         </p>
       </div>
@@ -49,7 +49,7 @@ export default async function DashboardPage() {
             action={
               <Link
                 href="/workflows"
-                className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+                className="inline-flex items-center gap-2 rounded-btn bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-dark transition-colors"
               >
                 <GitBranch className="h-4 w-4" />
                 Create workflow
@@ -61,19 +61,19 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      <section className="flex flex-wrap gap-4">
+      <section className="flex flex-wrap gap-3">
         <Link
           href="/workflows"
-          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-card hover:border-accent/30 hover:text-accent"
+          className="flex items-center gap-2.5 rounded-card border border-slate-200/80 bg-white px-5 py-3.5 text-sm font-medium text-slate-700 shadow-card hover:shadow-card-hover hover:border-slate-300/80 hover:text-accent transition-all"
         >
-          <GitBranch className="h-4 w-4" />
+          <GitBranch className="h-4 w-4 text-slate-400" />
           View all workflows
         </Link>
         <Link
           href="/executions"
-          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-card hover:border-accent/30 hover:text-accent"
+          className="flex items-center gap-2.5 rounded-card border border-slate-200/80 bg-white px-5 py-3.5 text-sm font-medium text-slate-700 shadow-card hover:shadow-card-hover hover:border-slate-300/80 hover:text-accent transition-all"
         >
-          <ListChecks className="h-4 w-4" />
+          <ListChecks className="h-4 w-4 text-slate-400" />
           View executions
         </Link>
       </section>

@@ -59,9 +59,9 @@ export function ExecutionsHistoryTable({ executions }: { executions: ExecutionRo
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-card border border-slate-200/80 bg-white shadow-card">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200" role="table">
+        <table className="min-w-full divide-y divide-slate-200/80" role="table">
           <thead>
             <tr className="bg-slate-50/90">
               <th
@@ -105,9 +105,9 @@ export function ExecutionsHistoryTable({ executions }: { executions: ExecutionRo
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200 bg-white">
-            {executions.map((e) => (
-              <tr key={e.id} className="hover:bg-slate-50/70 transition-colors">
+        <tbody className="divide-y divide-slate-200/80 bg-white">
+          {executions.map((e) => (
+            <tr key={e.id} className="hover:bg-slate-50/70 transition-colors">
                 <td className="whitespace-nowrap px-5 py-3.5">
                   <Link
                     href={`/workflows/${e.workflowId}`}
@@ -134,7 +134,7 @@ export function ExecutionsHistoryTable({ executions }: { executions: ExecutionRo
                 <td className="whitespace-nowrap px-5 py-3.5 text-right">
                   <Link
                     href={`/executions/${e.id}`}
-                    className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 hover:border-slate-300"
+                    className="inline-flex items-center gap-1 rounded-btn border border-slate-200/80 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-soft hover:bg-slate-50 hover:border-slate-300 transition-colors"
                     aria-label={`View execution ${e.id}`}
                   >
                     Details

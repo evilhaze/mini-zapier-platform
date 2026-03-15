@@ -153,25 +153,23 @@ export function WorkflowList() {
 
   return (
     <div className="space-y-6">
-      {/* Header + Create */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Workflows</h1>
-          <p className="mt-1 text-slate-500">
+          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Workflows</h1>
+          <p className="mt-1.5 text-sm text-slate-500">
             Create and manage automation workflows
           </p>
         </div>
         <button
           type="button"
           onClick={() => setCreateModalOpen(true)}
-          className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-card hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2"
+          className="inline-flex items-center gap-2 rounded-btn bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-colors"
         >
           <Plus className="h-4 w-4" />
           Create workflow
         </button>
       </div>
 
-      {/* Search + Filters */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -180,7 +178,7 @@ export function WorkflowList() {
             placeholder="Search workflows..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-slate-200 bg-white py-3 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            className="w-full rounded-input border border-slate-200/80 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-shadow"
             aria-label="Search workflows"
           />
         </div>
@@ -190,10 +188,10 @@ export function WorkflowList() {
               key={f.value}
               type="button"
               onClick={() => setStatusFilter(f.value)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-btn px-3 py-2 text-sm font-medium transition-colors ${
                 statusFilter === f.value
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
+                  ? 'bg-slate-800 text-white'
+                  : 'bg-white border border-slate-200/80 text-slate-600 hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300'
               }`}
             >
               {f.label}
@@ -235,7 +233,7 @@ export function WorkflowList() {
               <button
                 type="button"
                 onClick={() => setCreateModalOpen(true)}
-                className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+                className="inline-flex items-center gap-2 rounded-btn bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-dark transition-colors"
               >
                 <Plus className="h-4 w-4" />
                 Create workflow
@@ -246,10 +244,10 @@ export function WorkflowList() {
       ) : (
         <>
           {/* Table (desktop) */}
-          <div className="hidden overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card lg:block">
-            <table className="min-w-full divide-y divide-slate-200" role="table">
+          <div className="hidden overflow-hidden rounded-card border border-slate-200/80 bg-white shadow-card lg:block">
+            <table className="min-w-full divide-y divide-slate-200/80" role="table">
               <thead>
-                <tr className="bg-slate-50/80">
+                <tr className="bg-slate-50/90">
                   <th scope="col" className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
                     Name
                   </th>
@@ -276,13 +274,13 @@ export function WorkflowList() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200 bg-white">
+              <tbody className="divide-y divide-slate-200/80 bg-white">
                 {filtered.map((w) => {
                   const status = w.isPaused ? 'paused' : w.status;
                   const busy = actionId === w.id;
                   return (
-                    <tr key={w.id} className="hover:bg-slate-50/50">
-                      <td className="whitespace-nowrap px-5 py-4">
+                    <tr key={w.id} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="whitespace-nowrap px-5 py-3.5">
                         <Link
                           href={`/workflows/${w.id}`}
                           className="font-medium text-slate-900 hover:text-accent"
@@ -290,29 +288,29 @@ export function WorkflowList() {
                           {w.name}
                         </Link>
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4">
+                      <td className="whitespace-nowrap px-5 py-3.5">
                         <TriggerBadge trigger={w.triggerType} />
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4">
+                      <td className="whitespace-nowrap px-5 py-3.5">
                         <StatusBadge status={status} />
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-600">
+                      <td className="whitespace-nowrap px-5 py-3.5 text-sm text-slate-600">
                         {formatDate(w.lastRunAt)}
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-sm text-slate-500">
+                      <td className="whitespace-nowrap px-5 py-3.5 text-sm text-slate-500">
                         {new Date(w.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-right text-sm tabular-nums text-slate-600">
+                      <td className="whitespace-nowrap px-5 py-3.5 text-right text-sm tabular-nums text-slate-600">
                         {w.executionCount}
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4 text-right text-sm tabular-nums text-slate-600">
+                      <td className="whitespace-nowrap px-5 py-3.5 text-right text-sm tabular-nums text-slate-600">
                         {formatRate(w.successRate)}
                       </td>
-                      <td className="whitespace-nowrap px-5 py-4">
-                        <div className="flex items-center justify-end gap-1">
+                      <td className="whitespace-nowrap px-5 py-3.5">
+                        <div className="flex items-center justify-end gap-0.5">
                           <Link
                             href={`/editor/${w.id}`}
-                            className="rounded p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                            className="rounded-btn p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors"
                             title="Open editor"
                             aria-label={`Edit ${w.name}`}
                           >
@@ -322,7 +320,7 @@ export function WorkflowList() {
                             type="button"
                             onClick={() => handleRun(w.id)}
                             disabled={busy}
-                            className="rounded p-2 text-slate-400 hover:bg-slate-100 hover:text-accent disabled:opacity-50"
+                            className="rounded-btn p-2 text-slate-400 hover:bg-slate-100 hover:text-accent disabled:opacity-50 transition-colors"
                             title="Run once"
                             aria-label={`Run ${w.name}`}
                           >
@@ -333,18 +331,18 @@ export function WorkflowList() {
                               type="button"
                               onClick={() => handleResume(w.id)}
                               disabled={busy}
-                              className="rounded p-2 text-slate-400 hover:bg-slate-100 hover:text-accent disabled:opacity-50"
+                            className="rounded-btn p-2 text-slate-400 hover:bg-slate-100 hover:text-accent disabled:opacity-50 transition-colors"
                               title="Resume"
-                              aria-label={`Resume ${w.name}`}
-                            >
-                              <Play className="h-4 w-4" />
-                            </button>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => handlePause(w.id)}
-                              disabled={busy}
-                              className="rounded p-2 text-slate-400 hover:bg-slate-100 hover:text-amber-600 disabled:opacity-50"
+                            aria-label={`Resume ${w.name}`}
+                          >
+                            <Play className="h-4 w-4" />
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handlePause(w.id)}
+                            disabled={busy}
+                            className="rounded-btn p-2 text-slate-400 hover:bg-slate-100 hover:text-amber-600 disabled:opacity-50 transition-colors"
                               title="Pause"
                               aria-label={`Pause ${w.name}`}
                             >
@@ -355,7 +353,7 @@ export function WorkflowList() {
                             type="button"
                             onClick={() => handleDeleteClick(w.id, w.name)}
                             disabled={busy}
-                            className="rounded p-2 text-slate-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+                            className="rounded-btn p-2 text-slate-400 hover:bg-red-50 hover:text-red-600 disabled:opacity-50 transition-colors"
                             title="Delete"
                             aria-label={`Delete ${w.name}`}
                           >
@@ -371,14 +369,14 @@ export function WorkflowList() {
           </div>
 
           {/* Cards (mobile) */}
-          <div className="space-y-4 lg:hidden">
+          <div className="space-y-3 lg:hidden">
             {filtered.map((w) => {
               const status = w.isPaused ? 'paused' : w.status;
               const busy = actionId === w.id;
               return (
                 <div
                   key={w.id}
-                  className="rounded-xl border border-slate-200 bg-white p-4 shadow-card"
+                  className="rounded-card border border-slate-200/80 bg-white p-4 shadow-card"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <Link
@@ -398,7 +396,7 @@ export function WorkflowList() {
                   <div className="mt-3 flex flex-wrap items-center gap-2">
                     <Link
                       href={`/editor/${w.id}`}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                      className="inline-flex items-center gap-1.5 rounded-btn border border-slate-200/80 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                       Editor
@@ -407,7 +405,7 @@ export function WorkflowList() {
                       type="button"
                       onClick={() => handleRun(w.id)}
                       disabled={busy}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                      className="inline-flex items-center gap-1.5 rounded-btn border border-slate-200/80 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50 transition-colors"
                     >
                       {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <PlayCircle className="h-3.5 w-3.5" />}
                       Run
@@ -417,7 +415,7 @@ export function WorkflowList() {
                         type="button"
                         onClick={() => handleResume(w.id)}
                         disabled={busy}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        className="inline-flex items-center gap-1.5 rounded-btn border border-slate-200/80 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                       >
                         <Play className="h-3.5 w-3.5" />
                         Resume
@@ -427,7 +425,7 @@ export function WorkflowList() {
                         type="button"
                         onClick={() => handlePause(w.id)}
                         disabled={busy}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                        className="inline-flex items-center gap-1.5 rounded-btn border border-slate-200/80 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition-colors"
                       >
                         <PauseCircle className="h-3.5 w-3.5" />
                         Pause
@@ -437,7 +435,7 @@ export function WorkflowList() {
                       type="button"
                       onClick={() => handleDeleteClick(w.id, w.name)}
                       disabled={busy}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-sm font-medium text-red-600 hover:bg-red-50"
+                      className="inline-flex items-center gap-1.5 rounded-btn border border-red-200/80 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                       Delete

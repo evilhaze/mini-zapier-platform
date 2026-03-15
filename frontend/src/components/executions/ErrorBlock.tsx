@@ -12,7 +12,7 @@ type Props = {
 export function ErrorBlock({ title, message, subtitle }: Props) {
   return (
     <div
-      className="rounded-lg border-2 border-red-200 bg-red-50 p-4 shadow-sm"
+      className="rounded-card border-2 border-red-200 bg-red-50 p-4 shadow-soft"
       role="alert"
     >
       <div className="flex gap-3">

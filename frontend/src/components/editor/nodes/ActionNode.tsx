@@ -23,9 +23,9 @@ function ActionNode({ data, selected }: NodeProps<Node<FlowNodeData>>) {
   return (
     <div
       className={`
-        relative min-w-[200px] max-w-[220px] overflow-hidden rounded-xl bg-white text-left shadow-md
+        relative min-w-[200px] max-w-[220px] overflow-hidden rounded-card bg-white text-left shadow-soft
         ring-1 ring-slate-200/80
-        ${selected ? 'ring-2 ring-accent shadow-lg' : 'hover:ring-slate-300'}
+        ${selected ? 'ring-2 ring-accent shadow-card-hover' : 'hover:ring-slate-300'}
       `}
     >
       {/* Top handle */}

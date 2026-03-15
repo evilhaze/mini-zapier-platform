@@ -52,7 +52,7 @@ export function ConfirmDialog({
         onClick={onClose}
         aria-hidden
       />
-      <div className="relative w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 shadow-xl">
+      <div className="relative w-full max-w-md rounded-card border border-slate-200/80 bg-white p-6 shadow-card-hover">
         <button
           type="button"
           onClick={onClose}
@@ -85,7 +85,7 @@ export function ConfirmDialog({
                 type="button"
                 onClick={onClose}
                 disabled={loading}
-                className="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50"
+                className="rounded-btn border border-slate-200/80 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-soft hover:bg-slate-50 disabled:opacity-50 transition-colors"
               >
                 {cancelLabel}
               </button>
@@ -95,8 +95,8 @@ export function ConfirmDialog({
                 disabled={loading}
                 className={
                   isDanger
-                    ? 'inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 disabled:opacity-50'
-                    : 'inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-accent-dark disabled:opacity-50'
+                    ? 'inline-flex items-center gap-2 rounded-btn bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-red-700 disabled:opacity-50 transition-colors'
+                    : 'inline-flex items-center gap-2 rounded-btn bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-dark disabled:opacity-50 transition-colors'
                 }
               >
                 {loading && <Loader2 className="h-4 w-4 animate-spin" />}

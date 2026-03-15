@@ -41,7 +41,7 @@ export function ExecutionsFilters({ workflows }: Props) {
           id="exec-status"
           value={status}
           onChange={(e) => setFilter('status', e.target.value)}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+          className="rounded-input border border-slate-200/80 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-shadow"
         >
           {STATUS_OPTIONS.map((o) => (
             <option key={o.value || 'all'} value={o.value}>
@@ -58,7 +58,7 @@ export function ExecutionsFilters({ workflows }: Props) {
           id="exec-workflow"
           value={workflowId}
           onChange={(e) => setFilter('workflowId', e.target.value)}
-          className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent min-w-[180px]"
+          className="rounded-input border border-slate-200/80 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 min-w-[180px] transition-shadow"
         >
           <option value="">All workflows</option>
           {workflows.map((w) => (

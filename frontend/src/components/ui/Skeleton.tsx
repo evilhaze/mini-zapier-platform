@@ -16,7 +16,7 @@ export function Skeleton({ className = '' }: Props) {
 /** Skeleton for a stats card (dashboard style) */
 export function CardSkeleton() {
   return (
-    <div className="rounded-xl border border-slate-200/80 bg-white p-5 shadow-sm">
+    <div className="rounded-card border border-slate-200/80 bg-white p-5 shadow-card">
       <Skeleton className="h-3 w-20" />
       <Skeleton className="mt-3 h-8 w-16" />
     </div>
@@ -58,8 +58,8 @@ export function TableSkeleton({
   headerLabels?: string[];
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-      <table className="min-w-full divide-y divide-slate-200">
+    <div className="overflow-hidden rounded-card border border-slate-200/80 bg-white shadow-card">
+      <table className="min-w-full divide-y divide-slate-200/80">
         <thead>
           <tr className="bg-slate-50/80">
             {headerLabels
@@ -79,7 +79,7 @@ export function TableSkeleton({
                 ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-200 bg-white">
+        <tbody className="divide-y divide-slate-200/80 bg-white">
           {Array.from({ length: rows }).map((_, i) => (
             <TableRowSkeleton key={i} cols={cols} />
           ))}
@@ -95,7 +95,7 @@ export function CardGridSkeleton({ count = 6 }: { count?: number }) {
     <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: count }).map((_, i) => (
         <li key={i}>
-          <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4">
+          <div className="flex items-center gap-3 rounded-card border border-slate-200/80 bg-white p-4">
             <Skeleton className="h-5 w-5 shrink-0 rounded" />
             <Skeleton className="h-5 flex-1 max-w-[180px]" />
           </div>
@@ -110,7 +110,7 @@ export function ExecutionDetailSkeleton() {
   return (
     <div className="space-y-8">
       <Skeleton className="h-4 w-32" />
-      <div className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+      <div className="rounded-card border border-slate-200/80 bg-white overflow-hidden">
         <div className="border-b border-slate-200 bg-slate-50/80 px-5 py-4">
           <Skeleton className="h-4 w-48" />
           <Skeleton className="mt-2 h-6 w-64" />

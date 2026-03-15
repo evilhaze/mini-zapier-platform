@@ -44,7 +44,7 @@ export function StatisticsCards({ stats }: { stats: OverviewStats }) {
         return (
           <div
             key={key}
-            className={`rounded-xl border bg-white shadow-sm transition-shadow hover:shadow-card ${
+            className={`rounded-card border bg-white shadow-card transition-shadow hover:shadow-card-hover ${
               accent
                 ? 'border-accent/20'
                 : 'border-slate-200/80'

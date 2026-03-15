@@ -40,20 +40,20 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
       <aside
         className={`
-          fixed inset-y-0 left-0 z-50 flex w-[var(--sidebar-w)] shrink-0 flex-col border-r border-slate-200 bg-white transition-transform duration-200 ease-out
-          md:relative md:translate-x-0
+          fixed inset-y-0 left-0 z-50 flex w-[var(--sidebar-w)] shrink-0 flex-col border-r border-slate-200/80 bg-white shadow-soft transition-transform duration-200 ease-out
+          md:relative md:translate-x-0 md:shadow-none
           ${open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
         `}
         aria-label="Main navigation"
       >
         {/* Logo row */}
-        <div className="flex h-[var(--topbar-h)] items-center justify-between border-b border-slate-200 px-4 md:px-5">
+        <div className="flex h-[var(--topbar-h)] items-center justify-between border-b border-slate-200/80 px-4 md:px-5">
           <Link
             href="/dashboard"
-            className="flex items-center gap-2 font-semibold text-slate-900"
+            className="flex items-center gap-2.5 font-semibold text-slate-900"
             onClick={() => onClose()}
           >
-            <PlayCircle className="h-6 w-6 text-accent" aria-hidden />
+            <PlayCircle className="h-5 w-5 text-accent" aria-hidden />
             <span>Automation</span>
           </Link>
           <button
@@ -80,15 +80,15 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 href={href}
                 onClick={() => onClose()}
                 className={`
-                  flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors
+                  flex items-center gap-3 rounded-btn px-3 py-2.5 text-sm font-medium transition-colors
                   ${isActive
                     ? 'bg-accent/10 text-accent-dark'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }
                 `}
                 aria-current={isActive ? 'page' : undefined}
               >
-                <Icon className="h-5 w-5 shrink-0" aria-hidden />
+                <Icon className="h-5 w-5 shrink-0 opacity-80" aria-hidden />
                 {label}
               </Link>
             );

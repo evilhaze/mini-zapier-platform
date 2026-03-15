@@ -94,7 +94,7 @@ export function WorkflowDetailActions({
       <div className="flex flex-wrap gap-2">
         <Link
           href={`/editor/${workflowId}`}
-          className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+          className="inline-flex items-center gap-2 rounded-btn border border-slate-200/80 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-soft hover:bg-slate-50 transition-colors"
         >
           <Pencil className="h-4 w-4" />
           Open editor
@@ -103,7 +103,7 @@ export function WorkflowDetailActions({
           type="button"
           onClick={handleRun}
           disabled={busy}
-          className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-accent-dark disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-btn bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-dark disabled:opacity-50 transition-colors"
         >
           {loading === 'run' ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -117,7 +117,7 @@ export function WorkflowDetailActions({
             type="button"
             onClick={handleResume}
             disabled={busy}
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-btn border border-slate-200/80 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-soft hover:bg-slate-50 disabled:opacity-50 transition-colors"
           >
             {loading === 'pause' ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -131,7 +131,7 @@ export function WorkflowDetailActions({
             type="button"
             onClick={handlePause}
             disabled={busy}
-            className="inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-800 shadow-sm hover:bg-amber-100 disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-btn border border-amber-200/80 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-800 shadow-soft hover:bg-amber-100 disabled:opacity-50 transition-colors"
           >
             {loading === 'pause' ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -145,7 +145,7 @@ export function WorkflowDetailActions({
           type="button"
           onClick={() => setDeleteOpen(true)}
           disabled={busy}
-          className="inline-flex items-center gap-2 rounded-lg border border-red-200 bg-white px-4 py-2.5 text-sm font-medium text-red-600 shadow-sm hover:bg-red-50 disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-btn border border-red-200/80 bg-white px-4 py-2.5 text-sm font-medium text-red-600 shadow-soft hover:bg-red-50 disabled:opacity-50 transition-colors"
         >
           <Trash2 className="h-4 w-4" />
           Delete

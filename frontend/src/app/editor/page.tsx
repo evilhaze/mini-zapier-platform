@@ -21,8 +21,8 @@ export default async function EditorLandingPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-slate-900">Editor</h1>
-        <p className="mt-1 text-slate-500">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Editor</h1>
+        <p className="mt-1.5 text-sm text-slate-500">
           Select a workflow to edit in the canvas
         </p>
       </div>
@@ -47,7 +47,7 @@ export default async function EditorLandingPage() {
             <li key={w.id}>
               <Link
                 href={`/editor/${w.id}`}
-                className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-card transition-shadow hover:border-accent/30 hover:shadow-card-hover"
+                className="flex items-center gap-3 rounded-card border border-slate-200/80 bg-white p-4 shadow-card transition-all hover:border-accent/30 hover:shadow-card-hover"
               >
                 <PenSquare className="h-5 w-5 shrink-0 text-slate-400" />
                 <span className="font-medium text-slate-900">{w.name}</span>

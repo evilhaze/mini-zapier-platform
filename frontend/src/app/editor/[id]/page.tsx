@@ -107,8 +107,8 @@ export default function EditorPage() {
 
   if (loading) {
     return (
-      <div className="flex h-[calc(100vh-var(--topbar-h)-3rem)] flex-col items-center justify-center gap-3">
-        <Loader2 className="h-8 w-8 animate-spin text-slate-400" aria-hidden />
+      <div className="flex h-[calc(100vh-var(--topbar-h)-2.5rem)] flex-col items-center justify-center gap-4 rounded-card border border-slate-200/80 bg-white">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-300" aria-hidden />
         <p className="text-sm text-slate-500">Loading workflow...</p>
       </div>
     );
@@ -116,15 +116,15 @@ export default function EditorPage() {
 
   if (loadError || !workflow) {
     return (
-      <div className="flex flex-col gap-4 p-6">
-        <Link href="/workflows" className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900">
+      <div className="flex flex-col gap-4 p-6 rounded-card border border-slate-200/80 bg-white shadow-card">
+        <Link href="/workflows" className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
           <ArrowLeft className="h-4 w-4" />
           Workflows
         </Link>
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <div className="rounded-input border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
           {loadError ?? 'Workflow not found'}
         </div>
-        <p className="text-slate-600">The workflow may have been deleted or the link is incorrect.</p>
+        <p className="text-sm text-slate-600">The workflow may have been deleted or the link is incorrect.</p>
       </div>
     );
   }
@@ -132,21 +132,21 @@ export default function EditorPage() {
   const definition = (workflow.definitionJson ?? { nodes: [], edges: [] }) as DefinitionJson;
 
   return (
-    <div className="flex h-[calc(100vh-var(--topbar-h)-3rem)] flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card">
-      {/* Toolbar */}
-      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200 px-4 py-3">
-        <div className="flex items-center gap-3">
+    <div className="flex h-[calc(100vh-var(--topbar-h)-2.5rem)] flex-col overflow-hidden rounded-card border border-slate-200/80 bg-white shadow-card">
+      {/* Toolbar — compact, Make-style */}
+      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-white px-4 py-2.5">
+        <div className="flex items-center gap-3 min-w-0">
           <Link
             href={`/workflows/${id}`}
-            className="flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+            className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors shrink-0"
           >
             <ArrowLeft className="h-4 w-4" />
             Back
           </Link>
-          <span className="text-slate-400">|</span>
-          <span className="font-medium text-slate-900">{workflow.name}</span>
+          <span className="text-slate-300" aria-hidden>·</span>
+          <span className="font-semibold text-slate-900 truncate">{workflow.name}</span>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           {saveStatus === 'error' && saveErrorMessage && (
             <span className="flex items-center gap-1.5 text-sm text-red-600">
               <AlertCircle className="h-4 w-4 shrink-0" />
@@ -163,7 +163,7 @@ export default function EditorPage() {
             type="button"
             onClick={handleSave}
             disabled={saveStatus === 'saving'}
-            className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-dark disabled:opacity-50"
+            className="inline-flex items-center gap-2 rounded-btn bg-accent px-4 py-2 text-sm font-medium text-white shadow-soft hover:bg-accent-dark disabled:opacity-50 transition-colors"
           >
             {saveStatus === 'saving' ? (
               <>

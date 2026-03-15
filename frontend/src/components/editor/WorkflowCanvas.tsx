@@ -105,7 +105,7 @@ function WorkflowCanvasInner({
   const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
 
   return (
-    <div className="flex h-full min-w-0 flex-1">
+    <div className="flex h-full min-w-0 flex-1 bg-slate-50/50">
       <div ref={reactFlowWrapper} className="h-full flex-1">
         <ReactFlow
         nodes={nodes}
@@ -123,11 +123,11 @@ function WorkflowCanvasInner({
         proOptions={proOptions}
         defaultEdgeOptions={{ type: 'smoothstep' }}
       >
-        <Background variant={BackgroundVariant.Dots} gap={16} size={1} color="#e2e8f0" />
-        <Controls className="!border-slate-200 !bg-white !shadow-card" />
+        <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#cbd5e1" />
+        <Controls className="!border-slate-200/80 !rounded-btn !bg-white !shadow-soft" />
         <MiniMap
           nodeColor={(n) => (typeof n.data?.type === 'string' && isTriggerType(n.data.type) ? '#8b5cf6' : '#059669')}
-          className="!bg-slate-100"
+          className="!bg-white !border !border-slate-200/80 !rounded-card"
         />
       </ReactFlow>
       </div>

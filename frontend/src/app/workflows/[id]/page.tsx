@@ -53,17 +53,16 @@ export default async function WorkflowDetailPage({
     <div className="space-y-8">
       <Link
         href="/workflows"
-        className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-slate-900"
+        className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to workflows
       </Link>
 
-      {/* Header card */}
-      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-card">
+      <div className="rounded-card border border-slate-200/80 bg-white p-6 shadow-card">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">{workflow.name}</h1>
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{workflow.name}</h1>
             <div className="mt-3 flex flex-wrap items-center gap-3">
               <StatusBadge status={status} />
               <TriggerBadge trigger={workflow.triggerType} />
@@ -96,8 +95,7 @@ export default async function WorkflowDetailPage({
         </div>
       </div>
 
-      {/* Summary + editor link */}
-      <div className="rounded-lg border border-slate-200 bg-slate-50/50 px-4 py-3">
+      <div className="rounded-card border border-slate-200/80 bg-slate-50/50 px-5 py-3.5">
         <p className="text-sm text-slate-600">
           {workflow.description || 'No description.'}{' '}
           <Link
