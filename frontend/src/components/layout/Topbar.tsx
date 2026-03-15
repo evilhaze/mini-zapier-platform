@@ -1,6 +1,7 @@
 'use client';
 
-import { Menu } from 'lucide-react';
+import Link from 'next/link';
+import { Menu, Plus } from 'lucide-react';
 
 type TopbarProps = {
   onMenuClick: () => void;
@@ -26,6 +27,13 @@ export function Topbar({ onMenuClick }: TopbarProps) {
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
+        <Link
+          href="/workflows?create=1"
+          className="inline-flex items-center gap-2 rounded-btn bg-emerald-600 px-3.5 py-2 text-sm font-semibold text-white shadow-soft hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors"
+        >
+          <Plus className="h-4 w-4 shrink-0" aria-hidden />
+          Create workflow
+        </Link>
         <a
           href="/api-docs"
           target="_blank"

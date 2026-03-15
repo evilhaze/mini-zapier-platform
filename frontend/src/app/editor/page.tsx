@@ -23,7 +23,7 @@ export default async function EditorLandingPage() {
       <div>
         <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Editor</h1>
         <p className="mt-1.5 text-sm text-slate-500">
-          Select a workflow to edit in the canvas
+          Open a workflow to design it on the canvas, or create one to start.
         </p>
       </div>
 
@@ -31,11 +31,11 @@ export default async function EditorLandingPage() {
         <EmptyState
           icon={<PenSquare className="h-6 w-6" />}
           title="No workflows to edit"
-          description="Create a workflow first, then open it here to design triggers and steps on the canvas."
+          description="Create a workflow to open it in the editor and design triggers and steps on the canvas."
           action={
             <Link
-              href="/workflows"
-              className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-accent-dark"
+              href="/workflows?create=1"
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 transition-colors"
             >
               Create workflow
             </Link>

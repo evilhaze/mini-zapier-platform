@@ -109,6 +109,9 @@ export function CreateWorkflowModal({ open, onClose, onCreated }: Props) {
         </div>
 
         <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+          <p className="text-sm text-slate-500 -mt-1">
+            You&apos;ll open the editor next to add steps and connect your workflow.
+          </p>
           <div>
             <label htmlFor="create-workflow-name" className="block text-sm font-medium text-slate-700">
               Name <span className="text-red-500">*</span>
@@ -165,10 +168,10 @@ export function CreateWorkflowModal({ open, onClose, onCreated }: Props) {
             <button
               type="submit"
               disabled={loading || !name.trim()}
-              className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-dark disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50 transition-colors"
             >
               {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              Create & open editor
+              Create & open in Editor
             </button>
             <button
               type="button"

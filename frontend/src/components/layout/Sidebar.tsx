@@ -8,6 +8,7 @@ import {
   ListChecks,
   PenSquare,
   PlayCircle,
+  Plus,
   X,
 } from 'lucide-react';
 
@@ -67,6 +68,14 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         </div>
 
         <nav className="flex flex-1 flex-col gap-0.5 overflow-auto p-3" aria-label="Sidebar">
+          <Link
+            href="/workflows?create=1"
+            onClick={() => onClose()}
+            className="mb-3 flex items-center justify-center gap-2 rounded-btn border-2 border-emerald-600 bg-emerald-600 px-3 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-emerald-700 hover:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors"
+          >
+            <Plus className="h-4 w-4 shrink-0" aria-hidden />
+            Create workflow
+          </Link>
           {nav.map(({ href, label, icon: Icon }) => {
             const isActive =
               href === '/dashboard'

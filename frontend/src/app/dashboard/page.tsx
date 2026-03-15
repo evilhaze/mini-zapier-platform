@@ -48,8 +48,8 @@ export default async function DashboardPage() {
             description="Create a workflow to start automating tasks. Your stats and run history will show up here."
             action={
               <Link
-                href="/workflows"
-                className="inline-flex items-center gap-2 rounded-btn bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-dark transition-colors"
+                href="/workflows?create=1"
+                className="inline-flex items-center gap-2 rounded-btn bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-emerald-700 transition-colors"
               >
                 <GitBranch className="h-4 w-4" />
                 Create workflow
@@ -61,17 +61,26 @@ export default async function DashboardPage() {
         )}
       </section>
 
-      <section className="flex flex-wrap gap-3">
+      <section className="flex flex-wrap items-center gap-3">
+        <Link
+          href="/workflows?create=1"
+          className="inline-flex items-center gap-2.5 rounded-card bg-emerald-600 px-5 py-3.5 text-sm font-semibold text-white shadow-soft hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors"
+        >
+          <span className="flex h-8 w-8 items-center justify-center rounded-md bg-white/20">
+            <GitBranch className="h-4 w-4" />
+          </span>
+          Create workflow
+        </Link>
         <Link
           href="/workflows"
-          className="flex items-center gap-2.5 rounded-card border border-slate-200/80 bg-white px-5 py-3.5 text-sm font-medium text-slate-700 shadow-card hover:shadow-card-hover hover:border-slate-300/80 hover:text-accent transition-all"
+          className="flex items-center gap-2.5 rounded-card border border-slate-200/80 bg-white px-5 py-3.5 text-sm font-medium text-slate-700 shadow-card hover:shadow-card-hover hover:border-slate-300/80 hover:text-slate-900 transition-all"
         >
           <GitBranch className="h-4 w-4 text-slate-400" />
           View all workflows
         </Link>
         <Link
           href="/executions"
-          className="flex items-center gap-2.5 rounded-card border border-slate-200/80 bg-white px-5 py-3.5 text-sm font-medium text-slate-700 shadow-card hover:shadow-card-hover hover:border-slate-300/80 hover:text-accent transition-all"
+          className="flex items-center gap-2.5 rounded-card border border-slate-200/80 bg-white px-5 py-3.5 text-sm font-medium text-slate-700 shadow-card hover:shadow-card-hover hover:border-slate-300/80 hover:text-slate-900 transition-all"
         >
           <ListChecks className="h-4 w-4 text-slate-400" />
           View executions

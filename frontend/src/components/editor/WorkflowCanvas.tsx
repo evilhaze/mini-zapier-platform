@@ -104,8 +104,16 @@ function WorkflowCanvasInner({
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
 
+  const isEmpty = nodes.length === 0;
+  const hasOnlyTriggerNoActions =
+    nodes.length === 1 &&
+    typeof nodes[0].data?.type === 'string' &&
+    isTriggerType(nodes[0].data.type) &&
+    edges.length === 0;
+  const showStartState = isEmpty || hasOnlyTriggerNoActions;
+
   return (
-    <div className="flex h-full min-w-0 flex-1 bg-slate-50/50">
+    <div className="relative flex h-full min-w-0 flex-1 bg-slate-50/50">
       <div ref={reactFlowWrapper} className="h-full flex-1">
         <ReactFlow
         nodes={nodes}
@@ -131,6 +139,34 @@ function WorkflowCanvasInner({
         />
       </ReactFlow>
       </div>
+
+      {/* Start state overlay — guides user without blocking drag & drop */}
+      {showStartState && (
+        <div
+          className="absolute inset-0 flex items-center justify-center p-6 pointer-events-none"
+          aria-hidden
+        >
+          <div className="max-w-md rounded-2xl border border-slate-200/80 bg-white/95 px-8 py-8 text-center shadow-xl backdrop-blur-sm">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-violet-100 text-violet-600">
+              <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <h3 className="mt-5 text-xl font-semibold text-slate-900">
+              {isEmpty ? 'Choose your trigger' : 'Add your first step'}
+            </h3>
+            <p className="mt-2 text-sm text-slate-500">
+              {isEmpty
+                ? 'Drag a trigger from the left panel to start. Webhook, Schedule, or Manual — then connect actions.'
+                : 'Drag an action from the left and connect it to your trigger to run the workflow.'}
+            </p>
+            <p className="mt-4 text-xs font-medium uppercase tracking-wider text-slate-400">
+              Triggers ← left panel
+            </p>
+          </div>
+        </div>
+      )}
+
       <SettingsPanel node={selectedNode} onUpdate={handleUpdateNode} />
     </div>
   );

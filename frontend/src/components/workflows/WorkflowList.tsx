@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   Plus,
@@ -56,6 +56,7 @@ function formatRate(rate: number): string {
 
 export function WorkflowList() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [workflows, setWorkflows] = useState<WorkflowWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -64,6 +65,13 @@ export function WorkflowList() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('create') === '1') {
+      setCreateModalOpen(true);
+      router.replace('/workflows', { scroll: false });
+    }
+  }, [searchParams, router]);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -216,31 +224,33 @@ export function WorkflowList() {
           ]}
         />
       ) : filtered.length === 0 ? (
-        <EmptyState
-          icon={<GitBranch className="h-6 w-6" />}
-          title={
-            workflows.length === 0
-              ? 'No workflows yet'
-              : 'No matching workflows'
-          }
-          description={
-            workflows.length === 0
-              ? 'Create your first workflow to connect apps and automate repetitive tasks.'
-              : 'Try a different search term or filter to find what you need.'
-          }
-          action={
-            workflows.length === 0 ? (
-              <button
-                type="button"
-                onClick={() => setCreateModalOpen(true)}
-                className="inline-flex items-center gap-2 rounded-btn bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-dark transition-colors"
-              >
-                <Plus className="h-4 w-4" />
-                Create workflow
-              </button>
-            ) : undefined
-          }
-        />
+        workflows.length === 0 ? (
+          <div className="rounded-card border border-slate-200/80 bg-white py-20 px-6 text-center shadow-card">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-accent">
+              <GitBranch className="h-8 w-8" aria-hidden />
+            </div>
+            <h2 className="mt-6 text-2xl font-semibold tracking-tight text-slate-900">
+              Create your first workflow
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-base text-slate-500">
+              Connect apps and automate repetitive tasks. Start with a trigger (webhook, schedule, or manual) and add actions.
+            </p>
+            <button
+              type="button"
+              onClick={() => setCreateModalOpen(true)}
+              className="mt-8 inline-flex items-center gap-2.5 rounded-btn bg-accent px-6 py-3.5 text-base font-semibold text-white shadow-soft hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-colors"
+            >
+              <Plus className="h-5 w-5" aria-hidden />
+              Create your first workflow
+            </button>
+          </div>
+        ) : (
+          <EmptyState
+            icon={<GitBranch className="h-6 w-6" />}
+            title="No matching workflows"
+            description="Try a different search term or filter to find what you need."
+          />
+        )
       ) : (
         <>
           {/* Table (desktop) */}

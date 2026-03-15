@@ -107,7 +107,7 @@ export default function EditorPage() {
 
   if (loading) {
     return (
-      <div className="flex h-[calc(100vh-var(--topbar-h)-2.5rem)] flex-col items-center justify-center gap-4 rounded-card border border-slate-200/80 bg-white">
+      <div className="flex min-h-[calc(100vh-var(--topbar-h)-var(--page-y))] flex-col items-center justify-center gap-4 rounded-xl border border-slate-200/80 bg-white shadow-lg">
         <Loader2 className="h-8 w-8 animate-spin text-slate-300" aria-hidden />
         <p className="text-sm text-slate-500">Loading workflow...</p>
       </div>
@@ -116,7 +116,7 @@ export default function EditorPage() {
 
   if (loadError || !workflow) {
     return (
-      <div className="flex flex-col gap-4 p-6 rounded-card border border-slate-200/80 bg-white shadow-card">
+      <div className="flex flex-col gap-4 p-6 rounded-xl border border-slate-200/80 bg-white shadow-lg">
         <Link href="/workflows" className="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
           <ArrowLeft className="h-4 w-4" />
           Workflows
@@ -132,9 +132,9 @@ export default function EditorPage() {
   const definition = (workflow.definitionJson ?? { nodes: [], edges: [] }) as DefinitionJson;
 
   return (
-    <div className="flex h-[calc(100vh-var(--topbar-h)-2.5rem)] flex-col overflow-hidden rounded-card border border-slate-200/80 bg-white shadow-card">
-      {/* Toolbar — compact, Make-style */}
-      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-white px-4 py-2.5">
+    <div className="flex min-h-[calc(100vh-var(--topbar-h)-var(--page-y))] flex-col overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-lg">
+      {/* Toolbar — editor as main screen */}
+      <div className="flex shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-slate-50/80 px-4 py-2.5">
         <div className="flex items-center gap-3 min-w-0">
           <Link
             href={`/workflows/${id}`}
@@ -143,6 +143,8 @@ export default function EditorPage() {
             <ArrowLeft className="h-4 w-4" />
             Back
           </Link>
+          <span className="text-slate-300" aria-hidden>·</span>
+          <span className="text-xs font-medium uppercase tracking-wider text-slate-400">Editor</span>
           <span className="text-slate-300" aria-hidden>·</span>
           <span className="font-semibold text-slate-900 truncate">{workflow.name}</span>
         </div>
@@ -163,7 +165,7 @@ export default function EditorPage() {
             type="button"
             onClick={handleSave}
             disabled={saveStatus === 'saving'}
-            className="inline-flex items-center gap-2 rounded-btn bg-accent px-4 py-2 text-sm font-medium text-white shadow-soft hover:bg-accent-dark disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-2 rounded-btn bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-soft hover:bg-emerald-700 disabled:opacity-50 transition-colors"
           >
             {saveStatus === 'saving' ? (
               <>
