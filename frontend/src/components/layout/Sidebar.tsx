@@ -7,13 +7,13 @@ import {
   GitBranch,
   ListChecks,
   PenSquare,
-  PlayCircle,
+  Zap,
   Plus,
   X,
 } from 'lucide-react';
 
 const nav = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
   { href: '/workflows', label: 'Workflows', icon: GitBranch },
   { href: '/executions', label: 'Executions', icon: ListChecks },
   { href: '/editor', label: 'Editor', icon: PenSquare },
@@ -54,8 +54,12 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             className="flex items-center gap-2.5 font-semibold text-slate-900"
             onClick={() => onClose()}
           >
-            <PlayCircle className="h-5 w-5 text-accent" aria-hidden />
-            <span>Automation</span>
+            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-red-600 text-white">
+              <Zap className="h-4 w-4" aria-hidden />
+            </span>
+            <span className="text-base font-semibold tracking-tight">
+              Zyper
+            </span>
           </Link>
           <button
             type="button"
@@ -67,15 +71,18 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </button>
         </div>
 
-        <nav className="flex flex-1 flex-col gap-0.5 overflow-auto p-3" aria-label="Sidebar">
+        <nav className="flex flex-1 flex-col gap-3 overflow-auto p-4" aria-label="Sidebar">
           <Link
             href="/workflows?create=1"
             onClick={() => onClose()}
-            className="mb-3 flex items-center justify-center gap-2 rounded-btn border-2 border-emerald-600 bg-emerald-600 px-3 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-emerald-700 hover:border-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors"
+            className="mb-1 inline-flex items-center justify-center gap-2 rounded-btn border border-red-600 bg-red-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-red-700 hover:border-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
           >
             <Plus className="h-4 w-4 shrink-0" aria-hidden />
             Create workflow
           </Link>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 px-1">
+            Navigation
+          </div>
           {nav.map(({ href, label, icon: Icon }) => {
             const isActive =
               href === '/dashboard'
@@ -91,7 +98,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 className={`
                   flex items-center gap-3 rounded-btn px-3 py-2.5 text-sm font-medium transition-colors
                   ${isActive
-                    ? 'bg-accent/10 text-accent-dark'
+                    ? 'bg-red-50 text-red-700 border border-red-200'
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                   }
                 `}

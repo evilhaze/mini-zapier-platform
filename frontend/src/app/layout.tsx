@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans } from 'next/font/google';
+import { AuthProvider } from '@/contexts/AuthContext';
 import './globals.css';
-import { LayoutClient } from '@/components/layout';
 
 const font = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -10,8 +10,8 @@ const font = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'Automation Platform',
-  description: 'Mini-Zapier MVP — workflows, triggers, executions',
+  title: 'Zyper – Visual automation platform',
+  description: 'Design, run and monitor automations with visual workflows, triggers, actions and execution history.',
 };
 
 export default function RootLayout({
@@ -21,8 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={font.variable}>
-      <body className="min-h-screen font-sans">
-        <LayoutClient>{children}</LayoutClient>
+      <body className="min-h-screen bg-slate-50 font-sans text-slate-900">
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

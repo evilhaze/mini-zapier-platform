@@ -22,14 +22,14 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         <Menu className="h-5 w-5" />
       </button>
 
-      <div className="flex-1 text-center text-sm text-slate-400 md:text-left">
-        Workflows, triggers & executions
+      <div className="flex-1 text-center text-sm text-slate-500 md:text-left">
+        Design, run and monitor automations with Zyper.
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
         <Link
           href="/workflows?create=1"
-          className="inline-flex items-center gap-2 rounded-btn bg-emerald-600 px-3.5 py-2 text-sm font-semibold text-white shadow-soft hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-colors"
+          className="inline-flex items-center gap-2 rounded-btn bg-red-600 px-3.5 py-2 text-sm font-semibold text-white shadow-soft hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
         >
           <Plus className="h-4 w-4 shrink-0" aria-hidden />
           Create workflow

@@ -165,13 +165,13 @@ export function WorkflowList() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900">Workflows</h1>
           <p className="mt-1.5 text-sm text-slate-500">
-            Create and manage automation workflows
+            All of your automations in one place.
           </p>
         </div>
         <button
           type="button"
           onClick={() => setCreateModalOpen(true)}
-          className="inline-flex items-center gap-2 rounded-btn bg-accent px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-accent-dark focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 transition-colors"
+          className="inline-flex items-center gap-2 rounded-btn bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow-soft hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
         >
           <Plus className="h-4 w-4" />
           Create workflow
@@ -186,7 +186,7 @@ export function WorkflowList() {
             placeholder="Search workflows..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-input border border-slate-200/80 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 transition-shadow"
+            className="w-full rounded-input border border-slate-200/80 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20 transition-shadow"
             aria-label="Search workflows"
           />
         </div>

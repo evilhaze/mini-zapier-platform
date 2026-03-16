@@ -26,25 +26,36 @@ function SidebarItem({
   label,
   icon: Icon,
   variant,
+  onAddNode,
 }: {
   type: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
   variant: 'trigger' | 'action';
+  onAddNode?: (type: string, variant: 'trigger' | 'action') => void;
 }) {
   const onDragStart = useCallback(
     (e: React.DragEvent) => {
       e.dataTransfer.setData(DRAG_TYPE, type);
       e.dataTransfer.setData('variant', variant);
+      e.dataTransfer.setData('text/plain', `${variant}:${type}`);
       e.dataTransfer.effectAllowed = 'move';
     },
     [type, variant]
   );
 
+  const onClick = useCallback(() => {
+    onAddNode?.(type, variant);
+  }, [type, variant, onAddNode]);
+
   return (
     <div
+      role="button"
+      tabIndex={0}
       draggable
       onDragStart={onDragStart}
+      onClick={onClick}
+      onKeyDown={(e) => e.key === 'Enter' && onClick()}
       className={`
         flex cursor-grab items-center gap-3 rounded-btn border-2 border-dashed px-3 py-2.5 text-left transition-colors
         active:cursor-grabbing
@@ -64,7 +75,11 @@ function SidebarItem({
   );
 }
 
-export function Sidebar() {
+type SidebarProps = {
+  onAddNode?: (type: string, variant: 'trigger' | 'action') => void;
+};
+
+export function Sidebar({ onAddNode }: SidebarProps) {
   return (
     <aside className="flex w-56 shrink-0 flex-col border-r border-slate-200/80 bg-white">
       <div className="border-b border-slate-200/80 px-4 py-3">
@@ -72,7 +87,7 @@ export function Sidebar() {
           Add node
         </h3>
         <p className="mt-1 text-xs text-slate-400">
-          Drag onto canvas
+          Drag onto canvas or click to add
         </p>
       </div>
       <div className="flex-1 overflow-auto p-3">
@@ -86,6 +101,7 @@ export function Sidebar() {
                 label={type === 'email' ? 'Email trigger' : (NODE_LABELS[type] ?? type)}
                 icon={TRIGGER_ICONS[type] ?? Zap}
                 variant="trigger"
+                onAddNode={onAddNode}
               />
             ))}
           </div>
@@ -100,6 +116,7 @@ export function Sidebar() {
                 label={type === 'email' ? 'Email' : (NODE_LABELS[type] ?? type)}
                 icon={ACTION_ICONS[type] ?? Code}
                 variant="action"
+                onAddNode={onAddNode}
               />
             ))}
           </div>
