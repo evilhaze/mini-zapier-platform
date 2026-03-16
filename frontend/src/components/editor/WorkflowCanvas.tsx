@@ -24,6 +24,7 @@ import type { DefinitionJson } from './types';
 import { DRAG_TYPE_APPLICATION, Sidebar } from './Sidebar';
 import { isTriggerType } from './types';
 import { SettingsPanel } from './SettingsPanel';
+import { AnimatedEdge } from './AnimatedEdge';
 import { NodeActionsContext } from './NodeActionsContext';
 
 const proOptions = { hideAttribution: true };
@@ -249,18 +250,19 @@ function WorkflowCanvasInner({
         >
           <ReactFlow
             nodes={nodes}
-            edges={edges}
+              edges={edges}
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             onNodeClick={onNodeClick}
             onPaneClick={onPaneClick}
-            nodeTypes={nodeTypes}
+              nodeTypes={nodeTypes}
+              edgeTypes={{ animated: AnimatedEdge }}
             fitView
             style={{ width: '100%', height: '100%' }}
             fitViewOptions={{ padding: 0.2 }}
             proOptions={proOptions}
-            defaultEdgeOptions={{ type: 'smoothstep' }}
+              defaultEdgeOptions={{ type: 'animated' }}
           >
             <Background
               variant={BackgroundVariant.Dots}
