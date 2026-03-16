@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 const nav = [
-  { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
+  { href: '/home', label: 'Home', icon: LayoutDashboard },
   { href: '/workflows', label: 'Workflows', icon: GitBranch },
   { href: '/executions', label: 'Executions', icon: ListChecks },
   { href: '/editor', label: 'Editor', icon: PenSquare },
@@ -50,7 +50,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         {/* Logo row */}
         <div className="flex h-[var(--topbar-h)] items-center justify-between border-b border-slate-200/80 px-4 md:px-5">
           <Link
-            href="/dashboard"
+            href="/home"
             className="flex items-center gap-2.5 font-semibold text-slate-900"
             onClick={() => onClose()}
           >
@@ -85,8 +85,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           </div>
           {nav.map(({ href, label, icon: Icon }) => {
             const isActive =
-              href === '/dashboard'
-                ? pathname === '/dashboard'
+              href === '/home'
+                ? pathname === '/home'
                 : href === '/editor'
                   ? pathname?.startsWith('/editor') ?? false
                   : (pathname?.startsWith(href) ?? false);

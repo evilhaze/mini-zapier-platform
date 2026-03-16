@@ -1,15 +1,18 @@
 import Link from 'next/link';
-import { ArrowRight, GitBranch, LayoutDashboard, Activity, ShieldCheck } from 'lucide-react';
+import { ArrowRight, GitBranch, LayoutDashboard, Activity, ShieldCheck, Zap } from 'lucide-react';
+import { LandingBackground } from '@/components/landing/LandingBackground';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="relative min-h-screen bg-slate-50 overflow-hidden">
+      <LandingBackground />
+      <div className="relative z-10">
       {/* Top navbar */}
       <header className="border-b border-slate-200/70 bg-white/80 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2">
-            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-red-600 text-xs font-semibold text-white">
-              Z
+            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-red-600 text-white">
+              <Zap className="h-4 w-4" aria-hidden />
             </span>
             <span className="text-sm font-semibold tracking-tight text-slate-900">
               Zyper
@@ -43,11 +46,11 @@ export default function Home() {
               Sign up
             </Link>
             <Link
-              href="/workflows?create=1"
+              href="/demo"
               className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-red-700"
             >
               <GitBranch className="h-3.5 w-3.5" />
-              Start building
+              Try demo
             </Link>
           </div>
         </div>
@@ -499,14 +502,14 @@ export default function Home() {
           </p>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
             <Link
-              href="/workflows?create=1"
+              href="/demo"
               className="inline-flex items-center gap-2 rounded-btn bg-red-600 px-5 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
             >
               <GitBranch className="h-4 w-4" />
-              Create workflow
+              Try demo
             </Link>
             <Link
-              href="/dashboard"
+              href="/executions"
               className="inline-flex items-center gap-2 rounded-btn border border-slate-200/80 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:border-red-200 hover:text-red-700 transition-colors"
             >
               View execution history
@@ -526,12 +529,13 @@ export default function Home() {
             <a href="#templates" className="hover:text-slate-900">
               Templates
             </a>
-            <a href="/dashboard" className="hover:text-slate-900">
+            <a href="/home" className="hover:text-slate-900">
               Go to app
             </a>
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 }

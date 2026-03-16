@@ -66,13 +66,6 @@ export function WorkflowList() {
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  useEffect(() => {
-    if (searchParams.get('create') === '1') {
-      setCreateModalOpen(true);
-      router.replace('/workflows', { scroll: false });
-    }
-  }, [searchParams, router]);
-
   const load = useCallback(async () => {
     setLoading(true);
     try {

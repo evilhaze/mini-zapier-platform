@@ -11,7 +11,7 @@ export default function DemoPage() {
   useEffect(() => {
     if (!hydrated) return;
     tryDemo();
-    router.replace('/dashboard');
+    router.replace('/home');
   }, [hydrated, tryDemo, router]);
 
   return (

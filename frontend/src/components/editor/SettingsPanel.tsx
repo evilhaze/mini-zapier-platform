@@ -70,18 +70,7 @@ export function SettingsPanel({ node, onUpdate }: Props) {
     [node, onUpdate]
   );
 
-  if (!node) {
-    return (
-      <aside className="flex w-80 shrink-0 flex-col border-l border-slate-200 bg-slate-50/80">
-        <div className="border-b border-slate-200 px-4 py-4">
-          <h3 className="text-sm font-semibold text-slate-700">Node settings</h3>
-        </div>
-        <div className="flex flex-1 items-center justify-center p-6 text-center">
-          <p className="text-sm text-slate-500">Select a node to edit its settings</p>
-        </div>
-      </aside>
-    );
-  }
+  if (!node) return null;
 
   const { type, label, config = {}, name } = node.data;
   const nodeKind = node.type as string; // 'trigger' | 'action'
@@ -90,7 +79,7 @@ export function SettingsPanel({ node, onUpdate }: Props) {
   const cfg = config as Record<string, string | undefined>;
 
   return (
-    <aside className="flex w-80 shrink-0 flex-col border-l border-slate-200 bg-white">
+    <div className="flex w-80 flex-col bg-white">
       <div className="border-b border-slate-200 px-4 py-4">
         <h3 className="text-sm font-semibold text-slate-700">Node settings</h3>
         <p className="mt-0.5 text-xs text-slate-500">{typeLabel}</p>
@@ -304,6 +293,6 @@ export function SettingsPanel({ node, onUpdate }: Props) {
           </div>
         )}
       </div>
-    </aside>
+    </div>
   );
 }

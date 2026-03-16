@@ -41,10 +41,18 @@ function WorkflowCanvasInner({
   const { screenToFlowPosition } = useReactFlow();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const { nodes: initialNodes, edges: initialEdges } = definitionToFlow(initialDefinition);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<FlowNodeData>>(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  // If the initialDefinition prop changes (e.g. after async load), reset nodes/edges once.
+  useEffect(() => {
+    const { nodes: nextNodes, edges: nextEdges } = definitionToFlow(initialDefinition);
+    setNodes(nextNodes);
+    setEdges(nextEdges);
+  }, [initialDefinition, setNodes, setEdges]);
 
   useEffect(() => {
     if (getDefinitionRef)
@@ -106,9 +114,13 @@ function WorkflowCanvasInner({
 
   const onNodeClick = useCallback((_: React.MouseEvent, node: Node<FlowNodeData>) => {
     setSelectedNodeId(node.id);
+    setSettingsOpen(true);
   }, []);
 
-  const onPaneClick = useCallback(() => setSelectedNodeId(null), []);
+  const onPaneClick = useCallback(() => {
+    setSelectedNodeId(null);
+    setSettingsOpen(false);
+  }, []);
 
   const handleUpdateNode = useCallback(
     (nodeId: string, data: Partial<FlowNodeData>) => {
@@ -216,93 +228,124 @@ function WorkflowCanvasInner({
   );
 
   return (
-    <div className="flex min-h-0 flex-1">
-      <Sidebar onAddNode={handleAddNodeFromSidebar} />
-      <div className="relative flex h-full min-w-0 flex-1 bg-slate-50/50">
-        <div
-          ref={reactFlowWrapper}
-          className="h-full flex-1"
-          onDrop={onDrop}
-          onDragOver={onDragOver}
+    <>
+      {/* Main canvas fills all available space */}
+      <div
+        ref={reactFlowWrapper}
+        className="h-full w-full"
+        onDrop={onDrop}
+        onDragOver={onDragOver}
+      >
+        <NodeActionsContext.Provider
+          value={{
+            openSettings: (nodeId: string) => {
+              setSelectedNodeId(nodeId);
+              setSettingsOpen(true);
+            },
+            renameNode: handleRenameNode,
+            duplicateNode: handleDuplicateNode,
+            deleteNode: handleDeleteNode,
+          }}
         >
-          <NodeActionsContext.Provider
-            value={{
-              openSettings: (nodeId: string) => setSelectedNodeId(nodeId),
-              renameNode: handleRenameNode,
-              duplicateNode: handleDuplicateNode,
-              deleteNode: handleDeleteNode,
-            }}
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onNodeClick={onNodeClick}
+            onPaneClick={onPaneClick}
+            nodeTypes={nodeTypes}
+            fitView
+            style={{ width: '100%', height: '100%' }}
+            fitViewOptions={{ padding: 0.2 }}
+            proOptions={proOptions}
+            defaultEdgeOptions={{ type: 'smoothstep' }}
           >
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              onNodeClick={onNodeClick}
-              onPaneClick={onPaneClick}
-              nodeTypes={nodeTypes}
-              fitView
-              fitViewOptions={{ padding: 0.2 }}
-              proOptions={proOptions}
-              defaultEdgeOptions={{ type: 'smoothstep' }}
-            >
-              <Background
-                variant={BackgroundVariant.Dots}
-                gap={20}
-                size={1}
-                color="#cbd5e1"
-              />
-              <Controls className="!border-slate-200/80 !rounded-btn !bg-white !shadow-soft" />
-              <MiniMap
-                nodeColor={(n) =>
-                  typeof n.data?.type === 'string' && isTriggerType(n.data.type)
-                    ? '#8b5cf6'
-                    : '#059669'
-                }
-                className="!bg-white !border !border-slate-200/80 !rounded-card"
-              />
-            </ReactFlow>
-          </NodeActionsContext.Provider>
-        </div>
-
-      {/* Start state overlay — guides user; pointer-events-none so drop reaches wrapper */}
-      {showStartState && (
-        <div
-          className="pointer-events-none absolute inset-0 flex items-center justify-center p-4 sm:p-6"
-          aria-hidden
-        >
-          <div className="max-w-sm rounded-2xl border border-[#FECACA] bg-[#FEF2F2]/95 px-6 py-6 text-center shadow-lg backdrop-blur-sm pointer-events-none">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#FCA5A5]/20 text-[#EF4444]">
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">
-              {isEmpty ? 'Start with a trigger' : 'Add your first step'}
-            </h3>
-            <p className="mt-2 text-sm text-slate-600">
-              {isEmpty
-                ? 'Drag a trigger from the left sidebar to start your workflow. Webhook, Schedule or Manual.'
-                : 'Drag an action from the left and connect it to your trigger to run the workflow.'}
-            </p>
-            <p className="mt-4 text-xs font-medium uppercase tracking-wider text-slate-400">
-              Triggers and actions ← left sidebar
-            </p>
-          </div>
-        </div>
-      )}
-
-      <SettingsPanel node={selectedNode} onUpdate={handleUpdateNode} />
+            <Background
+              variant={BackgroundVariant.Dots}
+              gap={20}
+              size={1}
+              color="#cbd5e1"
+            />
+            <Controls className="!border-slate-200/80 !rounded-btn !bg-white !shadow-soft" />
+            <MiniMap
+              nodeColor={(n) =>
+                typeof n.data?.type === 'string' && isTriggerType(n.data.type)
+                  ? '#8b5cf6'
+                  : '#059669'
+              }
+              className="!bg-white !border !border-slate-200/80 !rounded-card"
+            />
+          </ReactFlow>
+        </NodeActionsContext.Provider>
       </div>
-    </div>
+
+      {/* Overlay layer for panels and hints */}
+      <div className="pointer-events-none absolute inset-0">
+        {/* Left Add Node panel as overlay */}
+        <div className="pointer-events-auto absolute left-4 top-4 z-20 max-h-[calc(100%-2rem)] w-60">
+          <Sidebar onAddNode={handleAddNodeFromSidebar} />
+        </div>
+
+        {/* Start state overlay — guides user */}
+        {showStartState && (
+          <div
+            className="pointer-events-none absolute inset-0 flex items-center justify-center p-4 sm:p-6"
+            aria-hidden
+          >
+            <div className="pointer-events-none max-w-sm rounded-2xl border border-[#FECACA] bg-[#FEF2F2]/95 px-6 py-6 text-center shadow-lg backdrop-blur-sm">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#FCA5A5]/20 text-[#EF4444]">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-slate-900">
+                {isEmpty ? 'Start with a trigger' : 'Add your first step'}
+              </h3>
+              <p className="mt-2 text-sm text-slate-600">
+                {isEmpty
+                  ? 'Drag a trigger from the left panel to start your workflow.'
+                  : 'Drag an action from the left and connect it to your trigger to run the workflow.'}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Floating settings inspector with close button */}
+        {selectedNode && settingsOpen && (
+          <div className="pointer-events-auto absolute inset-y-4 right-4 z-30 flex max-w-sm">
+            <div className="w-80 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-2">
+                <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Node settings
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSettingsOpen(false)}
+                  className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                  aria-label="Close settings"
+                >
+                  ×
+                </button>
+              </div>
+              <div className="max-h-[calc(100vh-6rem)] overflow-auto p-2">
+                <SettingsPanel node={selectedNode} onUpdate={handleUpdateNode} />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
 export function WorkflowCanvas(props: WorkflowCanvasProps) {
   return (
     <ReactFlowProvider>
-      <WorkflowCanvasInner {...props} />
+      <div className="relative flex h-full min-h-[600px] w-full bg-slate-50">
+        <WorkflowCanvasInner {...props} />
+      </div>
     </ReactFlowProvider>
   );
 }
