@@ -9,7 +9,7 @@ const labels: Record<string, string> = {
 };
 
 const styles: Record<string, string> = {
-  webhook: 'bg-violet-100 text-violet-800',
+  webhook: 'bg-blush-100 text-blush-800',
   schedule: 'bg-blue-100 text-blue-800',
   manual: 'bg-slate-100 text-slate-700',
   email: 'bg-amber-100 text-amber-800',

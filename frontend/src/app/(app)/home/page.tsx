@@ -3,6 +3,7 @@ import { API_BASE } from '@/lib/api';
 import { StatisticsCards } from '@/components/dashboard/StatisticsCards';
 import type { OverviewStats } from '@/components/dashboard/StatisticsCards';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { AIGenerateBlock } from '@/components/home/AIGenerateBlock';
 import { GitBranch, ListChecks, LayoutDashboard } from 'lucide-react';
 
 async function getStats(): Promise<OverviewStats> {
@@ -84,6 +85,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* AI workflow generator */}
+      <AIGenerateBlock />
 
       {/* Recommended / starter templates */}
       <section className="space-y-4">

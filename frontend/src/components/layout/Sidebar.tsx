@@ -70,6 +70,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
         </div>
 
         <nav className="flex flex-1 flex-col gap-3 overflow-auto p-4" aria-label="Sidebar">
+          {/* Global CTA: navigates to Workflows and opens create modal (WorkflowList reacts to ?create=1) */}
           <Link
             href="/workflows?create=1"
             onClick={() => onClose()}

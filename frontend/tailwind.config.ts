@@ -24,6 +24,17 @@ const config: Config = {
           light: '#10b981',
           dark: '#047857',
         },
+        /** Editor trigger accent: soft pastel pink / blush (premium, readable) */
+        blush: {
+          50: '#FDF2F7',
+          100: '#F6E3EA',
+          200: '#EFC7D6',
+          300: '#E8B9CA',
+          400: '#DEA5B5',
+          500: '#C97B8C',
+          600: '#B86B7C',
+          800: '#9E5A68',
+        },
       },
       borderRadius: {
         card: 'var(--radius-card)',

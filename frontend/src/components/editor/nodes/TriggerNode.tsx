@@ -120,26 +120,26 @@ function TriggerNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
       className={`
         relative min-w-[200px] max-w-[220px] overflow-hidden rounded-card bg-white text-left shadow-soft
         ring-1 ring-slate-200/80
-        ${selected ? 'ring-2 ring-[#FCA5A5] shadow-card-hover' : 'hover:ring-[#FECACA]'}
+        ${selected ? 'ring-2 ring-[#DEA5B5] shadow-card-hover' : 'hover:ring-[#EFC7D6]'}
       `}
     >
       {/* Top handle */}
       <Handle
         type="target"
         position={Position.Top}
-        className="!left-1/2 !-top-1.5 !h-3 !w-3 !-translate-x-1/2 !border-2 !border-white !bg-[#EF4444] !shadow"
+        className="!left-1/2 !-top-1.5 !h-3 !w-3 !-translate-x-1/2 !border-2 !border-white !bg-[#C97B8C] !shadow"
       />
 
-      {/* Left accent bar — trigger = soft red */}
-      <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#FCA5A5] to-[#EF4444]" />
+      {/* Left accent bar — trigger = soft pastel pink */}
+      <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#EFC7D6] to-[#C97B8C]" />
 
       <div className="pl-4 pr-3 py-3">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-violet-600">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#F6E3EA] text-[#B86B7C]">
             <Icon className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1 pt-0.5">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-violet-500">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#C97B8C]">
               Trigger · {subtype}
             </p>
             {isRenaming ? (
@@ -147,7 +147,7 @@ function TriggerNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
                 <input
                   ref={renameInputRef}
                   type="text"
-                  className="w-full rounded-input border border-slate-300 px-1.5 py-0.5 text-sm font-semibold text-slate-900 outline-none focus:border-[#EF4444] focus:ring-1 focus:ring-[#FCA5A5]"
+                  className="w-full rounded-input border border-slate-300 px-1.5 py-0.5 text-sm font-semibold text-slate-900 outline-none focus:border-[#DEA5B5] focus:ring-1 focus:ring-[#EFC7D6]"
                   value={tempName}
                   onChange={(e) => setTempName(e.target.value)}
                   onBlur={commitRename}
@@ -172,7 +172,7 @@ function TriggerNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
           <button
             ref={triggerRef}
             type="button"
-            className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-[#FEF2F2] hover:text-[#EF4444]"
+            className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-[#FDF2F7] hover:text-[#B86B7C]"
             title="Node actions"
             aria-label="Node actions"
             onPointerDown={(e) => {
@@ -233,7 +233,7 @@ function TriggerNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="!left-1/2 !-bottom-1.5 !h-3 !w-3 !-translate-x-1/2 !border-2 !border-white !bg-[#EF4444] !shadow"
+        className="!left-1/2 !-bottom-1.5 !h-3 !w-3 !-translate-x-1/2 !border-2 !border-white !bg-[#C97B8C] !shadow"
       />
     </div>
   );

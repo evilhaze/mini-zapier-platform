@@ -59,13 +59,13 @@ function SidebarItem({
       className={`
         flex cursor-grab items-center gap-3 rounded-btn border-2 border-dashed px-3 py-2.5 text-left transition-colors
         active:cursor-grabbing
-        ${variant === 'trigger' ? 'border-violet-200 bg-violet-50/50 hover:border-violet-300 hover:bg-violet-50' : 'border-slate-200 bg-slate-50/50 hover:border-slate-300 hover:bg-slate-100'}
+        ${variant === 'trigger' ? 'border-[#EFC7D6] bg-[#FDF2F7]/90 hover:border-[#E8B9CA] hover:bg-[#FDF2F7]' : 'border-red-200 bg-[#FEF2F2]/80 hover:border-red-300 hover:bg-red-50'}
       `}
     >
       <div
         className={`
           flex h-8 w-8 shrink-0 items-center justify-center rounded-lg
-          ${variant === 'trigger' ? 'bg-violet-100 text-violet-600' : 'bg-slate-200 text-slate-600'}
+          ${variant === 'trigger' ? 'bg-[#F6E3EA] text-[#B86B7C]' : 'bg-[#FEF2F2] text-[#EF4444]'}
         `}
       >
         <Icon className="h-4 w-4" />
@@ -92,7 +92,7 @@ export function Sidebar({ onAddNode }: SidebarProps) {
       </div>
       <div className="flex-1 overflow-auto p-3">
         <section className="mb-4">
-          <h4 className="mb-2 text-xs font-medium text-violet-600">Triggers</h4>
+          <h4 className="mb-2 text-xs font-medium text-[#B86B7C]">Triggers</h4>
           <div className="space-y-1.5">
             {TRIGGER_TYPES.map((type) => (
               <SidebarItem
@@ -107,7 +107,7 @@ export function Sidebar({ onAddNode }: SidebarProps) {
           </div>
         </section>
         <section>
-          <h4 className="mb-2 text-xs font-medium text-slate-600">Actions</h4>
+          <h4 className="mb-2 text-xs font-medium text-red-600">Actions</h4>
           <div className="space-y-1.5">
             {ACTION_TYPES.map((type) => (
               <SidebarItem

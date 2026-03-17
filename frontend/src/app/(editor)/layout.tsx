@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import { Toaster } from 'sonner';
 import { LayoutDashboard, GitBranch, ListChecks, Zap } from 'lucide-react';
 
 export default function EditorLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-100">
+      <Toaster position="top-center" richColors closeButton duration={3000} />
       {/* Compact icon sidebar — z-10 so tooltips render above editor/canvas */}
       <aside className="relative z-10 flex w-14 flex-shrink-0 flex-col items-center gap-4 overflow-visible border-r border-slate-800 bg-slate-950 py-4">
         <Link

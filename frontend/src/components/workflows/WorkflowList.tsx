@@ -83,6 +83,14 @@ export function WorkflowList() {
     load();
   }, [load]);
 
+  // Open create modal when navigating via sidebar/links with ?create=1
+  useEffect(() => {
+    if (searchParams.get('create') === '1') {
+      setCreateModalOpen(true);
+      router.replace('/workflows', { scroll: false });
+    }
+  }, [searchParams, router]);
+
   const filtered = workflows.filter((w) => {
     const matchSearch =
       !search.trim() ||

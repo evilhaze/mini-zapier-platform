@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 import { WorkflowCanvas } from '@/components/editor/WorkflowCanvas';
 import type { DefinitionJson } from '@/components/editor/types';
 import { API_BASE } from '@/lib/api';
@@ -62,6 +63,7 @@ export default function EditorPage() {
         body: JSON.stringify({ definitionJson: nextDef }),
       });
       if (!res.ok) throw new Error('Failed to save workflow');
+      toast.success('Workflow saved');
     } catch (e) {
       console.error(e);
     }
