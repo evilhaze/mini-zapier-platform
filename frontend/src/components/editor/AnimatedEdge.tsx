@@ -7,7 +7,7 @@ export function AnimatedEdge(props: EdgeProps) {
   const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, markerEnd } =
     props;
 
-  const [edgePath, centerX, centerY] = getBezierPath({
+  const [edgePath] = getBezierPath({
     sourceX,
     sourceY,
     targetX,
@@ -16,12 +16,14 @@ export function AnimatedEdge(props: EdgeProps) {
     targetPosition,
   });
 
+  const pathId = `edge-path-${id}`;
+
   return (
     <g>
       {/* subtle background stroke for contrast */}
       <BaseEdge id={id} path={edgePath} style={{ stroke: '#e2e8f0', strokeWidth: 2 }} />
 
-      {/* animated overlay stroke */}
+      {/* animated overlay stroke (keeps existing flow feel) */}
       <path
         id={id}
         d={edgePath}
@@ -41,8 +43,11 @@ export function AnimatedEdge(props: EdgeProps) {
         />
       </path>
 
-      {/* gradient definition */}
       <defs>
+        {/* path definition for lightning stream */}
+        <path id={pathId} d={edgePath} />
+
+        {/* gradient for stroke */}
         <linearGradient id="edge-gradient" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#f97373" stopOpacity="0.4" />
           <stop offset="50%" stopColor="#ef4444" stopOpacity="0.8" />
@@ -54,18 +59,28 @@ export function AnimatedEdge(props: EdgeProps) {
         <path d={edgePath} fill="none" stroke="transparent" strokeWidth={10} markerEnd={markerEnd} />
       )}
 
-      {/* small lightning accent at edge center */}
-      <g transform={`translate(${centerX} ${centerY})`}>
-        <path
-          d="M3 -6 L-1 0 H2 L-2 6 L4 0 H1 Z"
-          fill="none"
-          stroke="#f97373"
-          strokeWidth={1.4}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          opacity={0.65}
-        />
-      </g>
+      {/* stream of tiny lightning glyphs moving along the edge */}
+      <text
+        fontSize={8}
+        fill="#f97373"
+        opacity={0.85}
+      >
+        <textPath
+          href={`#${pathId}`}
+          startOffset="0%"
+          textLength="140%"
+          spacing="auto"
+        >
+          {'⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡'}
+          <animate
+            attributeName="startOffset"
+            from="0%"
+            to="100%"
+            dur="2.4s"
+            repeatCount="indefinite"
+          />
+        </textPath>
+      </text>
     </g>
   );
 }
