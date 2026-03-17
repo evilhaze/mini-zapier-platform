@@ -6,7 +6,6 @@ import {
   LayoutDashboard,
   GitBranch,
   ListChecks,
-  PenSquare,
   Zap,
   Plus,
   X,
@@ -16,7 +15,6 @@ const nav = [
   { href: '/home', label: 'Home', icon: LayoutDashboard },
   { href: '/workflows', label: 'Workflows', icon: GitBranch },
   { href: '/executions', label: 'Executions', icon: ListChecks },
-  { href: '/editor', label: 'Editor', icon: PenSquare },
 ] as const;
 
 type SidebarProps = {
@@ -87,9 +85,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             const isActive =
               href === '/home'
                 ? pathname === '/home'
-                : href === '/editor'
-                  ? pathname?.startsWith('/editor') ?? false
-                  : (pathname?.startsWith(href) ?? false);
+                : (pathname?.startsWith(href) ?? false);
             return (
               <Link
                 key={href}

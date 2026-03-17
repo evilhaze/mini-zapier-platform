@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { LayoutDashboard, GitBranch, ListChecks, PenSquare, Zap } from 'lucide-react';
+import { LayoutDashboard, GitBranch, ListChecks, Zap } from 'lucide-react';
 
 export default function EditorLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -23,9 +23,6 @@ export default function EditorLayout({ children }: { children: React.ReactNode }
           </EditorNavIcon>
           <EditorNavIcon href="/executions" label="Executions">
             <ListChecks className="h-4 w-4" aria-hidden />
-          </EditorNavIcon>
-          <EditorNavIcon href="/editor" label="Editor">
-            <PenSquare className="h-4 w-4" aria-hidden />
           </EditorNavIcon>
         </div>
       </aside>

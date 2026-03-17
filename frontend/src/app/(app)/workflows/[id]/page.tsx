@@ -46,13 +46,13 @@ export default async function WorkflowDetailPage({ params }: Props) {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href={`/editor/${id}`}
-            className="inline-flex items-center gap-2 rounded-btn border border-slate-200/80 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+            className="inline-flex items-center gap-2 rounded-btn bg-red-600 px-3.5 py-2 text-sm font-semibold text-white shadow-soft hover:bg-red-700"
           >
             Open in editor
           </Link>
           <Link
             href={`/executions?workflowId=${encodeURIComponent(id)}`}
-            className="inline-flex items-center gap-2 rounded-btn bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white shadow-soft hover:bg-slate-800"
+            className="inline-flex items-center gap-2 rounded-btn border border-slate-200/80 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
           >
             View executions
           </Link>
