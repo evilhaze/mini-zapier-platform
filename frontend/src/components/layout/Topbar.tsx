@@ -11,6 +11,8 @@ type TopbarProps = {
 };
 
 export function Topbar({ onMenuClick }: TopbarProps) {
+  const apiDocsUrl =
+    process.env.NEXT_PUBLIC_API_DOCS_URL ?? 'http://localhost:3001/api-docs';
   const { isLoggedIn, user, logout, hydrated } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -70,7 +72,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
       <div className="flex items-center gap-2 md:gap-4">
         <a
-          href="/api-docs"
+          href={apiDocsUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="text-sm font-medium text-slate-500 hover:text-accent transition-colors"

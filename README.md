@@ -37,14 +37,14 @@ A lightweight workflow automation platform with a visual editor, trigger-based r
               │                               │
               ▼                               ▼
 ┌─────────────────────────┐     ┌─────────────────────────────────┐
-│  SQLite (Prisma)       │     │  Redis (BullMQ)                  │
+│  PostgreSQL (Prisma)  │     │  Redis (BullMQ)                  │
 │  Workflows             │     │  Job queue for async execution  │
 │  Executions + Steps     │     │  Worker runs workflow engine     │
 └─────────────────────────┘     └─────────────────────────────────┘
 ```
 
 - **Frontend:** Next.js 15 (App Router), React 18, React Flow (canvas), Tailwind CSS, Sonner (toasts). Server components for data; client components for editor, filters, actions.
-- **Backend:** Express, Zod (validation), Prisma (SQLite), BullMQ (Redis), node-cron (schedule triggers). Single worker process consumes run jobs and executes workflows step-by-step.
+- **Backend:** Express, Zod (validation), Prisma (PostgreSQL), BullMQ (Redis), node-cron (schedule triggers). Single worker process consumes run jobs and executes workflows step-by-step.
 - **Data flow:** Editor saves `definitionJson` (nodes + edges). Run creates an Execution, enqueues a job; worker loads workflow, runs trigger then actions in order, writes ExecutionSteps and final status.
 
 ---
@@ -54,9 +54,9 @@ A lightweight workflow automation platform with a visual editor, trigger-based r
 | Layer     | Stack |
 |----------|--------|
 | Frontend | Next.js 15, React 18, React Flow (@xyflow/react), Tailwind CSS, Lucide icons, Sonner |
-| Backend  | Node.js, Express, Prisma, SQLite, BullMQ, node-cron, Zod, Swagger (swagger-jsdoc, swagger-ui-express) |
+| Backend  | Node.js, Express, Prisma, PostgreSQL, BullMQ, node-cron, Zod, Swagger (swagger-jsdoc, swagger-ui-express) |
 | Queue    | Redis (BullMQ) |
-| DB       | SQLite (file-based, Prisma) |
+| DB       | PostgreSQL (network DB, Prisma) |
 
 ---
 
@@ -98,7 +98,7 @@ npx prisma generate
 npx prisma db push
 ```
 
-SQLite DB file will be created at `backend/dev.db` (or path from `DATABASE_URL`).
+PostgreSQL database schema will be created/updated in the database specified by `DATABASE_URL`.
 
 ### 4. Redis
 
@@ -142,7 +142,7 @@ Frontend expects the API at `http://localhost:3001/api` by default (override wit
 |----------------|--------------------------------|----------------|
 | `NODE_ENV`     | Environment                    | `development`  |
 | `PORT`         | HTTP server port               | `3001`         |
-| `DATABASE_URL` | Prisma SQLite URL              | `file:./dev.db`|
+| `DATABASE_URL` | Prisma PostgreSQL URL          | `postgresql://USER:PASSWORD@HOST:5432/DBNAME?schema=public`|
 | `REDIS_HOST`   | Redis host for BullMQ          | `localhost`    |
 | `REDIS_PORT`   | Redis port                     | `6379`         |
 | `TELEGRAM_BOT_TOKEN` | Optional; for notifications | —          |
@@ -194,7 +194,7 @@ Main groups:
 - **Database action** — Stub; no real DB driver wired.
 - **Auth** — No login; single-user / local use.
 - **Webhook auth** — No signature verification; suitable for internal/demo only.
-- **Scale** — Single worker; SQLite and in-memory scheduler; not tuned for high throughput.
+- **Scale** — Single worker; PostgreSQL and in-memory scheduler; not tuned for high throughput.
 - **Editor** — No version history, no branching; one definition per workflow.
 - **Notifications** — Optional Telegram hook exists; no in-app notifications.
 
@@ -204,7 +204,7 @@ Main groups:
 
 - **Core value fast:** Visual editor + run + logs deliver the main “automation platform” experience (design → run → inspect) without auth or infra.
 - **Proven stack:** Next.js + Express + Prisma + BullMQ + React Flow are well-documented and allow quick iteration and a clean API boundary.
-- **SQLite + Redis:** Minimal setup (one file DB, one Redis instance), easy to run locally and demo.
+- **PostgreSQL + Redis:** Minimal setup (run Postgres + Redis), easy to run locally and demo.
 - **Real execution path:** Triggers, actions, queue, steps, and errors are implemented end-to-end so the product is demonstrable and extensible (e.g. add more actions or triggers later).
 - **Polished UI:** Dashboard, list/detail pages, filters, toasts, and execution logs make the MVP feel like a real product and set the base for future features (auth, more nodes, webhook security).
 

@@ -8,6 +8,7 @@ import {
   ListChecks,
   BarChart3,
   Zap,
+  PlugZap,
   Plus,
   X,
 } from 'lucide-react';
@@ -15,6 +16,7 @@ import {
 const nav = [
   { href: '/home', label: 'Home', icon: LayoutDashboard },
   { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/integrations', label: 'Integrations', icon: PlugZap },
   { href: '/workflows', label: 'Workflows', icon: GitBranch },
   { href: '/executions', label: 'Executions', icon: ListChecks },
 ] as const;

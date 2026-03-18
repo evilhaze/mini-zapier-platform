@@ -15,26 +15,26 @@ type Integration = {
 };
 
 const INTEGRATIONS: Integration[] = [
-  { id: 'gsheets', name: 'Google Sheets', subtitle: 'Электронные таблицы', initials: 'G', color: '#16a34a', comingSoon: true, popular: true },
-  { id: 'gdrive', name: 'Google Drive', subtitle: 'Файлы и папки', initials: 'G', color: '#2563eb', comingSoon: true, popular: true },
-  { id: 'gmail', name: 'Gmail', subtitle: 'Почта', initials: 'G', color: '#ef4444', comingSoon: true, popular: true },
-  { id: 'notion', name: 'Notion', subtitle: 'Документы и базы данных', initials: 'N', color: '#0f172a', comingSoon: true, popular: true },
-  { id: 'slack', name: 'Slack', subtitle: 'Командный чат', initials: 'S', color: '#7c3aed', comingSoon: true, popular: true },
-  { id: 'discord', name: 'Discord', subtitle: 'Сообщества', initials: 'D', color: '#5865F2', comingSoon: true, popular: true },
-  { id: 'github', name: 'GitHub', subtitle: 'Код и задачи', initials: 'GH', color: '#111827', comingSoon: true, popular: true },
-  { id: 'airtable', name: 'Airtable', subtitle: 'Таблицы и представления', initials: 'A', color: '#f59e0b', comingSoon: true, popular: true },
-  { id: 'trello', name: 'Trello', subtitle: 'Доски', initials: 'T', color: '#0ea5e9', comingSoon: true },
-  { id: 'dropbox', name: 'Dropbox', subtitle: 'Облачное хранилище', initials: 'D', color: '#2563eb', comingSoon: true },
-  { id: 'outlook', name: 'Outlook', subtitle: 'Почта и календарь', initials: 'O', color: '#1d4ed8', comingSoon: true },
-  { id: 'stripe', name: 'Stripe', subtitle: 'Платежи', initials: 'S', color: '#635bff', comingSoon: true, popular: true },
-  { id: 'webflow', name: 'Webflow', subtitle: 'CMS и сайты', initials: 'W', color: '#146ef5', comingSoon: true },
-  { id: 'shopify', name: 'Shopify', subtitle: 'Электронная коммерция', initials: 'S', color: '#16a34a', comingSoon: true },
+  { id: 'gsheets', name: 'Google Sheets', subtitle: 'Spreadsheets', initials: 'G', color: '#16a34a', comingSoon: true, popular: true },
+  { id: 'gdrive', name: 'Google Drive', subtitle: 'Files and folders', initials: 'G', color: '#2563eb', comingSoon: true, popular: true },
+  { id: 'gmail', name: 'Gmail', subtitle: 'Email inbox', initials: 'G', color: '#ef4444', comingSoon: true, popular: true },
+  { id: 'notion', name: 'Notion', subtitle: 'Docs & databases', initials: 'N', color: '#0f172a', comingSoon: true, popular: true },
+  { id: 'slack', name: 'Slack', subtitle: 'Team messaging', initials: 'S', color: '#7c3aed', comingSoon: true, popular: true },
+  { id: 'discord', name: 'Discord', subtitle: 'Communities', initials: 'D', color: '#5865F2', comingSoon: true, popular: true },
+  { id: 'github', name: 'GitHub', subtitle: 'Code & issues', initials: 'GH', color: '#111827', comingSoon: true, popular: true },
+  { id: 'airtable', name: 'Airtable', subtitle: 'Bases & views', initials: 'A', color: '#f59e0b', comingSoon: true, popular: true },
+  { id: 'trello', name: 'Trello', subtitle: 'Boards', initials: 'T', color: '#0ea5e9', comingSoon: true },
+  { id: 'dropbox', name: 'Dropbox', subtitle: 'Cloud storage', initials: 'D', color: '#2563eb', comingSoon: true },
+  { id: 'outlook', name: 'Outlook', subtitle: 'Mail & calendar', initials: 'O', color: '#1d4ed8', comingSoon: true },
+  { id: 'stripe', name: 'Stripe', subtitle: 'Payments', initials: 'S', color: '#635bff', comingSoon: true, popular: true },
+  { id: 'webflow', name: 'Webflow', subtitle: 'CMS & sites', initials: 'W', color: '#146ef5', comingSoon: true },
+  { id: 'shopify', name: 'Shopify', subtitle: 'E-commerce', initials: 'S', color: '#16a34a', comingSoon: true },
   { id: 'hubspot', name: 'HubSpot', subtitle: 'CRM', initials: 'H', color: '#f97316', comingSoon: true },
-  { id: 'linear', name: 'Linear', subtitle: 'Задачи продукта', initials: 'L', color: '#111827', comingSoon: true },
-  { id: 'asana', name: 'Asana', subtitle: 'Управление задачами', initials: 'A', color: '#f43f5e', comingSoon: true },
-  { id: 'clickup', name: 'ClickUp', subtitle: 'Задачи', initials: 'C', color: '#7c3aed', comingSoon: true },
-  { id: 'openai', name: 'OpenAI', subtitle: 'ИИ', initials: 'AI', color: '#0f766e', comingSoon: true, popular: true },
-  { id: 'calendly', name: 'Calendly', subtitle: 'Планирование', initials: 'C', color: '#2563eb', comingSoon: true },
+  { id: 'linear', name: 'Linear', subtitle: 'Product issues', initials: 'L', color: '#111827', comingSoon: true },
+  { id: 'asana', name: 'Asana', subtitle: 'Task management', initials: 'A', color: '#f43f5e', comingSoon: true },
+  { id: 'clickup', name: 'ClickUp', subtitle: 'Tasks', initials: 'C', color: '#7c3aed', comingSoon: true },
+  { id: 'openai', name: 'OpenAI', subtitle: 'AI', initials: 'AI', color: '#0f766e', comingSoon: true, popular: true },
+  { id: 'calendly', name: 'Calendly', subtitle: 'Scheduling', initials: 'C', color: '#2563eb', comingSoon: true },
 ];
 
 function IntegrationCard({ item }: { item: Integration }) {
@@ -43,7 +43,7 @@ function IntegrationCard({ item }: { item: Integration }) {
     <button
       type="button"
       onClick={() =>
-        toast.info('Скоро', { description: 'Интеграции будут доступны в ближайшее время.' })
+        toast.info('Coming soon', { description: 'Integrations will be available soon.' })
       }
       className={`
         group relative flex w-full items-start gap-3 rounded-2xl border bg-white px-4 py-4 text-left shadow-sm transition
@@ -63,7 +63,7 @@ function IntegrationCard({ item }: { item: Integration }) {
           {item.popular ? (
             <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
               <Star className="h-3 w-3" />
-              Популярное
+              Popular
             </span>
           ) : null}
         </div>
@@ -71,7 +71,7 @@ function IntegrationCard({ item }: { item: Integration }) {
       </div>
       <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-600">
         <Lock className="h-3.5 w-3.5" />
-        Скоро
+        Coming soon
       </span>
       <span
         aria-hidden
@@ -103,22 +103,22 @@ export default function IntegrationsPage() {
         />
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Интеграции</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Integrations</p>
             <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-              Подключайте любимые сервисы
+              Connect your favorite services
             </h1>
             <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
-              Мы готовим библиотеку интеграций, чтобы ваши воркфлоу могли работать с Google, Notion, Slack, GitHub
-              и многими другими сервисами. Этот раздел — превью того, что появится дальше.
+              We’re preparing an integrations library so your workflows can connect with Google, Notion, Slack, GitHub
+              and many more services. This page is a preview of what’s coming next.
             </p>
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700">
                 <Sparkles className="h-4 w-4" />
-                Скоро
+                Coming soon
               </span>
               <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">
                 <PlugZap className="h-4 w-4 text-slate-500" />
-                Маркетплейс приложений (превью)
+                App marketplace (preview)
               </span>
             </div>
           </div>
@@ -128,13 +128,13 @@ export default function IntegrationsPage() {
       <section className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">Популярные будущие приложения</h2>
+            <h2 className="text-lg font-semibold text-slate-900">Popular upcoming apps</h2>
             <p className="mt-1 text-sm text-slate-600">
-              Самые востребованные приложения, которые мы планируем добавить в первой версии.
+              Most requested apps we plan to add in the first release.
             </p>
           </div>
           <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-            Закрытое превью
+            Closed preview
           </div>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -146,9 +146,9 @@ export default function IntegrationsPage() {
 
       <section className="space-y-3">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900">Запланированные интеграции</h2>
+          <h2 className="text-lg font-semibold text-slate-900">Planned integrations</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Более широкий набор сервисов, которые мы будем добавлять со временем.
+            A wider set of services we’ll be adding over time.
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -159,10 +159,10 @@ export default function IntegrationsPage() {
       </section>
 
       <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
-        <h3 className="text-sm font-semibold text-slate-900">Запрошенные приложения</h3>
+        <h3 className="text-sm font-semibold text-slate-900">Requested apps</h3>
         <p className="mt-1 text-sm text-slate-600">
-          Хотите видеть здесь определённый сервис? Скоро добавим отдельный процесс запросов. А пока этот экран
-          показывает, как будет выглядеть будущий центр интеграций.
+          Want to see a specific service here? We’ll add a dedicated request flow soon. For now, this screen shows how
+          the future integrations hub will look.
         </p>
       </section>
     </div>

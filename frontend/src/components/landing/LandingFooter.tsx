@@ -1,4 +1,5 @@
 export function LandingFooter() {
+  const apiDocsUrl = process.env.NEXT_PUBLIC_API_DOCS_URL ?? 'http://localhost:3001/api-docs';
   return (
     <footer className="border-t border-slate-200 bg-white/80">
       <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
@@ -52,7 +53,7 @@ export function LandingFooter() {
                   </a>
                 </li>
                 <li>
-                  <a href="/api-docs" className="text-slate-600 hover:text-slate-900">
+                  <a href={apiDocsUrl} className="text-slate-600 hover:text-slate-900" target="_blank" rel="noopener noreferrer">
                     API Docs
                   </a>
                 </li>
