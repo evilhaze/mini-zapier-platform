@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useRef, useEffect, useState } from 'react';
+import { useCallback, useMemo, useRef, useEffect, useState } from 'react';
 import {
   ReactFlow,
   Background,
@@ -72,8 +72,16 @@ function WorkflowCanvasInner({
   // Notify outer editor when definition changes (for Saved/Unsaved UX).
   useEffect(() => {
     if (!onDirtyChange) return;
-    const sig = JSON.stringify(flowToDefinition(nodes, edges));
-    onDirtyChange(baselineSignature ? sig !== baselineSignature : true);
+    // IMPORTANT: node dragging updates positions on every mousemove.
+    // Computing JSON signatures on each tick can lag the UI.
+    // Debounce the signature computation so it runs after interaction settles.
+    const t = window.setTimeout(() => {
+      const sig = JSON.stringify(flowToDefinition(nodes, edges));
+      onDirtyChange(baselineSignature ? sig !== baselineSignature : true);
+    }, 250);
+    return () => {
+      window.clearTimeout(t);
+    };
   }, [nodes, edges, baselineSignature, onDirtyChange]);
 
   const onConnect = useCallback(
@@ -227,6 +235,11 @@ function WorkflowCanvasInner({
   }, [selectedNodeId, handleDeleteNode]);
 
   const selectedNode = nodes.find((n) => n.id === selectedNodeId) ?? null;
+  // Settings panel does not depend on node position. Avoid re-rendering the panel on drag.
+  const selectedNodeForPanel = useMemo(() => {
+    if (!selectedNode) return null;
+    return { id: selectedNode.id, type: selectedNode.type, data: selectedNode.data };
+  }, [selectedNode?.id, selectedNode?.type, selectedNode?.data]);
 
   const isEmpty = nodes.length === 0;
   const hasOnlyTriggerNoActions =
@@ -349,7 +362,7 @@ function WorkflowCanvasInner({
         )}
 
         {/* Floating settings inspector with close button */}
-        {selectedNode && settingsOpen && (
+        {selectedNodeForPanel && settingsOpen && (
           <div className="pointer-events-auto absolute inset-y-4 right-4 z-30 flex">
             <div className="w-[420px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl">
               <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-3">
@@ -369,7 +382,7 @@ function WorkflowCanvasInner({
               </div>
               <div className="max-h-[calc(100vh-6rem)] overflow-auto overflow-x-hidden p-3">
                 <SettingsPanel
-                  node={selectedNode}
+                  node={selectedNodeForPanel as unknown as Node<FlowNodeData>}
                   onUpdate={handleUpdateNode}
                   workflowId={workflowId}
                 />

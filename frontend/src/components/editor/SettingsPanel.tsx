@@ -152,21 +152,21 @@ function nextRunPreview(freq: string, time: string): { preview: string; nextRun:
     next.setSeconds(0, 0);
     next.setMinutes(Math.ceil((now.getMinutes() + 0.0001) / 5) * 5);
     if (next <= now) next.setMinutes(next.getMinutes() + 5);
-    return { preview: 'Runs every 5 minutes', nextRun: format(next) };
+    return { preview: 'Запускается каждые 5 минут', nextRun: format(next) };
   }
   if (freq === 'hourly') {
     const next = new Date(now);
     next.setSeconds(0, 0);
     next.setMinutes(0);
     next.setHours(now.getHours() + 1);
-    return { preview: 'Runs every hour', nextRun: format(next) };
+    return { preview: 'Запускается каждый час', nextRun: format(next) };
   }
   if (freq === 'daily') {
     const next = new Date(now);
     next.setSeconds(0, 0);
     next.setHours(hh, mm, 0, 0);
     if (next <= now) next.setDate(next.getDate() + 1);
-    return { preview: `Runs daily at ${humanTime || '00:00'}`, nextRun: format(next) };
+    return { preview: `Запускается каждый день в ${humanTime || '00:00'}`, nextRun: format(next) };
   }
   if (freq === 'weekly') {
     const next = new Date(now);
@@ -177,7 +177,7 @@ function nextRunPreview(freq: string, time: string): { preview: string; nextRun:
     const daysUntilMon = (1 - day + 7) % 7 || 7;
     next.setDate(next.getDate() + daysUntilMon);
     if (next <= now) next.setDate(next.getDate() + 7);
-    return { preview: `Runs weekly (Mon) at ${humanTime || '00:00'}`, nextRun: format(next) };
+    return { preview: `Запускается каждую неделю (Пн) в ${humanTime || '00:00'}`, nextRun: format(next) };
   }
   return { preview: 'Schedule', nextRun: '—' };
 }
@@ -185,6 +185,7 @@ function nextRunPreview(freq: string, time: string): { preview: string; nextRun:
 export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
   const [copiedKey, setCopiedKey] = useState<null | 'url' | 'payload' | 'curl'>(null);
   const [testing, setTesting] = useState(false);
+  const [runningNow, setRunningNow] = useState(false);
   const [showTelegramToken, setShowTelegramToken] = useState(false);
   const [lastExecutionId, setLastExecutionId] = useState<string | null>(null);
   const [lastExecution, setLastExecution] = useState<ExecutionDetail | null>(null);
@@ -293,6 +294,29 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
     }
   }, [webhookUrl]);
 
+  const handleRunNow = useCallback(async () => {
+    setRunningNow(true);
+    try {
+      const res = await fetch(`${API_BASE}/workflows/${workflowId}/run`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inputPayload: {} }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        const msg = (body as { error?: string }).error || `Failed (${res.status})`;
+        throw new Error(msg);
+      }
+      const data = (await res.json().catch(() => ({}))) as { executionId?: string };
+      if (data.executionId) setLastExecutionId(data.executionId);
+      toast.success('Запуск поставлен в очередь');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Run failed');
+    } finally {
+      setRunningNow(false);
+    }
+  }, [workflowId]);
+
   useEffect(() => {
     let cancelled = false;
     if (!lastExecutionId) return;
@@ -393,7 +417,7 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
     if (type === 'schedule') {
       const cron = (cfg.cron ?? '').trim();
       if (cron && !isValidCron(cron)) {
-        errors.cron = 'Cron must have 5 fields (e.g. 0 * * * *)';
+        errors.cron = 'Cron должен содержать 5 полей (например: 0 * * * *)';
       } else {
         errors.cron = null;
       }
@@ -424,10 +448,10 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
       return (
         <SectionCard
           title="Configuration"
-          subtitle="Choose a simple schedule or switch to advanced cron."
+          subtitle="Выберите простой режим или переключитесь на расширенный cron."
         >
           <div className="flex items-center justify-between gap-3">
-            <span className="text-xs font-semibold text-slate-800">Mode</span>
+            <span className="text-xs font-semibold text-slate-800">Режим</span>
             <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1 text-xs">
               <button
                 type="button"
@@ -457,7 +481,7 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
           {(cfg.scheduleMode ?? 'simple') === 'simple' ? (
             <>
               <div>
-                <label className="block text-xs font-semibold text-slate-800">Frequency</label>
+                <label className="block text-xs font-semibold text-slate-800">Частота</label>
                 <select
                   value={cfg.frequency ?? 'hourly'}
                   onChange={(e) => {
@@ -471,19 +495,19 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
                   }}
                   className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
                 >
-                  <option value="every5">Every 5 minutes</option>
-                  <option value="hourly">Hourly</option>
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly (Mon)</option>
+                  <option value="every5">Каждые 5 минут</option>
+                  <option value="hourly">Каждый час</option>
+                  <option value="daily">Каждый день</option>
+                  <option value="weekly">Каждую неделю (Пн)</option>
                 </select>
                 <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
-                  Choose how often this workflow should run.
+                  Как часто запускать workflow.
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-800">Time</label>
+                  <label className="block text-xs font-semibold text-slate-800">Время</label>
                   <input
                     type="time"
                     value={cfg.time ?? '09:00'}
@@ -499,11 +523,11 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
                     className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
                   />
                   <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
-                    Used for daily/weekly schedules.
+                    Используется для ежедневного/еженедельного режима.
                   </p>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-800">Timezone</label>
+                  <label className="block text-xs font-semibold text-slate-800">Часовой пояс</label>
                   <input
                     value={cfg.timezone ?? 'Local'}
                     onChange={(e) => updateConfig({ timezone: e.target.value })}
@@ -511,7 +535,7 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
                     className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
                   />
                   <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
-                    MVP: display only (scheduler uses server time).
+                    MVP: пока только отображение (планировщик использует время сервера).
                   </p>
                 </div>
               </div>
@@ -523,14 +547,14 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
                 value={cfg.cron ?? ''}
                 onChange={(v) => updateConfig({ cron: v })}
                 placeholder="0 * * * *"
-                helper="Advanced mode. Cron must have 5 fields."
-                hint="Examples: 0 * * * * (hourly), */5 * * * * (every 5 minutes)"
+                helper="Advanced режим. Cron должен содержать 5 полей."
+                hint="Примеры: 0 * * * * (каждый час), */5 * * * * (каждые 5 минут)"
                 error={(validation as Record<string, string | null>).cron ?? null}
               />
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => toast.success(isValidCron(cfg.cron ?? '') ? 'Cron looks valid' : 'Cron is invalid')}
+                  onClick={() => toast.success(isValidCron(cfg.cron ?? '') ? 'Cron выглядит корректным' : 'Cron некорректен')}
                   className="inline-flex items-center justify-center rounded-btn border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                 >
                   Validate
@@ -877,12 +901,32 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
       return (
         <SectionCard
           title="Preview / Test"
-          subtitle="A quick preview of when this schedule runs."
+          subtitle="Проверьте, когда будет следующий запуск."
         >
           <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4">
             <p className="text-sm font-semibold text-slate-900">{preview}</p>
-            <p className="mt-1 text-sm text-slate-600">Next run: {nextRun}</p>
+            <p className="mt-1 text-sm text-slate-600">Следующий запуск: {nextRun}</p>
           </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleRunNow}
+              disabled={runningNow}
+              className="inline-flex items-center justify-center rounded-btn bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-red-700 disabled:opacity-60"
+            >
+              {runningNow ? 'Запуск…' : 'Run now'}
+            </button>
+            <button
+              type="button"
+              onClick={() => toast.success(isValidCron(cfg.cron ?? '') ? 'Cron выглядит корректным' : 'Cron некорректен')}
+              className="inline-flex items-center justify-center rounded-btn border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Validate
+            </button>
+          </div>
+          <p className="text-sm leading-relaxed text-slate-600">
+            Run now поставит workflow в очередь на выполнение (для теста).
+          </p>
         </SectionCard>
       );
     }
@@ -901,11 +945,14 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
     type,
     cfg.frequency,
     cfg.time,
+    cfg.cron,
     copiedKey,
     copyToClipboard,
     curlExample,
     handleTestWebhook,
+    handleRunNow,
     samplePayloadText,
+    runningNow,
     testing,
     webhookUrl,
   ]);

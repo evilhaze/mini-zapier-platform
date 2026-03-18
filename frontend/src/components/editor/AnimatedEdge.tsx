@@ -16,8 +16,6 @@ export function AnimatedEdge(props: EdgeProps) {
     targetPosition,
   });
 
-  const pathId = `edge-path-${id}`;
-
   return (
     <g>
       {/* subtle background stroke for contrast */}
@@ -44,9 +42,6 @@ export function AnimatedEdge(props: EdgeProps) {
       </path>
 
       <defs>
-        {/* path definition for lightning stream */}
-        <path id={pathId} d={edgePath} />
-
         {/* gradient for stroke */}
         <linearGradient id="edge-gradient" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0%" stopColor="#f97373" stopOpacity="0.4" />
@@ -59,28 +54,6 @@ export function AnimatedEdge(props: EdgeProps) {
         <path d={edgePath} fill="none" stroke="transparent" strokeWidth={10} markerEnd={markerEnd} />
       )}
 
-      {/* stream of tiny lightning glyphs moving along the edge */}
-      <text
-        fontSize={8}
-        fill="#f97373"
-        opacity={0.85}
-      >
-        <textPath
-          href={`#${pathId}`}
-          startOffset="0%"
-          textLength="140%"
-          spacing="auto"
-        >
-          {'⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡   ⚡'}
-          <animate
-            attributeName="startOffset"
-            from="0%"
-            to="100%"
-            dur="2.4s"
-            repeatCount="indefinite"
-          />
-        </textPath>
-      </text>
     </g>
   );
 }
