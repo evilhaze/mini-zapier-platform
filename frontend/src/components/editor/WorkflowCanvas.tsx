@@ -347,65 +347,68 @@ function WorkflowCanvasInner({
 
   return (
     <>
-      {/* Main canvas fills all available space */}
-      <div
-        ref={reactFlowWrapper}
-        className="h-full w-full"
-        onDrop={onDrop}
-        onDragOver={onDragOver}
-      >
-        <NodeActionsContext.Provider
-          value={{
-            openSettings: (nodeId: string) => {
-              setSelectedNodeId(nodeId);
-              setSettingsOpen(true);
-            },
-            renameNode: handleRenameNode,
-            duplicateNode: handleDuplicateNode,
-            deleteNode: handleDeleteNode,
-          }}
-        >
-          <ReactFlow
-            nodes={nodes}
-              edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onNodeClick={onNodeClick}
-            onPaneClick={onPaneClick}
-              nodeTypes={nodeTypes}
-              edgeTypes={{ animated: AnimatedEdge }}
-            fitView
-            style={{ width: '100%', height: '100%' }}
-            fitViewOptions={{ padding: 0.2 }}
-            proOptions={proOptions}
-              defaultEdgeOptions={{ type: 'animated' }}
-          >
-            <Background
-              variant={BackgroundVariant.Dots}
-              gap={24}
-              size={1}
-              color="#e2e8f0"
-            />
-            <Controls className="!border-slate-200/80 !rounded-btn !bg-white !shadow-soft" />
-            <MiniMap
-              nodeColor={(n) =>
-                typeof n.data?.type === 'string' && isTriggerType(n.data.type)
-                  ? '#8b5cf6'
-                  : '#059669'
-              }
-              className="!bg-white !border !border-slate-200/80 !rounded-card"
-            />
-          </ReactFlow>
-        </NodeActionsContext.Provider>
-      </div>
-
-      {/* Overlay layer for panels and hints */}
-      <div className="pointer-events-none absolute inset-0">
-        {/* Left Add Node panel as overlay */}
-        <div className="pointer-events-auto absolute left-4 top-4 z-20 max-h-[calc(100%-2rem)] w-60">
+      <div className="flex h-full min-h-0 w-full gap-4">
+        {/* Left column: Add Node */}
+        <div className="w-56 shrink-0">
           <Sidebar onAddNode={handleAddNodeFromSidebar} />
         </div>
+
+        {/* Right: Canvas */}
+        <div
+          ref={reactFlowWrapper}
+          className="relative h-full min-h-0 flex-1"
+          onDrop={onDrop}
+          onDragOver={onDragOver}
+        >
+          <NodeActionsContext.Provider
+            value={{
+              openSettings: (nodeId: string) => {
+                setSelectedNodeId(nodeId);
+                setSettingsOpen(true);
+              },
+              renameNode: handleRenameNode,
+              duplicateNode: handleDuplicateNode,
+              deleteNode: handleDeleteNode,
+            }}
+          >
+            <ReactFlow
+              nodes={nodes}
+              edges={edges}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onNodeClick={onNodeClick}
+              onPaneClick={onPaneClick}
+              nodeTypes={nodeTypes}
+              edgeTypes={{ animated: AnimatedEdge }}
+              fitView
+              style={{ width: '100%', height: '100%' }}
+              fitViewOptions={{ padding: 0.2 }}
+              proOptions={proOptions}
+              defaultEdgeOptions={{ type: 'animated' }}
+            >
+              <Background
+                variant={BackgroundVariant.Dots}
+                gap={24}
+                size={1}
+                color="#e2e8f0"
+              />
+              <Controls className="!border-slate-200/80 !rounded-btn !bg-white !shadow-soft" />
+              <MiniMap
+                nodeColor={(n) =>
+                  typeof n.data?.type === 'string' && isTriggerType(n.data.type)
+                    ? '#8b5cf6'
+                    : '#059669'
+                }
+                className="!bg-white !border !border-slate-200/80 !rounded-card"
+              />
+            </ReactFlow>
+          </NodeActionsContext.Provider>
+        </div>
+      </div>
+
+      {/* Overlay layer for panels and hints (canvas area only) */}
+      <div className="pointer-events-none absolute inset-0">
 
         {/* Start state overlay — guides user */}
         {showStartState && (
