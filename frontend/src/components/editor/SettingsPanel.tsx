@@ -327,13 +327,14 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
   useEffect(() => {
     let cancelled = false;
     if (!lastExecutionId) return;
+    const id = lastExecutionId;
 
     async function poll() {
       setLastExecutionLoading(true);
       try {
         // Poll briefly so MVP users see results without leaving the editor.
         for (let i = 0; i < 12; i++) {
-          const ex = await fetchExecutionById(lastExecutionId);
+          const ex = await fetchExecutionById(id);
           if (cancelled) return;
           setLastExecution(ex);
           if (ex.status !== 'pending' && ex.status !== 'running') break;

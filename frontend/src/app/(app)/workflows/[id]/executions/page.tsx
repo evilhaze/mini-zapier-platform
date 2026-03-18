@@ -1,11 +1,11 @@
 import { redirect } from 'next/navigation';
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
-export default function WorkflowExecutionsRedirectPage({ params }: Props) {
-  const { id } = params;
+export default async function WorkflowExecutionsRedirectPage({ params }: Props) {
+  const { id } = await params;
   redirect(`/executions?workflowId=${encodeURIComponent(id)}`);
 }
 

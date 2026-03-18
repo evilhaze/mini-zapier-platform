@@ -12,7 +12,7 @@ import { WorkflowDetailActions } from '@/components/workflows/WorkflowDetailActi
 import type { DefinitionJson } from '@/components/editor/types';
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 function safeParseDefinition(definitionJson: unknown): DefinitionJson | null {
@@ -78,7 +78,7 @@ function orderedNodeList(def: DefinitionJson | null): Array<{ id: string; type: 
 }
 
 export default async function WorkflowDetailPage({ params }: Props) {
-  const { id } = params;
+  const { id } = await params;
 
   const wf = await fetchWorkflowWithStats(id);
   const def = safeParseDefinition(wf?.definitionJson);

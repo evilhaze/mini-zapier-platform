@@ -1,19 +1,17 @@
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
-import { getExecution, getExecutionSteps } from '@/api';
 import { StepCard } from '@/components/executions/StepCard';
+import { fetchExecutionById } from '@/lib/executions-api';
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export default async function ExecutionDetailPage({ params }: Props) {
-  const { id } = params;
+  const { id } = await params;
 
-  const [execution, steps] = await Promise.all([
-    getExecution(id).catch(() => null),
-    getExecutionSteps(id).catch(() => []),
-  ]);
+  const execution = await fetchExecutionById(id).catch(() => null);
+  const steps = execution?.steps ?? [];
 
   return (
     <div className="space-y-6">
@@ -33,15 +31,15 @@ export default async function ExecutionDetailPage({ params }: Props) {
         </h1>
         {execution && (
           <p className="text-sm text-slate-500">
-            Workflow {execution.workflow_id} · {execution.trigger_type} ·{' '}
+            Workflow {execution.workflowId} · {execution.triggerType} ·{' '}
             {execution.status}
           </p>
         )}
       </header>
 
       <div className="space-y-4">
-        {steps.map((step) => (
-          <StepCard key={step.id} step={step} />
+        {steps.map((step, index) => (
+          <StepCard key={step.id} step={step} index={index} isLast={index === steps.length - 1} />
         ))}
         {steps.length === 0 && (
           <div className="rounded-card border border-slate-200/80 bg-white p-4 text-sm text-slate-500 shadow-card">

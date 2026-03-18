@@ -41,7 +41,7 @@ function ActionNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
   useEffect(() => {
     if (!menuOpen) return;
     const handleDocumentMouseDown = (event: MouseEvent) => {
-      const target = event.target as Node | null;
+      const target = event.target as globalThis.Node | null;
       if (target && (triggerRef.current?.contains(target) || menuRef.current?.contains(target))) {
         return;
       }
