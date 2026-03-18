@@ -28,6 +28,7 @@ import { AnimatedEdge } from './AnimatedEdge';
 import { NodeActionsContext } from './NodeActionsContext';
 import { ExecutionResultsPanel, type ExecutionWithSteps, type ExpectedNode } from './ExecutionResultsPanel';
 import { API_BASE } from '@/lib/api';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const proOptions = { hideAttribution: true };
 
@@ -47,6 +48,8 @@ function WorkflowCanvasInner({
   baselineSignature,
   onDirtyChange,
 }: WorkflowCanvasProps) {
+  const { theme } = useTheme();
+  const backgroundDotColor = theme === 'dark' ? '#334155' : '#e2e8f0';
   const { screenToFlowPosition } = useReactFlow();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -393,16 +396,18 @@ function WorkflowCanvasInner({
                 variant={BackgroundVariant.Dots}
                 gap={24}
                 size={1}
-                color="#e2e8f0"
+                color={backgroundDotColor}
               />
-              <Controls className="!border-slate-200/80 !rounded-btn !bg-white !shadow-soft" />
+              <Controls
+                className="!border-slate-200/80 !rounded-btn !bg-white !shadow-soft dark:!border-slate-800/80 dark:!bg-slate-950"
+              />
               <MiniMap
                 nodeColor={(n) =>
                   typeof n.data?.type === 'string' && isTriggerType(n.data.type)
                     ? '#8b5cf6'
                     : '#059669'
                 }
-                className="!bg-white !border !border-slate-200/80 !rounded-card"
+                className="!bg-white !border !border-slate-200/80 !rounded-card dark:!bg-slate-950 dark:!border-slate-800/80"
               />
             </ReactFlow>
           </NodeActionsContext.Provider>
@@ -415,7 +420,7 @@ function WorkflowCanvasInner({
                 className="pointer-events-none absolute inset-0 flex items-center justify-center p-4 sm:p-6"
                 aria-hidden
               >
-                <div className="pointer-events-none max-w-sm rounded-2xl border border-[#FECACA] bg-[#FEF2F2]/95 px-6 py-6 text-center shadow-lg backdrop-blur-sm">
+                <div className="pointer-events-none max-w-sm rounded-2xl border border-[#FECACA] bg-[#FEF2F2]/95 px-6 py-6 text-center shadow-lg backdrop-blur-sm dark:bg-slate-900/60">
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#FCA5A5]/20 text-[#EF4444]">
                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                       <path
@@ -426,10 +431,10 @@ function WorkflowCanvasInner({
                       />
                     </svg>
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold text-slate-900">
+                  <h3 className="mt-4 text-lg font-semibold text-slate-900 dark:text-slate-50">
                     {isEmpty ? 'Start with a trigger' : 'Add your first step'}
                   </h3>
-                  <p className="mt-2 text-sm text-slate-600">
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
                     {isEmpty
                       ? 'Drag a trigger from the left panel to start your workflow.'
                       : 'Drag an action from the left and connect it to your trigger to run the workflow.'}
@@ -441,8 +446,8 @@ function WorkflowCanvasInner({
             {/* Floating settings inspector with close button */}
             {selectedNodeForPanel && settingsOpen && (
               <div className="pointer-events-auto absolute inset-y-4 right-4 z-30 flex">
-                <div className="w-[420px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl">
-                  <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-3">
+                <div className="w-[420px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-slate-800/80 dark:bg-slate-950">
+                  <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-3 dark:border-slate-800/80">
                     <div className="min-w-0">
                       <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
                         Node settings
@@ -451,7 +456,7 @@ function WorkflowCanvasInner({
                     <button
                       type="button"
                       onClick={() => setSettingsOpen(false)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-slate-100"
                       aria-label="Close settings"
                     >
                       <span className="text-lg leading-none">×</span>

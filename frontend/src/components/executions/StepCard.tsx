@@ -49,7 +49,7 @@ export function StepCard({ step, index, isLast }: Props) {
               ? 'border-red-300 bg-red-50 text-red-600'
               : success
                 ? 'border-emerald-300 bg-emerald-50 text-emerald-600'
-                : 'border-slate-200 bg-slate-50 text-slate-500'
+                  : 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400'
           }`}
         >
           <StatusIcon
@@ -58,14 +58,14 @@ export function StepCard({ step, index, isLast }: Props) {
           />
         </div>
         {!isLast && (
-          <div className="mt-1 w-0.5 h-10 bg-slate-200" aria-hidden />
+          <div className="mt-1 w-0.5 h-10 bg-slate-200 dark:bg-slate-800" aria-hidden />
         )}
       </div>
 
       {/* Card content */}
       <div className="flex-1 min-w-0 pb-8">
         <div
-          className={`rounded-card border-2 bg-white shadow-soft overflow-hidden ${
+          className={`rounded-card border-2 bg-white shadow-soft overflow-hidden dark:bg-slate-950/60 dark:border-slate-800/80 ${
             failed
               ? 'border-red-200'
               : success
@@ -74,16 +74,16 @@ export function StepCard({ step, index, isLast }: Props) {
           }`}
         >
           {/* Step header */}
-          <div className="flex flex-wrap items-center gap-2 gap-y-1.5 border-b border-slate-100 px-4 py-3 bg-slate-50/50">
+          <div className="flex flex-wrap items-center gap-2 gap-y-1.5 border-b border-slate-100 px-4 py-3 bg-slate-50/50 dark:border-slate-800/80 dark:bg-slate-900/40">
             <span className="font-mono text-xs font-semibold text-slate-500">
               Step {index + 1}
             </span>
             <span className="font-medium text-slate-900">
               {step.nodeName || step.nodeId}
             </span>
-            <span className="text-slate-500 text-sm">({step.nodeType})</span>
+            <span className="text-slate-500 text-sm dark:text-slate-400">({step.nodeType})</span>
             <ExecutionStatusBadge status={step.status} />
-            <span className="text-xs text-slate-400 tabular-nums ml-auto">
+            <span className="text-xs text-slate-400 tabular-nums ml-auto dark:text-slate-500">
               {stepDuration(step.startedAt, step.finishedAt)}
             </span>
             {step.retryCount > 0 && (

@@ -120,7 +120,7 @@ function ActionNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
     <div
       className={`
         relative min-w-[200px] max-w-[220px] overflow-hidden rounded-card bg-white text-left shadow-soft
-        ring-1 ring-slate-200/80 transition
+        ring-1 ring-slate-200/80 transition dark:bg-slate-900 dark:ring-slate-800/80 dark:text-slate-100
         ${selected
           ? 'ring-2 ring-[#F87171] shadow-card-hover -translate-y-[1px]'
           : 'hover:ring-[#FECACA] hover:-translate-y-[1px]'}
@@ -150,7 +150,7 @@ function ActionNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
                 <input
                   ref={renameInputRef}
                   type="text"
-                  className="w-full rounded-input border border-slate-300 px-1.5 py-0.5 text-sm font-semibold text-slate-900 outline-none focus:border-[#EF4444] focus:ring-1 focus:ring-[#FCA5A5]"
+                  className="w-full rounded-input border border-slate-300 bg-white px-1.5 py-0.5 text-sm font-semibold text-slate-900 outline-none focus:border-[#EF4444] focus:ring-1 focus:ring-[#FCA5A5] dark:border-slate-700 dark:bg-slate-950 dark:text-slate-50"
                   value={tempName}
                   onChange={(e) => setTempName(e.target.value)}
                   onBlur={commitRename}
@@ -167,15 +167,15 @@ function ActionNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
               </div>
             ) : (
               <>
-                <p className="mt-0.5 truncate text-sm font-semibold text-slate-900">{title}</p>
-                <p className="mt-1 line-clamp-2 text-xs text-slate-500">{description}</p>
+                <p className="mt-0.5 truncate text-sm font-semibold text-slate-900 dark:text-slate-50">{title}</p>
+                <p className="mt-1 line-clamp-2 text-xs text-slate-500 dark:text-slate-300">{description}</p>
               </>
             )}
           </div>
           <button
             ref={triggerRef}
             type="button"
-            className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-[#FEF2F2] hover:text-[#EF4444]"
+            className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-[#FEF2F2] hover:text-[#EF4444] dark:text-slate-300 dark:hover:bg-[#0f172a] dark:hover:text-[#F87171]"
             title="Node actions"
             aria-label="Node actions"
             onPointerDown={(e) => {
@@ -195,34 +195,34 @@ function ActionNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
         ? createPortal(
             <div
               ref={menuRef}
-              className="fixed z-[1000] w-44 rounded-lg border border-slate-200 bg-white py-1 text-sm shadow-lg"
+              className="fixed z-[1000] w-44 rounded-lg border border-slate-200 bg-white py-1 text-sm shadow-lg dark:border-slate-800 dark:bg-slate-950"
               style={{ top: menuPosition.top, left: menuPosition.left }}
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 type="button"
-                className="flex w-full items-center justify-between px-3 py-1.5 text-left text-slate-700 hover:bg-slate-50"
+                className="flex w-full items-center justify-between px-3 py-1.5 text-left text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-900"
                 onClick={handleSettings}
               >
                 <span>Settings</span>
               </button>
               <button
                 type="button"
-                className="flex w-full items-center justify-between px-3 py-1.5 text-left text-slate-700 hover:bg-slate-50"
+                className="flex w-full items-center justify-between px-3 py-1.5 text-left text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-900"
                 onClick={startRename}
               >
                 <span>Rename</span>
               </button>
               <button
                 type="button"
-                className="flex w-full items-center justify-between px-3 py-1.5 text-left text-slate-700 hover:bg-slate-50"
+                className="flex w-full items-center justify-between px-3 py-1.5 text-left text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-900"
                 onClick={handleDuplicate}
               >
                 <span>Duplicate</span>
               </button>
               <button
                 type="button"
-                className="flex w-full items-center justify-between px-3 py-1.5 text-left text-red-600 hover:bg-red-50"
+                className="flex w-full items-center justify-between px-3 py-1.5 text-left text-red-600 hover:bg-red-50 dark:text-red-300 dark:hover:bg-red-950/20"
                 onClick={handleDelete}
               >
                 <span>Delete</span>

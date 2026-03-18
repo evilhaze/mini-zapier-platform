@@ -2,10 +2,14 @@
 
 import type { EdgeProps } from '@xyflow/react';
 import { BaseEdge, getBezierPath } from '@xyflow/react';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export function AnimatedEdge(props: EdgeProps) {
   const { id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, markerEnd } =
     props;
+  const { theme } = useTheme();
+
+  const baseStroke = theme === 'dark' ? '#334155' : '#e2e8f0';
 
   const [edgePath] = getBezierPath({
     sourceX,
@@ -19,7 +23,7 @@ export function AnimatedEdge(props: EdgeProps) {
   return (
     <g>
       {/* subtle background stroke for contrast */}
-      <BaseEdge id={id} path={edgePath} style={{ stroke: '#e2e8f0', strokeWidth: 2 }} />
+      <BaseEdge id={id} path={edgePath} style={{ stroke: baseStroke, strokeWidth: 2 }} />
 
       {/* animated overlay stroke (keeps existing flow feel) */}
       <path

@@ -26,3 +26,14 @@ body {
 .react-flow__background {
   @apply bg-surface-100;
 }
+
+/* Dark mode for React Flow primitives inside editor */
+.dark .react-flow__node {
+  border-color: rgb(51 65 85) !important; /* slate-700 */
+}
+.dark .react-flow__handle {
+  background-color: rgb(15 23 42) !important; /* slate-900 */
+}
+.dark .react-flow__background {
+  background-color: rgb(15 23 42) !important; /* slate-900 */
+}

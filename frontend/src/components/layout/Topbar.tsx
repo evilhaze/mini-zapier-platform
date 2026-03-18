@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Menu, User, LogOut, ChevronDown } from 'lucide-react';
 import Link from '@/components/ui/Link';
 import { useAuth } from '@/contexts/AuthContext';
+import { ThemeToggleButton } from './ThemeToggleButton';
 
 type TopbarProps = {
   onMenuClick: () => void;
@@ -54,19 +55,19 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
   return (
     <header
-      className="flex h-[var(--topbar-h)] shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-white px-4 md:px-6"
+      className="flex h-[var(--topbar-h)] shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-white px-4 md:px-6 dark:border-slate-800/80 dark:bg-slate-950"
       role="banner"
     >
       <button
         type="button"
         aria-label="Open menu"
         onClick={onMenuClick}
-        className="rounded-btn p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 md:hidden"
+        className="rounded-btn p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 md:hidden dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-200"
       >
         <Menu className="h-5 w-5" />
       </button>
 
-      <div className="flex-1 text-center text-sm text-slate-500 md:text-left">
+      <div className="flex-1 text-center text-sm text-slate-500 md:text-left dark:text-slate-300">
         Design, run and monitor automations with Zyper.
       </div>
 
@@ -75,10 +76,11 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           href={apiDocsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-sm font-medium text-slate-500 hover:text-accent transition-colors"
+          className="text-sm font-medium text-slate-500 hover:text-accent transition-colors dark:text-slate-300"
         >
           API Docs
         </a>
+        <ThemeToggleButton className="border-none bg-transparent shadow-none dark:border-none dark:bg-transparent" />
         {!hydrated ? (
           <div className="h-9 w-24 rounded-xl bg-slate-100" aria-hidden />
         ) : isLoggedIn ? (
@@ -86,7 +88,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
-              className="group inline-flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white px-2 py-1.5 shadow-sm transition hover:bg-slate-50"
+              className="group inline-flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white px-2 py-1.5 shadow-sm transition hover:bg-slate-50 dark:border-slate-800/80 dark:bg-slate-950 dark:hover:bg-slate-900"
               aria-haspopup="menu"
               aria-expanded={open}
             >
@@ -101,16 +103,16 @@ export function Topbar({ onMenuClick }: TopbarProps) {
               <span className="hidden max-w-[180px] truncate text-sm font-semibold text-slate-700 md:inline">
                 {displayName}
               </span>
-              <ChevronDown className="hidden h-4 w-4 text-slate-400 transition group-hover:text-slate-500 md:inline" />
+              <ChevronDown className="hidden h-4 w-4 text-slate-400 transition group-hover:text-slate-500 md:inline dark:group-hover:text-slate-300 dark:text-slate-500" />
             </button>
 
             {open && (
               <div
                 role="menu"
-                className="absolute right-0 mt-2 w-[320px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl"
+                className="absolute right-0 mt-2 w-[320px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-slate-800/80 dark:bg-slate-950"
               >
-                <div className="flex items-start gap-3 border-b border-slate-200/80 px-4 py-4">
-                  <div className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 text-base font-semibold text-slate-800 ring-1 ring-black/5">
+                <div className="flex items-start gap-3 border-b border-slate-200/80 px-4 py-4 dark:border-slate-800/80">
+                  <div className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 text-base font-semibold text-slate-800 ring-1 ring-black/5 dark:bg-slate-900 dark:text-slate-200 dark:ring-black/20">
                     {user?.avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" />
@@ -119,11 +121,11 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                     )}
                   </div>
                   <div className="min-w-0">
-                    <div className="truncate text-sm font-semibold text-slate-900">{displayName}</div>
+                    <div className="truncate text-sm font-semibold text-slate-900 dark:text-slate-50">{displayName}</div>
                     {user?.username ? (
-                      <div className="truncate text-xs text-slate-500">@{user.username}</div>
+                      <div className="truncate text-xs text-slate-500 dark:text-slate-300">@{user.username}</div>
                     ) : null}
-                    {user?.email ? <div className="truncate text-xs text-slate-500">{user.email}</div> : null}
+                    {user?.email ? <div className="truncate text-xs text-slate-500 dark:text-slate-300">{user.email}</div> : null}
                   </div>
                 </div>
 
@@ -131,19 +133,19 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                   <Link
                     href="/account"
                     onClick={() => setOpen(false)}
-                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-900"
                     role="menuitem"
                   >
-                    <User className="h-4 w-4 text-slate-500" />
+                    <User className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                     Open profile
                   </Link>
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-900"
                     role="menuitem"
                   >
-                    <LogOut className="h-4 w-4 text-slate-500" />
+                    <LogOut className="h-4 w-4 text-slate-500 dark:text-slate-400" />
                     Logout
                   </button>
                 </div>
@@ -154,7 +156,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+              className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-slate-100"
             >
               Log in
             </Link>

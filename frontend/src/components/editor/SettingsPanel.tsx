@@ -25,13 +25,13 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-3">
+    <section className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-3 dark:border-slate-800/80 dark:bg-slate-950">
       <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-700">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-700 dark:text-slate-300">
           {title}
         </p>
         {subtitle && (
-          <p className="text-sm leading-relaxed text-slate-600">
+          <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
             {subtitle}
           </p>
         )}
@@ -65,10 +65,10 @@ function Field({
   multiline?: boolean;
 }) {
   const inputClass =
-    'mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20';
+    'mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400';
   return (
     <div>
-      <label className="block text-xs font-semibold text-slate-800">{label}</label>
+      <label className="block text-xs font-semibold text-slate-800 dark:text-slate-200">{label}</label>
       {multiline ? (
         <textarea
           value={value}
@@ -846,7 +846,7 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
           title="Preview / Test"
           subtitle="The easiest way to verify your workflow."
         >
-          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-2">
+          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-2 dark:border-slate-800/80 dark:bg-slate-950/40">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <p className="text-xs font-semibold text-slate-800">Webhook URL</p>
@@ -857,7 +857,7 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
               <button
                 type="button"
                 onClick={() => copyToClipboard(webhookUrl, 'url')}
-                className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-900"
               >
                 {copiedKey === 'url' ? 'Copied' : 'Copy URL'}
               </button>
@@ -865,9 +865,9 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
             <input
               readOnly
               value={webhookUrl}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-900 shadow-sm"
+              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-900 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-100"
             />
-            <p className="text-sm leading-relaxed text-slate-600">
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
               Send an HTTP POST request to this URL to trigger the workflow.
             </p>
             <button
@@ -879,10 +879,10 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
               {testing ? 'Testing…' : 'Test webhook'}
             </button>
             {(lastExecutionLoading || lastExecution) && (
-              <div className="rounded-xl border border-slate-200 bg-white px-3 py-2">
-                <p className="text-xs text-slate-600">
+              <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-800 dark:bg-slate-900/60">
+                <p className="text-xs text-slate-600 dark:text-slate-300">
                   Last test:{' '}
-                  <span className="font-semibold text-slate-900">
+                  <span className="font-semibold text-slate-900 dark:text-slate-50">
                     {lastExecutionLoading ? 'running…' : (lastExecution?.status ?? '—')}
                   </span>
                 </p>
@@ -890,34 +890,34 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
             )}
           </div>
 
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2 dark:border-slate-800/80 dark:bg-slate-950/40">
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs font-semibold text-slate-800">Sample payload</p>
               <button
                 type="button"
                 onClick={() => copyToClipboard(samplePayloadText, 'payload')}
-                className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-900"
               >
                 {copiedKey === 'payload' ? 'Copied' : 'Copy example'}
               </button>
             </div>
-            <pre className="overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 whitespace-pre-wrap break-words">
+            <pre className="overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 whitespace-pre-wrap break-words dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-200">
               {samplePayloadText}
             </pre>
           </div>
 
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2 dark:border-slate-800/80 dark:bg-slate-950/40">
             <div className="flex items-center justify-between gap-2">
               <p className="text-xs font-semibold text-slate-800">cURL</p>
               <button
                 type="button"
                 onClick={() => copyToClipboard(curlExample, 'curl')}
-                className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-900"
               >
                 {copiedKey === 'curl' ? 'Copied' : 'Copy curl'}
               </button>
             </div>
-            <pre className="overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 whitespace-pre-wrap break-words">
+            <pre className="overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 whitespace-pre-wrap break-words dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-200">
               {curlExample}
             </pre>
           </div>
@@ -934,9 +934,9 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
           title="Preview / Test"
           subtitle="Проверьте, когда будет следующий запуск."
         >
-          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4">
-            <p className="text-sm font-semibold text-slate-900">{preview}</p>
-            <p className="mt-1 text-sm text-slate-600">Следующий запуск: {nextRun}</p>
+          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 dark:border-slate-800/80 dark:bg-slate-950/40">
+            <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{preview}</p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">Следующий запуск: {nextRun}</p>
           </div>
           <div className="flex gap-2">
             <button
@@ -950,7 +950,7 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
             <button
               type="button"
               onClick={() => toast.success(isValidCron(cfg.cron ?? '') ? 'Cron выглядит корректным' : 'Cron некорректен')}
-              className="inline-flex items-center justify-center rounded-btn border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              className="inline-flex items-center justify-center rounded-btn border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-900"
             >
               Validate
             </button>

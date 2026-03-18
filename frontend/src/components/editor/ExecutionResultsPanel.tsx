@@ -147,18 +147,18 @@ export function ExecutionResultsPanel({
   if (!execution && !loading) return null;
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white/95 backdrop-blur-sm shadow-lg overflow-hidden transition-opacity duration-200">
-      <div className="border-b border-slate-200/80 bg-white px-5 py-4">
+    <div className="rounded-2xl border border-slate-200/80 bg-white/95 backdrop-blur-sm shadow-lg overflow-hidden transition-opacity duration-200 dark:border-slate-800/80 dark:bg-slate-950/80">
+      <div className="border-b border-slate-200/80 bg-white px-5 py-4 dark:border-slate-800/80 dark:bg-slate-950">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
               Last execution
             </p>
-            <p className="mt-2 text-sm font-semibold text-slate-900">
+            <p className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-50">
               {loading ? 'Running…' : execution ? `Status: ${execution.status}` : '—'}
             </p>
             {execution?.errorMessage && (
-              <p className="mt-1 text-sm text-red-600">{execution.errorMessage}</p>
+              <p className="mt-1 text-sm text-red-600 dark:text-red-300">{execution.errorMessage}</p>
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -170,7 +170,7 @@ export function ExecutionResultsPanel({
                 type="button"
                 onClick={onClose}
                 aria-label="Close panel"
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 hover:border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/30"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 hover:border-slate-200 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-red-500/30"
               >
                 <X className="h-4 w-4" aria-hidden />
               </button>
@@ -181,11 +181,11 @@ export function ExecutionResultsPanel({
 
       <div className="p-5 space-y-3">
         {merged.trigger && (
-          <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 px-4 py-3">
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 px-4 py-3 dark:border-slate-800/80 dark:bg-slate-900/50">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-sm font-semibold text-slate-900 truncate">{merged.trigger.title}</p>
-                <p className="mt-1 text-xs text-slate-600">Webhook: payload stored as execution input.</p>
+                <p className="text-sm font-semibold text-slate-900 truncate dark:text-slate-50">{merged.trigger.title}</p>
+                <p className="mt-1 text-xs text-slate-600 dark:text-slate-300">Webhook: payload stored as execution input.</p>
               </div>
               <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
             </div>
@@ -208,7 +208,10 @@ export function ExecutionResultsPanel({
                     ? 'text-amber-600'
                     : 'text-slate-500';
             return (
-              <div key={s.nodeId} className="rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden">
+                <div
+                  key={s.nodeId}
+                  className="rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden dark:border-slate-800/80 dark:bg-slate-950"
+                >
                 <button
                   type="button"
                   onClick={() => onToggleStep?.(s.nodeId)}
@@ -217,15 +220,15 @@ export function ExecutionResultsPanel({
                   <div className="flex items-start gap-3 min-w-0">
                     <Icon className={`h-5 w-5 shrink-0 ${iconClass}`} />
                     <div className="min-w-0">
-                      <p className="text-sm font-semibold text-slate-900 truncate">
+                      <p className="text-sm font-semibold text-slate-900 truncate dark:text-slate-50">
                         {idx + 1}. {s.title}
                       </p>
-                      <p className="mt-1 text-xs text-slate-600 truncate">
+                      <p className="mt-1 text-xs text-slate-600 truncate dark:text-slate-300">
                         {s.summary}
                         {s.retryCount > 0 ? ` · retries: ${s.retryCount}` : ''}
                       </p>
                       {s.error && (
-                        <p className="mt-1 text-xs text-red-600 truncate">{s.error}</p>
+                        <p className="mt-1 text-xs text-red-600 dark:text-red-300 truncate">{s.error}</p>
                       )}
                     </div>
                   </div>
@@ -242,9 +245,9 @@ export function ExecutionResultsPanel({
                 </button>
 
                 {open && (
-                  <div className="border-t border-slate-200/80 p-4 space-y-3 bg-white">
+                  <div className="border-t border-slate-200/80 p-4 space-y-3 bg-white dark:border-slate-800/80 dark:bg-slate-950">
                     {s.status === 'skipped' ? (
-                      <p className="text-sm text-slate-600">
+                      <p className="text-sm text-slate-600 dark:text-slate-300">
                         Этот шаг не был выполнен, потому что выполнение остановилось раньше.
                       </p>
                     ) : (

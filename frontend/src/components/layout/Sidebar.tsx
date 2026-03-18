@@ -46,14 +46,15 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           fixed inset-y-0 left-0 z-50 flex w-[var(--sidebar-w)] shrink-0 flex-col border-r border-slate-200/80 bg-white shadow-soft transition-transform duration-200 ease-out
           md:relative md:translate-x-0 md:shadow-none
           ${open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+          dark:border-slate-800/80 dark:bg-slate-950
         `}
         aria-label="Main navigation"
       >
         {/* Logo row */}
-        <div className="flex h-[var(--topbar-h)] items-center justify-between border-b border-slate-200/80 px-4 md:px-5">
+        <div className="flex h-[var(--topbar-h)] items-center justify-between border-b border-slate-200/80 px-4 md:px-5 dark:border-slate-800/80">
           <Link
             href="/home"
-            className="flex items-center gap-2.5 font-semibold text-slate-900"
+            className="flex items-center gap-2.5 font-semibold text-slate-900 dark:text-slate-50"
             onClick={() => onClose()}
           >
             <span className="flex h-7 w-7 items-center justify-center rounded-md bg-red-600 text-white">
@@ -67,7 +68,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             type="button"
             aria-label="Close menu"
             onClick={onClose}
-            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 md:hidden"
+            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 md:hidden dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-200"
           >
             <X className="h-5 w-5" />
           </button>
@@ -99,8 +100,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 className={`
                   flex items-center gap-3 rounded-btn px-3 py-2.5 text-sm font-medium transition-colors
                   ${isActive
-                    ? 'bg-red-50 text-red-700 border border-red-200'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                    ? 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/20 dark:text-red-200 dark:border-red-800/60'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-slate-100'
                   }
                 `}
                 aria-current={isActive ? 'page' : undefined}

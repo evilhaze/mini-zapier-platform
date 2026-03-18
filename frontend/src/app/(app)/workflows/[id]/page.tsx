@@ -106,7 +106,7 @@ export default async function WorkflowDetailPage({ params }: Props) {
         </Link>
       </div>
 
-      <header className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+      <header className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-950">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-start gap-3">

@@ -35,6 +35,52 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Fallback dark theme overrides.
+   These keep the UI readable even when some components still use light-only Tailwind colors.
+   Note: landing pages are outside ThemeProvider, so `.dark` class won't be present there. */
+.dark .bg-white {
+  background-color: rgb(15 23 42) !important; /* slate-900 */
+}
+.dark .bg-white\/70 {
+  background-color: rgba(15, 23, 42, 0.7) !important;
+}
+.dark .bg-white\/80 {
+  background-color: rgba(15, 23, 42, 0.8) !important;
+}
+.dark .bg-white\/95 {
+  background-color: rgba(15, 23, 42, 0.95) !important;
+}
+.dark .bg-slate-50 {
+  background-color: rgb(15 23 42) !important; /* slate-900 */
+}
+.dark .bg-slate-50\/60 {
+  background-color: rgba(15, 23, 42, 0.6) !important;
+}
+.dark .bg-slate-50\/50 {
+  background-color: rgba(15, 23, 42, 0.5) !important;
+}
+.dark .text-slate-900 {
+  color: rgb(241 245 249) !important; /* slate-100 */
+}
+.dark .text-slate-800 {
+  color: rgb(226 232 240) !important; /* slate-200 */
+}
+.dark .text-slate-700 {
+  color: rgb(226 232 240) !important; /* slate-200 */
+}
+.dark .text-slate-600 {
+  color: rgb(148 163 184) !important; /* slate-400 */
+}
+.dark .text-slate-500 {
+  color: rgb(148 163 184) !important; /* slate-400 */
+}
+.dark .border-slate-200 {
+  border-color: rgb(51 65 85) !important; /* slate-700 */
+}
+.dark .border-slate-200\/80 {
+  border-color: rgba(51, 65, 85, 0.8) !important;
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

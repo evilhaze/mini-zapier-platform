@@ -23,7 +23,7 @@ export function CodePanel({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between gap-2 border-b border-slate-200/80 bg-slate-50/80 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+        className="flex w-full items-center justify-between gap-2 border-b border-slate-200/80 bg-slate-50/80 px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors dark:border-slate-800/80 dark:bg-slate-950/50 dark:text-slate-200 dark:hover:bg-slate-900"
       >
         <span className="flex items-center gap-2">
           {open ? (
@@ -35,7 +35,7 @@ export function CodePanel({
         </span>
       </button>
       {open && (
-        <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-slate-800 max-h-[320px] overflow-y-auto">
+        <pre className="overflow-x-auto p-4 font-mono text-xs leading-relaxed text-slate-800 max-h-[320px] overflow-y-auto dark:text-slate-200">
           <code>{content}</code>
         </pre>
       )}

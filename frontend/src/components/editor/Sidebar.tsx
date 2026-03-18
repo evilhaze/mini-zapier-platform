@@ -60,6 +60,7 @@ function SidebarItem({
         group flex cursor-grab items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-3 py-2.5 text-left shadow-sm transition
         hover:-translate-y-[1px] hover:border-slate-300 hover:shadow-md
         active:cursor-grabbing
+        dark:bg-slate-950 dark:border-slate-800/80
         ${variant === 'trigger'
           ? 'hover:bg-[#FDF2F7] focus-visible:ring-2 focus-visible:ring-[#DEA5B5]/30'
           : 'hover:bg-red-50 focus-visible:ring-2 focus-visible:ring-red-200'}
@@ -76,8 +77,10 @@ function SidebarItem({
         <Icon className="h-4 w-4" />
       </div>
       <div className="min-w-0 flex-1">
-        <span className="block truncate text-[13px] font-semibold text-slate-900">{label}</span>
-        <span className="mt-0.5 block text-xs text-slate-500">
+        <span className="block truncate text-[13px] font-semibold text-slate-900 dark:text-slate-100">
+          {label}
+        </span>
+        <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-300">
           {variant === 'trigger' ? 'Starts the workflow' : 'Runs after previous step'}
         </span>
       </div>
@@ -91,15 +94,15 @@ type SidebarProps = {
 
 export function Sidebar({ onAddNode }: SidebarProps) {
   return (
-    <aside className="flex h-full w-56 shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-soft">
-      <div className="border-b border-slate-200/80 px-3.5 py-3">
-        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+    <aside className="flex h-full w-56 shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-soft dark:border-slate-800/80 dark:bg-slate-950">
+      <div className="border-b border-slate-200/80 px-3.5 py-3 dark:border-slate-800/80">
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
           Add node
         </h3>
-        <p className="mt-1.5 text-sm font-semibold text-slate-900">
+        <p className="mt-1.5 text-sm font-semibold text-slate-900 dark:text-slate-100">
           Triggers & actions
         </p>
-        <p className="mt-1 text-xs leading-relaxed text-slate-600">
+        <p className="mt-1 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
           Drag onto the canvas or click to add.
         </p>
       </div>

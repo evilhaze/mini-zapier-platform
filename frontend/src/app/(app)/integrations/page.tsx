@@ -48,6 +48,7 @@ function IntegrationCard({ item }: { item: Integration }) {
       className={`
         group relative flex w-full items-start gap-3 rounded-2xl border bg-white px-4 py-4 text-left shadow-sm transition
         ${locked ? 'border-slate-200/80 hover:border-slate-300 hover:shadow-md' : 'border-emerald-200'}
+        dark:bg-slate-950 dark:border-slate-800/80
       `}
     >
       <div
@@ -59,7 +60,7 @@ function IntegrationCard({ item }: { item: Integration }) {
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <div className="truncate text-sm font-semibold text-slate-900">{item.name}</div>
+          <div className="truncate text-sm font-semibold text-slate-900 dark:text-slate-50">{item.name}</div>
           {item.popular ? (
             <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
               <Star className="h-3 w-3" />
@@ -67,9 +68,9 @@ function IntegrationCard({ item }: { item: Integration }) {
             </span>
           ) : null}
         </div>
-        <div className="mt-1 truncate text-xs text-slate-500">{item.subtitle}</div>
+        <div className="mt-1 truncate text-xs text-slate-500 dark:text-slate-300">{item.subtitle}</div>
       </div>
-      <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-600">
+      <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-300">
         <Lock className="h-3.5 w-3.5" />
         Coming soon
       </span>
@@ -90,7 +91,7 @@ export default function IntegrationsPage() {
 
   return (
     <div className="space-y-8">
-      <section className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+      <section className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-950">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
@@ -103,11 +104,11 @@ export default function IntegrationsPage() {
         />
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Integrations</p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-300">Integrations</p>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl dark:text-slate-50">
               Connect your favorite services
             </h1>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base">
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 sm:text-base dark:text-slate-300">
               We’re preparing an integrations library so your workflows can connect with Google, Notion, Slack, GitHub
               and many more services. This page is a preview of what’s coming next.
             </p>
@@ -116,7 +117,7 @@ export default function IntegrationsPage() {
                 <Sparkles className="h-4 w-4" />
                 Coming soon
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700">
+              <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-200">
                 <PlugZap className="h-4 w-4 text-slate-500" />
                 App marketplace (preview)
               </span>
@@ -128,8 +129,8 @@ export default function IntegrationsPage() {
       <section className="space-y-3">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">Popular upcoming apps</h2>
-            <p className="mt-1 text-sm text-slate-600">
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Popular upcoming apps</h2>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
               Most requested apps we plan to add in the first release.
             </p>
           </div>
@@ -145,9 +146,9 @@ export default function IntegrationsPage() {
       </section>
 
       <section className="space-y-3">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-900">Planned integrations</h2>
-          <p className="mt-1 text-sm text-slate-600">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">Planned integrations</h2>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
             A wider set of services we’ll be adding over time.
           </p>
         </div>
@@ -158,9 +159,9 @@ export default function IntegrationsPage() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
-        <h3 className="text-sm font-semibold text-slate-900">Requested apps</h3>
-        <p className="mt-1 text-sm text-slate-600">
+      <section className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-950">
+        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-50">Requested apps</h3>
+        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
           Want to see a specific service here? We’ll add a dedicated request flow soon. For now, this screen shows how
           the future integrations hub will look.
         </p>
