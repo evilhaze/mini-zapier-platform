@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { API_BASE } from '@/lib/api';
+import { api } from '@/lib/api';
 import { toast } from 'sonner';
 import {
   BarChart3,
@@ -37,6 +37,12 @@ type ExecutionListItem = {
   errorMessage: string | null;
   workflow?: { id: string; name: string } | null;
 };
+
+function isExecutionsResponse(value: unknown): value is { data: ExecutionListItem[] } {
+  if (typeof value !== 'object' || value === null) return false;
+  const maybe = value as { data?: unknown };
+  return Array.isArray(maybe.data);
+}
 
 type Period = '24h' | '7d' | '30d' | 'all';
 
@@ -257,10 +263,10 @@ export default function AnalyticsPage() {
       setLoading(true);
       try {
         const [ov, ex] = await Promise.all([
-          fetch(`${API_BASE}/statistics/overview`, { cache: 'no-store' }).then((r) => r.json()),
-          fetch(`${API_BASE}/executions?limit=200`, { cache: 'no-store' }).then((r) => r.json()),
+          api<OverviewStats>('/statistics/overview', { cache: 'no-store' }),
+          api<unknown>('/executions?limit=200', { cache: 'no-store' }),
         ]);
-        const list = Array.isArray(ex?.data) ? (ex.data as ExecutionListItem[]) : Array.isArray(ex) ? (ex as ExecutionListItem[]) : [];
+        const list = Array.isArray(ex) ? (ex as ExecutionListItem[]) : isExecutionsResponse(ex) ? ex.data : [];
         if (!cancelled) {
           setOverview(ov as OverviewStats);
           setExecutions(list);
