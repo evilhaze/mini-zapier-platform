@@ -12,14 +12,21 @@ import {
 const STORAGE_DEMO = 'zyper_demo';
 const STORAGE_USER = 'zyper_user';
 
-type User = { email: string };
+export type User = {
+  email: string;
+  name?: string | null;
+  username?: string | null;
+  avatarUrl?: string | null;
+  createdAt?: string | null; // ISO
+  status?: 'active' | 'demo' | 'unknown';
+};
 
 type AuthContextValue = {
   isDemo: boolean;
   isLoggedIn: boolean;
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string, profile?: Pick<User, 'name' | 'username'>) => Promise<void>;
   tryDemo: () => void;
   logout: () => void;
   hydrated: boolean;
@@ -38,7 +45,18 @@ function readUser(): User | null {
     const raw = window.localStorage.getItem(STORAGE_USER);
     if (!raw) return null;
     const data = JSON.parse(raw) as User;
-    return data?.email ? data : null;
+    if (!data?.email) return null;
+    return {
+      email: String(data.email),
+      name: typeof data.name === 'string' ? data.name : null,
+      username: typeof data.username === 'string' ? data.username : null,
+      avatarUrl: typeof data.avatarUrl === 'string' ? data.avatarUrl : null,
+      createdAt: typeof data.createdAt === 'string' ? data.createdAt : null,
+      status:
+        data.status === 'active' || data.status === 'demo' || data.status === 'unknown'
+          ? data.status
+          : 'unknown',
+    };
   } catch {
     return null;
   }
@@ -72,7 +90,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!password.trim()) throw new Error('Password is required');
       if (typeof window === 'undefined') return;
       window.localStorage.removeItem(STORAGE_DEMO);
-      const u = { email: email.trim() };
+      const existing = readUser();
+      const nowIso = new Date().toISOString();
+      const cleanEmail = email.trim();
+      const inferredName = cleanEmail.split('@')[0]?.replace(/[._-]+/g, ' ') ?? cleanEmail;
+      const u: User =
+        existing?.email?.toLowerCase() === cleanEmail.toLowerCase()
+          ? {
+              ...existing,
+              email: cleanEmail,
+              status: 'active',
+              createdAt: existing.createdAt ?? nowIso,
+              name: existing.name ?? inferredName,
+              username: existing.username ?? cleanEmail.split('@')[0] ?? null,
+            }
+          : {
+              email: cleanEmail,
+              name: inferredName,
+              username: cleanEmail.split('@')[0] ?? null,
+              createdAt: nowIso,
+              status: 'active',
+            };
       window.localStorage.setItem(STORAGE_USER, JSON.stringify(u));
       setUser(u);
       setIsLoggedIn(true);
@@ -82,12 +120,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const signup = useCallback(
-    async (email: string, password: string) => {
+    async (email: string, password: string, profile?: Pick<User, 'name' | 'username'>) => {
       if (!email.trim()) throw new Error('Email is required');
       if (!password.trim()) throw new Error('Password is required');
       if (typeof window === 'undefined') return;
       window.localStorage.removeItem(STORAGE_DEMO);
-      const u = { email: email.trim() };
+      const nowIso = new Date().toISOString();
+      const cleanEmail = email.trim();
+      const inferredName = cleanEmail.split('@')[0]?.replace(/[._-]+/g, ' ') ?? cleanEmail;
+      const name = profile?.name?.trim() || inferredName;
+      const username = profile?.username?.trim() || (cleanEmail.split('@')[0] ?? null);
+      const u: User = {
+        email: cleanEmail,
+        name,
+        username,
+        createdAt: nowIso,
+        status: 'active',
+      };
       window.localStorage.setItem(STORAGE_USER, JSON.stringify(u));
       setUser(u);
       setIsLoggedIn(true);

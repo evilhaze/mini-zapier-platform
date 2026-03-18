@@ -349,14 +349,14 @@ function WorkflowCanvasInner({
     <>
       <div className="flex h-full min-h-0 w-full gap-4">
         {/* Left column: Add Node */}
-        <div className="w-56 shrink-0">
+        <div className="w-56 min-w-56 shrink-0 min-h-0 relative z-10">
           <Sidebar onAddNode={handleAddNodeFromSidebar} />
         </div>
 
         {/* Right: Canvas */}
         <div
           ref={reactFlowWrapper}
-          className="relative h-full min-h-0 flex-1"
+          className="relative h-full min-h-0 min-w-0 flex-1"
           onDrop={onDrop}
           onDragOver={onDragOver}
         >
@@ -404,79 +404,85 @@ function WorkflowCanvasInner({
               />
             </ReactFlow>
           </NodeActionsContext.Provider>
-        </div>
-      </div>
 
-      {/* Overlay layer for panels and hints (canvas area only) */}
-      <div className="pointer-events-none absolute inset-0">
-
-        {/* Start state overlay — guides user */}
-        {showStartState && (
-          <div
-            className="pointer-events-none absolute inset-0 flex items-center justify-center p-4 sm:p-6"
-            aria-hidden
-          >
-            <div className="pointer-events-none max-w-sm rounded-2xl border border-[#FECACA] bg-[#FEF2F2]/95 px-6 py-6 text-center shadow-lg backdrop-blur-sm">
-              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#FCA5A5]/20 text-[#EF4444]">
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h3 className="mt-4 text-lg font-semibold text-slate-900">
-                {isEmpty ? 'Start with a trigger' : 'Add your first step'}
-              </h3>
-              <p className="mt-2 text-sm text-slate-600">
-                {isEmpty
-                  ? 'Drag a trigger from the left panel to start your workflow.'
-                  : 'Drag an action from the left and connect it to your trigger to run the workflow.'}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Floating settings inspector with close button */}
-        {selectedNodeForPanel && settingsOpen && (
-          <div className="pointer-events-auto absolute inset-y-4 right-4 z-30 flex">
-            <div className="w-[420px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl">
-              <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-3">
-                <div className="min-w-0">
-                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                    Node settings
-                  </span>
+          {/* Overlay layer for panels and hints (canvas area only) */}
+          <div className="pointer-events-none absolute inset-0">
+            {/* Start state overlay — guides user */}
+            {showStartState && (
+              <div
+                className="pointer-events-none absolute inset-0 flex items-center justify-center p-4 sm:p-6"
+                aria-hidden
+              >
+                <div className="pointer-events-none max-w-sm rounded-2xl border border-[#FECACA] bg-[#FEF2F2]/95 px-6 py-6 text-center shadow-lg backdrop-blur-sm">
+                  <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#FCA5A5]/20 text-[#EF4444]">
+                    <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="mt-4 text-lg font-semibold text-slate-900">
+                    {isEmpty ? 'Start with a trigger' : 'Add your first step'}
+                  </h3>
+                  <p className="mt-2 text-sm text-slate-600">
+                    {isEmpty
+                      ? 'Drag a trigger from the left panel to start your workflow.'
+                      : 'Drag an action from the left and connect it to your trigger to run the workflow.'}
+                  </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setSettingsOpen(false)}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900"
-                  aria-label="Close settings"
-                >
-                  <span className="text-lg leading-none">×</span>
-                </button>
               </div>
-              <div className="max-h-[calc(100vh-6rem)] overflow-auto overflow-x-hidden p-3">
-                <SettingsPanel
-                  node={selectedNodeForPanel as unknown as Node<FlowNodeData>}
-                  onUpdate={handleUpdateNode}
-                  workflowId={workflowId}
-                  onNewExecutionId={handleNewExecutionId}
+            )}
+
+            {/* Floating settings inspector with close button */}
+            {selectedNodeForPanel && settingsOpen && (
+              <div className="pointer-events-auto absolute inset-y-4 right-4 z-30 flex">
+                <div className="w-[420px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl">
+                  <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-3">
+                    <div className="min-w-0">
+                      <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                        Node settings
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSettingsOpen(false)}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                      aria-label="Close settings"
+                    >
+                      <span className="text-lg leading-none">×</span>
+                    </button>
+                  </div>
+                  <div className="max-h-[calc(100vh-6rem)] overflow-auto overflow-x-hidden p-3">
+                    <SettingsPanel
+                      node={selectedNodeForPanel as unknown as Node<FlowNodeData>}
+                      onUpdate={handleUpdateNode}
+                      workflowId={workflowId}
+                      onNewExecutionId={handleNewExecutionId}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Unified last execution results */}
+            {(lastExecutionLoading || lastExecution) && (
+              <div className="pointer-events-auto absolute bottom-4 left-4 z-20 w-[520px] max-w-[calc(100%-2rem)]">
+                <ExecutionResultsPanel
+                  execution={lastExecution}
+                  loading={lastExecutionLoading}
+                  expected={expectedSteps}
+                  openStepNodeId={openResultNodeId}
+                  onToggleStep={(nodeId) =>
+                    setOpenResultNodeId((cur) => (cur === nodeId ? null : nodeId))
+                  }
                 />
               </div>
-            </div>
+            )}
           </div>
-        )}
-
-        {/* Unified last execution results */}
-        {(lastExecutionLoading || lastExecution) && (
-          <div className="pointer-events-auto absolute bottom-4 left-4 z-20 w-[520px] max-w-[calc(100%-2rem)]">
-            <ExecutionResultsPanel
-              execution={lastExecution}
-              loading={lastExecutionLoading}
-              expected={expectedSteps}
-              openStepNodeId={openResultNodeId}
-              onToggleStep={(nodeId) => setOpenResultNodeId((cur) => (cur === nodeId ? null : nodeId))}
-            />
-          </div>
-        )}
+        </div>
       </div>
     </>
   );
@@ -485,7 +491,7 @@ function WorkflowCanvasInner({
 export function WorkflowCanvas(props: WorkflowCanvasProps) {
   return (
     <ReactFlowProvider>
-      <div className="relative flex h-full min-h-[600px] w-full bg-slate-50">
+      <div className="relative h-full min-h-[600px] w-full bg-slate-50">
         {/* Polished canvas background (soft + subtle structure) */}
         <div
           className="pointer-events-none absolute inset-0"

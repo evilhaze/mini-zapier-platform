@@ -6,12 +6,14 @@ import { toast } from 'sonner';
 import { WorkflowCanvas } from '@/components/editor/WorkflowCanvas';
 import type { DefinitionJson } from '@/components/editor/types';
 import { API_BASE } from '@/lib/api';
+import { CopyButton } from '@/components/ui/CopyButton';
 
 export default function EditorPage() {
   const params = useParams<{ id: string }>();
   const id = params.id;
   const router = useRouter();
   const [definition, setDefinition] = useState<DefinitionJson | null>(null);
+  const [workflowName, setWorkflowName] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -29,6 +31,14 @@ export default function EditorPage() {
         if (!res.ok) throw new Error('Failed to load workflow');
         const data = await res.json();
         if (!cancelled) {
+          const name =
+            typeof (data as { name?: unknown }).name === 'string'
+              ? ((data as { name: string }).name ?? '')
+              : typeof (data as { title?: unknown }).title === 'string'
+                ? ((data as { title: string }).title ?? '')
+                : '';
+          setWorkflowName(name);
+
           let def: DefinitionJson | null = null;
           const raw = (data.definitionJson ?? data.definition) as unknown;
           try {
@@ -112,8 +122,17 @@ export default function EditorPage() {
               Workflow editor
             </p>
             <p className="truncate text-sm font-semibold text-slate-900">
-              {id}
+              {workflowName?.trim() ? workflowName.trim() : 'Untitled workflow'}
             </p>
+            <div className="mt-1 flex items-center gap-2">
+              <span className="truncate text-xs text-slate-500">{id}</span>
+              <CopyButton
+                value={id}
+                label="Copy ID"
+                copiedLabel="Copied"
+                className="shrink-0 rounded-lg border border-slate-200/80 bg-white px-2 py-1 text-[11px] font-semibold text-slate-600 hover:bg-slate-50"
+              />
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <span

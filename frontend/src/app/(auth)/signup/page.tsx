@@ -8,6 +8,8 @@ import { useAuth } from '@/contexts/AuthContext';
 export default function SignupPage() {
   const router = useRouter();
   const { signup } = useAuth();
+  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -18,7 +20,7 @@ export default function SignupPage() {
     setError(null);
     setLoading(true);
     try {
-      await signup(email, password);
+      await signup(email, password, { name, username });
       router.replace('/home');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Sign up failed');
@@ -42,6 +44,36 @@ export default function SignupPage() {
             {error}
           </div>
         )}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label htmlFor="signup-name" className="block text-xs font-medium text-slate-600">
+              Name
+            </label>
+            <input
+              id="signup-name"
+              type="text"
+              autoComplete="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="mt-1 w-full rounded-input border border-slate-200/80 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+              placeholder="Jane Doe"
+            />
+          </div>
+          <div>
+            <label htmlFor="signup-username" className="block text-xs font-medium text-slate-600">
+              Username
+            </label>
+            <input
+              id="signup-username"
+              type="text"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="mt-1 w-full rounded-input border border-slate-200/80 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/20"
+              placeholder="jane"
+            />
+          </div>
+        </div>
         <div>
           <label
             htmlFor="signup-email"
