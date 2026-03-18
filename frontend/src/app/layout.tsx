@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={font.variable}>
-      <body className="min-h-screen bg-slate-50 font-sans text-slate-900">
+      <body className="min-h-screen bg-slate-50 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-100">
         <AuthProvider>
           {children}
         </AuthProvider>

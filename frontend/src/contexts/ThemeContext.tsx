@@ -23,6 +23,10 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const STORAGE_KEY = 'zyper_theme';
 
+// In Next.js route groups, there can be multiple mounted ThemeProviders during navigation.
+// We keep a small ref-count so we don't remove the `dark` class while another provider is still active.
+let mountedProviders = 0;
+
 function readSavedTheme(): Theme | null {
   if (typeof window === 'undefined') return null;
   const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -37,6 +41,26 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setHydrated(true);
   }, []);
+
+  // Apply Tailwind `dark` class to <html> so global backgrounds (body/html/root wrappers) switch too.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    mountedProviders += 1;
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+
+    return () => {
+      mountedProviders -= 1;
+      if (mountedProviders <= 0) {
+        document.documentElement.classList.remove('dark');
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
 
   const setTheme = useCallback((t: Theme) => {
     setThemeState(t);
@@ -70,7 +94,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       <div
         className={
           theme === 'dark'
-            ? 'dark min-h-screen bg-slate-950 text-slate-100'
+            ? 'min-h-screen bg-slate-950 text-slate-100'
             : 'min-h-screen bg-slate-50 text-slate-900'
         }
       >

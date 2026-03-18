@@ -21,17 +21,30 @@ async function start() {
     console.error('Scheduler registerAll failed (server will still start):', (e as Error).message);
   }
 
-  const worker = getWorker(async (job) => {
-    await runWorkflowExecution({
-      executionId: job.data.executionId,
-      workflowId: job.data.workflowId,
-      triggerType: job.data.triggerType,
-      inputPayload: job.data.inputPayload,
+  // Start background worker. Redis outages should not prevent API from starting.
+  try {
+    const worker = getWorker(async (job) => {
+      await runWorkflowExecution({
+        executionId: job.data.executionId,
+        workflowId: job.data.workflowId,
+        triggerType: job.data.triggerType,
+        inputPayload: job.data.inputPayload,
+      });
     });
-  });
-  worker.on('failed', (job, err) => {
-    console.error('Workflow job failed', job?.id, err?.message);
-  });
+
+    if (!worker) {
+      console.warn('[worker] Redis is not configured; worker is disabled');
+    } else {
+      worker.on('failed', (job, err) => {
+        console.error('Workflow job failed', job?.id, err?.message);
+      });
+      worker.on('error', (err) => {
+        console.error('[worker] error:', err?.message ?? err);
+      });
+    }
+  } catch (e) {
+    console.error('Worker init failed (server will still start):', (e as Error).message);
+  }
 
   app.listen(config.port, () => {
     console.log(`Server http://localhost:${config.port}`);

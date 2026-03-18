@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { existsSync } from 'fs';
 import { routes } from './routes/index.js';
 import { swaggerServe, swaggerSetup } from './config/swagger.js';
 
@@ -55,11 +56,20 @@ export function createApp() {
   app.use('/api', routes);
   app.use('/api-docs', swaggerServe, swaggerSetup);
 
-  if (process.env.NODE_ENV !== 'test') {
-    app.use(express.static(join(__dirname, '../../frontend/dist')));
-    app.get('*', (_req, res) => {
-      res.sendFile(join(__dirname, '../../frontend/dist/index.html'));
-    });
+  // In production the frontend is served by a separate Saturn service.
+  // Backend should behave as a pure API server by default.
+  const shouldServeFrontend = process.env.SERVE_FRONTEND === 'true';
+  if (shouldServeFrontend) {
+    const distDir = process.env.FRONTEND_DIST_DIR ?? join(__dirname, '../../frontend/dist');
+    const indexPath = join(distDir, 'index.html');
+    if (existsSync(indexPath)) {
+      app.use(express.static(distDir));
+      app.get('*', (_req, res) => {
+        res.sendFile(indexPath);
+      });
+    } else {
+      console.warn('[frontend] dist not found, skipping static frontend serving:', indexPath);
+    }
   }
 
   return app;

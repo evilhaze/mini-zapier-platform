@@ -31,6 +31,12 @@ body {
   @apply bg-slate-50 text-slate-800 antialiased;
 }
 
+/* Ensure overall page background switches too (not only cards/components). */
+.dark body {
+  background-color: rgb(15 23 42) !important; /* slate-900 */
+  color: rgb(241 245 249) !important; /* slate-100 */
+}
+
 html {
   scroll-behavior: smooth;
 }
