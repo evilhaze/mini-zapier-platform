@@ -14,6 +14,34 @@ type Props = {
   workflowId: string;
 };
 
+function SectionCard({
+  title,
+  subtitle,
+  children,
+}: {
+  title: string;
+  subtitle?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-3">
+      <div className="space-y-1">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-700">
+          {title}
+        </p>
+        {subtitle && (
+          <p className="text-sm leading-relaxed text-slate-600">
+            {subtitle}
+          </p>
+        )}
+      </div>
+      <div className="space-y-3">
+        {children}
+      </div>
+    </section>
+  );
+}
+
 function Field({
   label,
   value,
@@ -374,6 +402,514 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
     return errors;
   }, [cfg, nodeKind, type]);
 
+  const configurationSection = useMemo(() => {
+    if (type === 'webhook') {
+      return (
+        <SectionCard
+          title="Configuration"
+          subtitle="Webhook is the entry point of your workflow. External systems can call this URL."
+        >
+          <Field
+            label="Description (optional)"
+            value={cfg.description ?? ''}
+            onChange={(v) => updateConfig({ description: v })}
+            placeholder="e.g. Receives order events"
+            helper="Optional context for what this webhook represents."
+          />
+        </SectionCard>
+      );
+    }
+
+    if (type === 'schedule') {
+      return (
+        <SectionCard
+          title="Configuration"
+          subtitle="Choose a simple schedule or switch to advanced cron."
+        >
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-xs font-semibold text-slate-800">Mode</span>
+            <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1 text-xs">
+              <button
+                type="button"
+                onClick={() => updateConfig({ scheduleMode: 'simple' })}
+                className={`px-2.5 py-1 rounded-lg font-semibold ${
+                  (cfg.scheduleMode ?? 'simple') === 'simple'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Simple
+              </button>
+              <button
+                type="button"
+                onClick={() => updateConfig({ scheduleMode: 'advanced' })}
+                className={`px-2.5 py-1 rounded-lg font-semibold ${
+                  (cfg.scheduleMode ?? 'simple') === 'advanced'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Advanced
+              </button>
+            </div>
+          </div>
+
+          {(cfg.scheduleMode ?? 'simple') === 'simple' ? (
+            <>
+              <div>
+                <label className="block text-xs font-semibold text-slate-800">Frequency</label>
+                <select
+                  value={cfg.frequency ?? 'hourly'}
+                  onChange={(e) => {
+                    const freq = e.target.value;
+                    let cron = cfg.cron ?? '';
+                    if (freq === 'every5') cron = '*/5 * * * *';
+                    if (freq === 'hourly') cron = '0 * * * *';
+                    if (freq === 'daily') cron = '0 9 * * *';
+                    if (freq === 'weekly') cron = '0 9 * * 1';
+                    updateConfig({ frequency: freq, cron });
+                  }}
+                  className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                >
+                  <option value="every5">Every 5 minutes</option>
+                  <option value="hourly">Hourly</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly (Mon)</option>
+                </select>
+                <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
+                  Choose how often this workflow should run.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-800">Time</label>
+                  <input
+                    type="time"
+                    value={cfg.time ?? '09:00'}
+                    onChange={(e) => {
+                      const t = e.target.value;
+                      const freq = cfg.frequency ?? 'hourly';
+                      const [h, m] = t.split(':').map((x) => Number(x));
+                      let cron = cfg.cron ?? '';
+                      if (freq === 'daily') cron = `${m} ${h} * * *`;
+                      if (freq === 'weekly') cron = `${m} ${h} * * 1`;
+                      updateConfig({ time: t, cron });
+                    }}
+                    className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                  />
+                  <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
+                    Used for daily/weekly schedules.
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-800">Timezone</label>
+                  <input
+                    value={cfg.timezone ?? 'Local'}
+                    onChange={(e) => updateConfig({ timezone: e.target.value })}
+                    placeholder="Local"
+                    className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                  />
+                  <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
+                    MVP: display only (scheduler uses server time).
+                  </p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <Field
+                label="Cron expression"
+                value={cfg.cron ?? ''}
+                onChange={(v) => updateConfig({ cron: v })}
+                placeholder="0 * * * *"
+                helper="Advanced mode. Cron must have 5 fields."
+                hint="Examples: 0 * * * * (hourly), */5 * * * * (every 5 minutes)"
+                error={(validation as Record<string, string | null>).cron ?? null}
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => toast.success(isValidCron(cfg.cron ?? '') ? 'Cron looks valid' : 'Cron is invalid')}
+                  className="inline-flex items-center justify-center rounded-btn border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                  Validate
+                </button>
+              </div>
+            </>
+          )}
+        </SectionCard>
+      );
+    }
+
+    if (type === 'http') {
+      return (
+        <SectionCard
+          title="Configuration"
+          subtitle="Use this node to call another API or webhook."
+        >
+          <div>
+            <label className="block text-xs font-semibold text-slate-800">Method</label>
+            <select
+              value={cfg.method ?? 'GET'}
+              onChange={(e) => updateConfig({ method: e.target.value })}
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+            >
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+              <option value="PATCH">PATCH</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+          </div>
+          <Field
+            label="URL"
+            value={cfg.url ?? ''}
+            onChange={(v) => updateConfig({ url: v })}
+            placeholder="https://api.example.com/..."
+            type="url"
+            helper="The endpoint to call."
+            error={validation.url}
+          />
+          <Field
+            label="Headers (JSON)"
+            value={typeof cfg.headers === 'string' ? cfg.headers : (cfg.headers ? JSON.stringify(cfg.headers, null, 2) : '')}
+            onChange={(v) => updateConfig({ headers: v })}
+            placeholder='{"Authorization": "Bearer ..."}'
+            multiline
+            helper="Optional JSON object. Example: Authorization header."
+            error={validation.headers}
+          />
+          {(cfg.method === 'POST' || cfg.method === 'PUT' || cfg.method === 'PATCH') && (
+            <Field
+              label="Body (JSON)"
+              value={typeof cfg.body === 'string' ? cfg.body : (cfg.body ? JSON.stringify(cfg.body, null, 2) : '')}
+              onChange={(v) => updateConfig({ body: v })}
+              placeholder='{"key": "value"}'
+              multiline
+              helper="JSON payload for the request."
+              error={validation.httpBody}
+            />
+          )}
+        </SectionCard>
+      );
+    }
+
+    if (type === 'telegram') {
+      return (
+        <SectionCard
+          title="Configuration"
+          subtitle="Send a message to a Telegram chat, group, or channel."
+        >
+          <div>
+            <div className="flex items-center justify-between gap-2">
+              <label className="block text-xs font-semibold text-slate-800">Bot token</label>
+              <button
+                type="button"
+                onClick={() => setShowTelegramToken((v) => !v)}
+                className="text-xs font-medium text-slate-600 hover:text-slate-900"
+              >
+                {showTelegramToken ? 'Hide' : 'Show'}
+              </button>
+            </div>
+            <input
+              type={showTelegramToken ? 'text' : 'password'}
+              value={cfg.botToken ?? ''}
+              onChange={(e) => updateConfig({ botToken: e.target.value })}
+              placeholder="123456:ABC-DEF..."
+              className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder:text-slate-500 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+            />
+            <p className="mt-1.5 text-xs leading-relaxed text-slate-600">Your Telegram bot token from BotFather.</p>
+            <p className="mt-1.5 text-xs leading-relaxed text-slate-600">Stored in the workflow definition (MVP).</p>
+            {validation.botToken && <p className="mt-1 text-xs text-red-600">{validation.botToken}</p>}
+          </div>
+          <Field
+            label="Chat ID"
+            value={cfg.chatId ?? ''}
+            onChange={(v) => updateConfig({ chatId: v })}
+            placeholder="e.g. -1001234567890"
+            helper="The ID of the chat, group, or channel where the message will be sent."
+            error={validation.chatId}
+          />
+          <Field
+            label="Message"
+            value={cfg.text ?? ''}
+            onChange={(v) => updateConfig({ text: v })}
+            placeholder="Write your message…"
+            multiline
+            helper="Write the message to send."
+            error={validation.text}
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-800">Parse mode</label>
+              <select
+                value={cfg.parseMode ?? 'Plain'}
+                onChange={(e) => updateConfig({ parseMode: e.target.value === 'Plain' ? '' : e.target.value })}
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+              >
+                <option value="Plain">Plain text</option>
+                <option value="Markdown">Markdown</option>
+                <option value="HTML">HTML</option>
+              </select>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-600">How Telegram should parse your message.</p>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-800">Options</label>
+              <label className="mt-3 flex items-center gap-2 text-sm text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={cfg.disableWebPreview === 'true'}
+                  onChange={(e) => updateConfig({ disableWebPreview: e.target.checked ? 'true' : '' })}
+                  className="h-4 w-4 rounded border-slate-300"
+                />
+                Disable link previews
+              </label>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-600">Prevents Telegram from generating website previews.</p>
+            </div>
+          </div>
+        </SectionCard>
+      );
+    }
+
+    if (nodeKind === 'action' && type === 'email') {
+      return (
+        <SectionCard
+          title="Configuration"
+          subtitle="Sends an outgoing email. Testing may send a real email."
+        >
+          <Field
+            label="To"
+            value={cfg.to ?? ''}
+            onChange={(v) => updateConfig({ to: v })}
+            placeholder="user@example.com"
+            type="email"
+            helper="Recipient email address."
+            error={validation.to}
+          />
+          <Field
+            label="Subject"
+            value={cfg.subject ?? ''}
+            onChange={(v) => updateConfig({ subject: v })}
+            placeholder="Subject line (e.g. New webhook event)"
+            helper="Subject line of the email."
+            error={validation.subject}
+          />
+          <Field
+            label="Body"
+            value={cfg.body ?? ''}
+            onChange={(v) => updateConfig({ body: v })}
+            placeholder="Write your email message…"
+            multiline
+            helper="Body of the email message."
+            error={validation.body}
+          />
+        </SectionCard>
+      );
+    }
+
+    if (type === 'db') {
+      return (
+        <SectionCard
+          title="Configuration"
+          subtitle="Stores data inside the workflow system."
+        >
+          <Field
+            label="What should be saved?"
+            value={cfg.mapping ?? cfg.payload ?? ''}
+            onChange={(v) => updateConfig({ mapping: v, payload: v })}
+            placeholder="Leave empty to save the full payload"
+            helper="Choose a field/key from the payload, or leave empty to save everything."
+          />
+        </SectionCard>
+      );
+    }
+
+    if (type === 'transform') {
+      return (
+        <SectionCard
+          title="Configuration"
+          subtitle="Reshape data for the next step."
+        >
+          <Field
+            label="Rules / Output template (JSON)"
+            value={typeof cfg.mapping === 'string' ? cfg.mapping : (cfg.mapping && typeof cfg.mapping === 'object' ? JSON.stringify(cfg.mapping, null, 2) : '')}
+            onChange={(v) => updateConfig({ mapping: v })}
+            placeholder='{\n  "message": "$.message"\n}'
+            multiline
+            helper="Define output fields and map them from previous node data (MVP)."
+            error={validation.mapping}
+          />
+        </SectionCard>
+      );
+    }
+
+    if (nodeKind === 'trigger' && type === 'email') {
+      return (
+        <SectionCard
+          title="Configuration"
+          subtitle="MVP note: inbound email trigger is not fully implemented yet."
+        >
+          <Field
+            label="From (filter)"
+            value={cfg.from ?? ''}
+            onChange={(v) => updateConfig({ from: v })}
+            placeholder="optional (e.g. billing@company.com)"
+            helper="Only trigger when the sender matches."
+          />
+          <Field
+            label="Subject contains"
+            value={cfg.subjectFilter ?? ''}
+            onChange={(v) => updateConfig({ subjectFilter: v })}
+            placeholder="optional (e.g. Invoice)"
+            helper="Only trigger when the subject contains this text."
+          />
+        </SectionCard>
+      );
+    }
+
+    if (type === 'manual') {
+      return (
+        <SectionCard
+          title="Configuration"
+          subtitle="No configuration required for MVP."
+        >
+          <p className="text-sm text-slate-600">
+            Use this trigger to run the workflow manually from the editor (MVP).
+          </p>
+        </SectionCard>
+      );
+    }
+
+    return null;
+  }, [
+    cfg,
+    toast,
+    type,
+    nodeKind,
+    updateConfig,
+    copyToClipboard,
+    webhookUrl,
+    samplePayloadText,
+    curlExample,
+    handleTestWebhook,
+    testing,
+    copiedKey,
+    validation,
+    showTelegramToken,
+  ]);
+
+  const previewSection = useMemo(() => {
+    if (type === 'webhook') {
+      return (
+        <SectionCard
+          title="Preview / Test"
+          subtitle="The easiest way to verify your workflow."
+        >
+          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold text-slate-800">Webhook URL</p>
+              <button
+                type="button"
+                onClick={() => copyToClipboard(webhookUrl, 'url')}
+                className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+              >
+                {copiedKey === 'url' ? 'Copied' : 'Copy URL'}
+              </button>
+            </div>
+            <input
+              readOnly
+              value={webhookUrl}
+              className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-900 shadow-sm"
+            />
+            <p className="text-sm leading-relaxed text-slate-600">
+              Send an HTTP POST request to this URL to trigger the workflow.
+            </p>
+            <button
+              type="button"
+              onClick={handleTestWebhook}
+              disabled={testing}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-3 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-red-700 disabled:opacity-60"
+            >
+              {testing ? 'Testing…' : 'Test webhook'}
+            </button>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold text-slate-800">Sample payload</p>
+              <button
+                type="button"
+                onClick={() => copyToClipboard(samplePayloadText, 'payload')}
+                className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+              >
+                {copiedKey === 'payload' ? 'Copied' : 'Copy example'}
+              </button>
+            </div>
+            <pre className="overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 whitespace-pre-wrap break-words">
+              {samplePayloadText}
+            </pre>
+          </div>
+
+          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-semibold text-slate-800">cURL</p>
+              <button
+                type="button"
+                onClick={() => copyToClipboard(curlExample, 'curl')}
+                className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+              >
+                {copiedKey === 'curl' ? 'Copied' : 'Copy curl'}
+              </button>
+            </div>
+            <pre className="overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 whitespace-pre-wrap break-words">
+              {curlExample}
+            </pre>
+          </div>
+        </SectionCard>
+      );
+    }
+
+    if (type === 'schedule') {
+      const freq = cfg.frequency ?? 'hourly';
+      const time = cfg.time ?? '09:00';
+      const { preview, nextRun } = nextRunPreview(freq, time);
+      return (
+        <SectionCard
+          title="Preview / Test"
+          subtitle="A quick preview of when this schedule runs."
+        >
+          <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4">
+            <p className="text-sm font-semibold text-slate-900">{preview}</p>
+            <p className="mt-1 text-sm text-slate-600">Next run: {nextRun}</p>
+          </div>
+        </SectionCard>
+      );
+    }
+
+    return (
+      <SectionCard
+        title="Preview / Test"
+        subtitle="Run this workflow from the trigger node to see results here."
+      >
+        <p className="text-sm text-slate-600">
+          Tip: Use <span className="font-semibold text-slate-900">Test webhook</span> (Webhook trigger) to execute your workflow and see per-node status.
+        </p>
+      </SectionCard>
+    );
+  }, [
+    type,
+    cfg.frequency,
+    cfg.time,
+    copiedKey,
+    copyToClipboard,
+    curlExample,
+    handleTestWebhook,
+    samplePayloadText,
+    testing,
+    webhookUrl,
+  ]);
+
   return (
     <div className="flex w-full flex-col bg-white">
       <div className="border-b border-slate-200/80 px-6 py-5">
@@ -390,14 +926,11 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
       <div className="flex-1 overflow-auto overflow-x-hidden px-6 py-5 space-y-5">
         {/* Status / Result */}
         {(lastExecutionLoading || lastExecution) && (
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
+          <SectionCard title="Status / Result">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-700">
-                Status
-              </p>
               {lastExecutionId && (
                 <span className="text-[11px] font-mono text-slate-500">
-                  {lastExecutionId.slice(0, 8)}…
+                  Execution {lastExecutionId.slice(0, 8)}…
                 </span>
               )}
             </div>
@@ -425,14 +958,11 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
                 )}
               </div>
             )}
-          </div>
+          </SectionCard>
         )}
 
         {/* General */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-700">
-            General
-          </p>
+        <SectionCard title="General" subtitle="Basic settings for this node.">
           <Field
             label="Label"
             value={name ?? label ?? ''}
@@ -440,479 +970,13 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
             placeholder={typeLabel}
             helper="A friendly name you’ll see on the canvas."
           />
-        </div>
+        </SectionCard>
 
-        {/* --- Webhook trigger: basic info --- */}
-        {type === 'webhook' && (
-          <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-700">
-                Webhook
-              </p>
-              <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-700">
-                POST
-              </span>
-            </div>
-
-            <p className="text-sm leading-relaxed text-slate-600">
-              Webhook is the entry point of your workflow. External systems can call this URL.
-            </p>
-
-            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-2">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold text-slate-800">Webhook URL</p>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(webhookUrl, 'url')}
-                  className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  {copiedKey === 'url' ? 'Copied' : 'Copy URL'}
-                </button>
-              </div>
-              <input
-                readOnly
-                value={webhookUrl}
-                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-900 shadow-sm"
-              />
-              <p className="text-sm leading-relaxed text-slate-600">
-                Send an HTTP POST request to this URL to trigger the workflow.
-              </p>
-              <button
-                type="button"
-                onClick={handleTestWebhook}
-                disabled={testing}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-3 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-red-700 disabled:opacity-60"
-              >
-                {testing ? 'Testing…' : 'Test webhook'}
-              </button>
-              <p className="text-sm leading-relaxed text-slate-600">
-                Tip: If your workflow is connected to Telegram, this test should send the message.
-              </p>
-            </div>
-
-            <Field
-              label="Description (optional)"
-              value={cfg.description ?? ''}
-              onChange={(v) => updateConfig({ description: v })}
-              placeholder="e.g. Receives order events"
-              helper="Optional context for what this webhook represents."
-            />
-
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold text-slate-800">Sample payload</p>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(samplePayloadText, 'payload')}
-                  className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  {copiedKey === 'payload' ? 'Copied' : 'Copy example'}
-                </button>
-              </div>
-              <pre className="overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 whitespace-pre-wrap break-words">
-                {samplePayloadText}
-              </pre>
-            </div>
-
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-semibold text-slate-800">cURL</p>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(curlExample, 'curl')}
-                  className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-                >
-                  {copiedKey === 'curl' ? 'Copied' : 'Copy curl'}
-                </button>
-              </div>
-              <pre className="overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 whitespace-pre-wrap break-words">
-                {curlExample}
-              </pre>
-            </div>
-
-          </div>
-        )}
-
-        {/* --- Schedule: cron --- */}
-        {type === 'schedule' && (
-          <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-700">
-                Configuration
-              </p>
-              <div className="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1 text-xs">
-                <button
-                  type="button"
-                  onClick={() => updateConfig({ scheduleMode: 'simple' })}
-                  className={`px-2.5 py-1 rounded-lg font-semibold ${
-                    (cfg.scheduleMode ?? 'simple') === 'simple'
-                      ? 'bg-white text-slate-900 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Simple
-                </button>
-                <button
-                  type="button"
-                  onClick={() => updateConfig({ scheduleMode: 'advanced' })}
-                  className={`px-2.5 py-1 rounded-lg font-semibold ${
-                    (cfg.scheduleMode ?? 'simple') === 'advanced'
-                      ? 'bg-white text-slate-900 shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Advanced
-                </button>
-              </div>
-            </div>
-
-            {(cfg.scheduleMode ?? 'simple') === 'simple' ? (
-              <>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-800">Frequency</label>
-                  <select
-                    value={cfg.frequency ?? 'hourly'}
-                    onChange={(e) => {
-                      const freq = e.target.value;
-                      let cron = cfg.cron ?? '';
-                      if (freq === 'every5') cron = '*/5 * * * *';
-                      if (freq === 'hourly') cron = '0 * * * *';
-                      if (freq === 'daily') cron = '0 9 * * *';
-                      if (freq === 'weekly') cron = '0 9 * * 1';
-                      updateConfig({ frequency: freq, cron });
-                    }}
-                    className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-                  >
-                    <option value="every5">Every 5 minutes</option>
-                    <option value="hourly">Hourly</option>
-                    <option value="daily">Daily</option>
-                    <option value="weekly">Weekly (Mon)</option>
-                  </select>
-                  <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
-                    Choose how often this workflow should run.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-800">Time</label>
-                    <input
-                      type="time"
-                      value={cfg.time ?? '09:00'}
-                      onChange={(e) => {
-                        const t = e.target.value;
-                        const freq = cfg.frequency ?? 'hourly';
-                        const [h, m] = t.split(':').map((x) => Number(x));
-                        let cron = cfg.cron ?? '';
-                        if (freq === 'daily') cron = `${m} ${h} * * *`;
-                        if (freq === 'weekly') cron = `${m} ${h} * * 1`;
-                        updateConfig({ time: t, cron });
-                      }}
-                      className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-                    />
-                    <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
-                      Used for daily/weekly schedules.
-                    </p>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-800">Timezone</label>
-                    <input
-                      value={cfg.timezone ?? 'Local'}
-                      onChange={(e) => updateConfig({ timezone: e.target.value })}
-                      placeholder="Local"
-                      className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
-                    />
-                    <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
-                      MVP: display only (scheduler uses server time).
-                    </p>
-                  </div>
-                </div>
-
-                <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                  {(() => {
-                    const freq = cfg.frequency ?? 'hourly';
-                    const time = cfg.time ?? '09:00';
-                    const { preview, nextRun } = nextRunPreview(freq, time);
-                    return (
-                      <div className="space-y-1">
-                        <p className="text-xs font-semibold text-slate-800">{preview}</p>
-                        <p className="text-xs text-slate-600">Next run: {nextRun}</p>
-                      </div>
-                    );
-                  })()}
-                </div>
-              </>
-            ) : (
-              <>
-                <Field
-                  label="Cron expression"
-                  value={cfg.cron ?? ''}
-                  onChange={(v) => updateConfig({ cron: v })}
-                  placeholder="0 * * * *"
-                  helper="Advanced mode. Cron must have 5 fields."
-                  hint="Examples: 0 * * * * (hourly), */5 * * * * (every 5 minutes)"
-                  error={(validation as Record<string, string | null>).cron ?? null}
-                />
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => toast.success(isValidCron(cfg.cron ?? '') ? 'Cron looks valid' : 'Cron is invalid')}
-                    className="inline-flex items-center justify-center rounded-btn border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                  >
-                    Validate
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        )}
+        {configurationSection}
+        {previewSection}
 
         {/* --- Email trigger --- */}
-        {nodeKind === 'trigger' && type === 'email' && (
-          <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
-              Configuration
-            </p>
-            <p className="text-xs text-slate-600">
-              MVP note: inbound email trigger is not fully implemented yet. These fields are placeholders.
-            </p>
-            <Field
-              label="From (filter)"
-              value={cfg.from ?? ''}
-              onChange={(v) => updateConfig({ from: v })}
-              placeholder="optional (e.g. billing@company.com)"
-              helper="Only trigger when the sender matches."
-            />
-            <Field
-              label="Subject contains"
-              value={cfg.subjectFilter ?? ''}
-              onChange={(v) => updateConfig({ subjectFilter: v })}
-              placeholder="optional (e.g. Invoice)"
-              helper="Only trigger when the subject contains this text."
-            />
-          </div>
-        )}
-
-        {/* --- HTTP action --- */}
-        {type === 'http' && (
-          <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
-              Configuration
-            </p>
-            <p className="text-xs text-slate-600">
-              Use this node to call another API or webhook.
-            </p>
-            <div>
-              <label className="block text-xs font-medium text-slate-700">Method</label>
-              <select
-                value={cfg.method ?? 'GET'}
-                onChange={(e) => updateConfig({ method: e.target.value })}
-                className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-              >
-                <option value="GET">GET</option>
-                <option value="POST">POST</option>
-                <option value="PUT">PUT</option>
-                <option value="PATCH">PATCH</option>
-                <option value="DELETE">DELETE</option>
-              </select>
-            </div>
-            <Field
-              label="URL"
-              value={cfg.url ?? ''}
-              onChange={(v) => updateConfig({ url: v })}
-              placeholder="https://api.example.com/..."
-              type="url"
-              helper="The endpoint to call."
-              error={validation.url}
-            />
-            <Field
-              label="Headers (JSON)"
-              value={typeof cfg.headers === 'string' ? cfg.headers : (cfg.headers ? JSON.stringify(cfg.headers, null, 2) : '')}
-              onChange={(v) => updateConfig({ headers: v })}
-              placeholder='{"Authorization": "Bearer ..."}'
-              multiline
-              helper="Optional JSON object. Example: Authorization header."
-              error={validation.headers}
-            />
-            {(cfg.method === 'POST' || cfg.method === 'PUT' || cfg.method === 'PATCH') && (
-              <Field
-                label="Body (JSON)"
-                value={typeof cfg.body === 'string' ? cfg.body : (cfg.body ? JSON.stringify(cfg.body, null, 2) : '')}
-                onChange={(v) => updateConfig({ body: v })}
-                placeholder='{"key": "value"}'
-                multiline
-                helper="JSON payload for the request."
-                error={validation.httpBody}
-              />
-            )}
-          </div>
-        )}
-
-        {/* --- Email action --- */}
-        {nodeKind === 'action' && type === 'email' && (
-          <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
-              Configuration
-            </p>
-            <p className="text-xs text-slate-600">
-              Testing this workflow may send a real email.
-            </p>
-            <Field
-              label="To"
-              value={cfg.to ?? ''}
-              onChange={(v) => updateConfig({ to: v })}
-              placeholder="user@example.com"
-              type="email"
-              helper="Recipient email address."
-              error={validation.to}
-            />
-            <Field
-              label="Subject"
-              value={cfg.subject ?? ''}
-              onChange={(v) => updateConfig({ subject: v })}
-              placeholder="Subject line (e.g. New webhook event)"
-              helper="Subject line of the email."
-              error={validation.subject}
-            />
-            <Field
-              label="Body"
-              value={cfg.body ?? ''}
-              onChange={(v) => updateConfig({ body: v })}
-              placeholder="Write your email message…"
-              multiline
-              helper="Body of the email message."
-              error={validation.body}
-            />
-          </div>
-        )}
-
-        {/* --- Telegram --- */}
-        {type === 'telegram' && (
-          <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
-              Configuration
-            </p>
-            <div>
-              <div className="flex items-center justify-between gap-2">
-                <label className="block text-xs font-medium text-slate-700">Bot token</label>
-                <button
-                  type="button"
-                  onClick={() => setShowTelegramToken((v) => !v)}
-                  className="text-xs font-medium text-slate-600 hover:text-slate-900"
-                >
-                  {showTelegramToken ? 'Hide' : 'Show'}
-                </button>
-              </div>
-              <input
-                type={showTelegramToken ? 'text' : 'password'}
-                value={cfg.botToken ?? ''}
-                onChange={(e) => updateConfig({ botToken: e.target.value })}
-                placeholder="123456:ABC-DEF..."
-                className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 placeholder:text-slate-500 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-              />
-              <p className="mt-1 text-xs text-slate-600">Your Telegram bot token from BotFather.</p>
-              <p className="mt-1 text-xs text-slate-600">Stored in the workflow definition (MVP).</p>
-              {validation.botToken && <p className="mt-1 text-xs text-red-600">{validation.botToken}</p>}
-            </div>
-            <Field
-              label="Chat ID"
-              value={cfg.chatId ?? ''}
-              onChange={(v) => updateConfig({ chatId: v })}
-              placeholder="e.g. -1001234567890"
-              helper="The ID of the chat, group, or channel where the message will be sent."
-              error={validation.chatId}
-            />
-            <Field
-              label="Text"
-              value={cfg.text ?? ''}
-              onChange={(v) => updateConfig({ text: v })}
-              placeholder="Message text (supports Markdown)"
-              multiline
-              helper="Write the message to send."
-              error={validation.text}
-            />
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-slate-700">Parse mode</label>
-                <select
-                  value={cfg.parseMode ?? 'Plain'}
-                  onChange={(e) => updateConfig({ parseMode: e.target.value === 'Plain' ? '' : e.target.value })}
-                  className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-800 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                >
-                  <option value="Plain">Plain text</option>
-                  <option value="Markdown">Markdown</option>
-                  <option value="HTML">HTML</option>
-                </select>
-                <p className="mt-1 text-xs text-slate-600">How Telegram should parse your message.</p>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-700">Options</label>
-                <label className="mt-2 flex items-center gap-2 text-xs text-slate-700">
-                  <input
-                    type="checkbox"
-                    checked={cfg.disableWebPreview === 'true'}
-                    onChange={(e) => updateConfig({ disableWebPreview: e.target.checked ? 'true' : '' })}
-                    className="h-4 w-4 rounded border-slate-300"
-                  />
-                  Disable link previews
-                </label>
-                <p className="mt-1 text-xs text-slate-600">Prevents Telegram from generating website previews.</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* --- DB --- */}
-        {type === 'db' && (
-          <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
-              Configuration
-            </p>
-            <p className="text-xs text-slate-600">
-              This node stores data inside the workflow system.
-            </p>
-            <Field
-              label="What should be saved?"
-              value={cfg.mapping ?? cfg.payload ?? ''}
-              onChange={(v) => updateConfig({ mapping: v, payload: v })}
-              placeholder="Leave empty to save the full payload"
-              helper="Choose a field/key from the payload, or leave empty to save everything."
-            />
-          </div>
-        )}
-
-        {/* --- Transform --- */}
-        {type === 'transform' && (
-          <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
-              Configuration
-            </p>
-            <p className="text-xs text-slate-600">
-              Use this node to reshape data for the next step.
-            </p>
-            <Field
-              label="Rules / Output template (JSON)"
-              value={typeof cfg.mapping === 'string' ? cfg.mapping : (cfg.mapping && typeof cfg.mapping === 'object' ? JSON.stringify(cfg.mapping, null, 2) : '')}
-              onChange={(v) => updateConfig({ mapping: v })}
-              placeholder='{\n  "message": "$.message"\n}'
-              multiline
-              helper="Define output fields and map them from previous node data (MVP)."
-              error={validation.mapping}
-            />
-          </div>
-        )}
-
-        {/* Manual trigger: no extra config */}
-        {type === 'manual' && (
-          <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-700">
-              Help
-            </p>
-            <p className="text-xs text-slate-600">
-              Runs when you test or run the workflow manually. No extra configuration (MVP).
-            </p>
-          </div>
-        )}
+        {/* legacy per-node blocks removed; rendered via unified sections above */}
       </div>
     </div>
   );
