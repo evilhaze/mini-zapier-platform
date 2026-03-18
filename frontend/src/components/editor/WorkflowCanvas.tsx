@@ -55,6 +55,7 @@ function WorkflowCanvasInner({
   const [lastExecution, setLastExecution] = useState<ExecutionWithSteps | null>(null);
   const [lastExecutionLoading, setLastExecutionLoading] = useState(false);
   const [openResultNodeId, setOpenResultNodeId] = useState<string | null>(null);
+  const [resultsPanelDismissed, setResultsPanelDismissed] = useState(false);
 
   const { nodes: initialNodes, edges: initialEdges } = definitionToFlow(initialDefinition);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<FlowNodeData>>(initialNodes);
@@ -307,6 +308,7 @@ function WorkflowCanvasInner({
   }, [lastExecutionId]);
 
   const handleNewExecutionId = useCallback((executionId: string) => {
+    setResultsPanelDismissed(false);
     setLastExecutionId(executionId);
     setOpenResultNodeId(null);
   }, []);
@@ -468,7 +470,7 @@ function WorkflowCanvasInner({
             )}
 
             {/* Unified last execution results */}
-            {(lastExecutionLoading || lastExecution) && (
+            {(lastExecutionLoading || lastExecution) && !resultsPanelDismissed && (
               <div className="pointer-events-auto absolute bottom-4 left-4 z-20 w-[520px] max-w-[calc(100%-2rem)]">
                 <ExecutionResultsPanel
                   execution={lastExecution}
@@ -478,6 +480,7 @@ function WorkflowCanvasInner({
                   onToggleStep={(nodeId) =>
                     setOpenResultNodeId((cur) => (cur === nodeId ? null : nodeId))
                   }
+                  onClose={() => setResultsPanelDismissed(true)}
                 />
               </div>
             )}

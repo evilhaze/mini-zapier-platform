@@ -1,6 +1,19 @@
 import Link from 'next/link';
-import { ArrowRight, GitBranch, LayoutDashboard, Activity, ShieldCheck, Zap } from 'lucide-react';
+import { Activity, ArrowRight, GitBranch, LayoutDashboard, ShieldCheck, Zap } from 'lucide-react';
 import { LandingBackground } from '@/components/landing/LandingBackground';
+import { LandingAiAssistantSection } from '@/components/landing/LandingAiAssistantSection';
+import { LandingAnalyticsShowcase } from '@/components/landing/LandingAnalyticsShowcase';
+import { LandingCapabilities } from '@/components/landing/LandingCapabilities';
+import { LandingDeveloperSide } from '@/components/landing/LandingDeveloperSide';
+import { LandingFinalCta } from '@/components/landing/LandingFinalCta';
+import { LandingFooter } from '@/components/landing/LandingFooter';
+import { LandingHero } from '@/components/landing/LandingHero';
+import { LandingHowItWorks } from '@/components/landing/LandingHowItWorks';
+import { LandingIntegrationsShowcase } from '@/components/landing/LandingIntegrationsShowcase';
+import { LandingMonitoringSection } from '@/components/landing/LandingMonitoringSection';
+import { LandingSocialProof } from '@/components/landing/LandingSocialProof';
+import { LandingTemplates } from '@/components/landing/LandingTemplates';
+import { Reveal } from '@/components/landing/Reveal';
 
 export default function Home() {
   return (
@@ -57,7 +70,43 @@ export default function Home() {
       </header>
 
       <main className="mx-auto max-w-6xl px-4 pb-16 pt-10 sm:px-6 lg:px-8 lg:pt-16 space-y-20">
-        {/* Hero */}
+        <Reveal>
+          <LandingHero />
+        </Reveal>
+        <Reveal>
+          <LandingSocialProof />
+        </Reveal>
+        <Reveal>
+          <LandingCapabilities />
+        </Reveal>
+        <Reveal>
+          <LandingHowItWorks />
+        </Reveal>
+        <Reveal>
+          <LandingTemplates />
+        </Reveal>
+        <Reveal>
+          <LandingAiAssistantSection />
+        </Reveal>
+        <Reveal>
+          <LandingMonitoringSection />
+        </Reveal>
+        <Reveal>
+          <LandingIntegrationsShowcase />
+        </Reveal>
+        <Reveal>
+          <LandingAnalyticsShowcase />
+        </Reveal>
+        <Reveal>
+          <LandingDeveloperSide />
+        </Reveal>
+        <Reveal>
+          <LandingFinalCta />
+        </Reveal>
+
+        {false && (
+          <>
+            {/* Hero */}
         <section className="grid gap-10 lg:grid-cols-2 lg:items-center">
           <div className="space-y-5">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-600">
@@ -516,10 +565,18 @@ export default function Home() {
             </Link>
           </div>
         </section>
+          </>
+        )}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white/80">
+      <Reveal>
+        <LandingFooter />
+      </Reveal>
+
+      {false && (
+        <>
+          {/* Footer */}
+          <footer className="border-t border-slate-200 bg-white/80">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 text-xs text-slate-500 sm:px-6 lg:px-8">
           <span>© {new Date().getFullYear()} Zyper. All rights reserved.</span>
           <div className="flex items-center gap-4">
@@ -534,7 +591,9 @@ export default function Home() {
             </a>
           </div>
         </div>
-      </footer>
+          </footer>
+        </>
+      )}
       </div>
     </div>
   );

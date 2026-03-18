@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { ChevronDown, ChevronRight, CheckCircle2, XCircle, Circle, AlertTriangle } from 'lucide-react';
+import { ChevronDown, ChevronRight, CheckCircle2, XCircle, Circle, AlertTriangle, X } from 'lucide-react';
 import { CodePanel } from '@/components/executions/CodePanel';
 import { NODE_LABELS, isTriggerType } from './types';
 
@@ -40,6 +40,7 @@ type Props = {
   expected: ExpectedNode[];
   onToggleStep?: (nodeId: string) => void;
   openStepNodeId?: string | null;
+  onClose?: () => void;
 };
 
 function stepLabel(nodeType: string, nodeName?: string | null) {
@@ -76,6 +77,7 @@ export function ExecutionResultsPanel({
   expected,
   openStepNodeId,
   onToggleStep,
+  onClose,
 }: Props) {
   const merged = useMemo(() => {
     if (!execution) {
@@ -145,10 +147,10 @@ export function ExecutionResultsPanel({
   if (!execution && !loading) return null;
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm shadow-sm overflow-hidden">
+    <div className="rounded-2xl border border-slate-200/80 bg-white/95 backdrop-blur-sm shadow-lg overflow-hidden transition-opacity duration-200">
       <div className="border-b border-slate-200/80 bg-white px-5 py-4">
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
               Last execution
             </p>
@@ -159,10 +161,20 @@ export function ExecutionResultsPanel({
               <p className="mt-1 text-sm text-red-600">{execution.errorMessage}</p>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${statusPill(execution?.status ?? '')}`}>
               {execution?.status ?? '—'}
             </span>
+            {onClose && (
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close panel"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 hover:border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500/30"
+              >
+                <X className="h-4 w-4" aria-hidden />
+              </button>
+            )}
           </div>
         </div>
       </div>
