@@ -26,6 +26,8 @@ import { isTriggerType } from './types';
 import { SettingsPanel } from './SettingsPanel';
 import { AnimatedEdge } from './AnimatedEdge';
 import { NodeActionsContext } from './NodeActionsContext';
+import { ExecutionResultsPanel, type ExecutionWithSteps, type ExpectedNode } from './ExecutionResultsPanel';
+import { API_BASE } from '@/lib/api';
 
 const proOptions = { hideAttribution: true };
 
@@ -49,6 +51,10 @@ function WorkflowCanvasInner({
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [lastExecutionId, setLastExecutionId] = useState<string | null>(null);
+  const [lastExecution, setLastExecution] = useState<ExecutionWithSteps | null>(null);
+  const [lastExecutionLoading, setLastExecutionLoading] = useState(false);
+  const [openResultNodeId, setOpenResultNodeId] = useState<string | null>(null);
 
   const { nodes: initialNodes, edges: initialEdges } = definitionToFlow(initialDefinition);
   const [nodes, setNodes, onNodesChange] = useNodesState<Node<FlowNodeData>>(initialNodes);
@@ -241,6 +247,70 @@ function WorkflowCanvasInner({
     return { id: selectedNode.id, type: selectedNode.type, data: selectedNode.data };
   }, [selectedNode?.id, selectedNode?.type, selectedNode?.data]);
 
+  const expectedSteps: ExpectedNode[] = useMemo(() => {
+    // Compute expected action node order starting from trigger (BFS), similar to backend runner.
+    const byId = new Map(nodes.map((n) => [n.id, n]));
+    const outEdges = new Map<string, string[]>();
+    for (const e of edges) {
+      if (!outEdges.has(e.source)) outEdges.set(e.source, []);
+      outEdges.get(e.source)!.push(e.target);
+    }
+    const trigger = nodes.find((n) => typeof n.data?.type === 'string' && isTriggerType(n.data.type));
+    if (!trigger) return [];
+    const ordered: ExpectedNode[] = [];
+    const visited = new Set<string>();
+    const q: string[] = [trigger.id];
+    while (q.length) {
+      const id = q.shift()!;
+      if (visited.has(id)) continue;
+      visited.add(id);
+      const node = byId.get(id);
+      if (node && typeof node.data?.type === 'string' && !isTriggerType(node.data.type)) {
+        ordered.push({ nodeId: node.id, nodeType: node.data.type, nodeName: node.data.name ?? node.data.label ?? null });
+      }
+      for (const next of outEdges.get(id) ?? []) {
+        if (!visited.has(next)) q.push(next);
+      }
+    }
+    return ordered;
+  }, [nodes, edges]);
+
+  // Fetch and poll last execution details for the unified results panel.
+  useEffect(() => {
+    let cancelled = false;
+    if (!lastExecutionId) return;
+    async function poll() {
+      setLastExecutionLoading(true);
+      try {
+        for (let i = 0; i < 14; i++) {
+          const res = await fetch(`${API_BASE}/executions/${lastExecutionId}`, {
+            cache: 'no-store',
+            headers: { Accept: 'application/json' },
+          });
+          if (!res.ok) throw new Error('Failed to load execution');
+          const ex = (await res.json()) as ExecutionWithSteps;
+          if (cancelled) return;
+          setLastExecution(ex);
+          if (ex.status !== 'pending' && ex.status !== 'running') break;
+          await new Promise((r) => setTimeout(r, 500));
+        }
+      } catch {
+        if (!cancelled) setLastExecution(null);
+      } finally {
+        if (!cancelled) setLastExecutionLoading(false);
+      }
+    }
+    poll();
+    return () => {
+      cancelled = true;
+    };
+  }, [lastExecutionId]);
+
+  const handleNewExecutionId = useCallback((executionId: string) => {
+    setLastExecutionId(executionId);
+    setOpenResultNodeId(null);
+  }, []);
+
   const isEmpty = nodes.length === 0;
   const hasOnlyTriggerNoActions =
     nodes.length === 1 &&
@@ -385,9 +455,23 @@ function WorkflowCanvasInner({
                   node={selectedNodeForPanel as unknown as Node<FlowNodeData>}
                   onUpdate={handleUpdateNode}
                   workflowId={workflowId}
+                  onNewExecutionId={handleNewExecutionId}
                 />
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Unified last execution results */}
+        {(lastExecutionLoading || lastExecution) && (
+          <div className="pointer-events-auto absolute bottom-4 left-4 z-20 w-[520px] max-w-[calc(100%-2rem)]">
+            <ExecutionResultsPanel
+              execution={lastExecution}
+              loading={lastExecutionLoading}
+              expected={expectedSteps}
+              openStepNodeId={openResultNodeId}
+              onToggleStep={(nodeId) => setOpenResultNodeId((cur) => (cur === nodeId ? null : nodeId))}
+            />
           </div>
         )}
       </div>

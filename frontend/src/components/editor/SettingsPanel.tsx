@@ -12,6 +12,7 @@ type Props = {
   node: Node<FlowNodeData> | null;
   onUpdate: (nodeId: string, data: Partial<FlowNodeData>) => void;
   workflowId: string;
+  onNewExecutionId?: (executionId: string) => void;
 };
 
 function SectionCard({
@@ -182,7 +183,7 @@ function nextRunPreview(freq: string, time: string): { preview: string; nextRun:
   return { preview: 'Schedule', nextRun: '—' };
 }
 
-export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
+export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: Props) {
   const [copiedKey, setCopiedKey] = useState<null | 'url' | 'payload' | 'curl'>(null);
   const [testing, setTesting] = useState(false);
   const [runningNow, setRunningNow] = useState(false);
@@ -285,7 +286,10 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
         throw new Error(msg);
       }
       const data = (await res.json().catch(() => ({}))) as { executionId?: string };
-      if (data.executionId) setLastExecutionId(data.executionId);
+      if (data.executionId) {
+        setLastExecutionId(data.executionId);
+        onNewExecutionId?.(data.executionId);
+      }
       toast.success('Webhook test queued');
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Webhook test failed');
@@ -308,14 +312,17 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
         throw new Error(msg);
       }
       const data = (await res.json().catch(() => ({}))) as { executionId?: string };
-      if (data.executionId) setLastExecutionId(data.executionId);
+      if (data.executionId) {
+        setLastExecutionId(data.executionId);
+        onNewExecutionId?.(data.executionId);
+      }
       toast.success('Запуск поставлен в очередь');
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Run failed');
     } finally {
       setRunningNow(false);
     }
-  }, [workflowId]);
+  }, [workflowId, onNewExecutionId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -431,8 +438,16 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
       return (
         <SectionCard
           title="Configuration"
-          subtitle="Webhook is the entry point of your workflow. External systems can call this URL."
+          subtitle="Webhook — это входная точка workflow. Внешний сервис может отправить HTTP POST запрос на этот URL, чтобы запустить workflow."
         >
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-800">
+              Method
+            </span>
+            <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">
+              POST
+            </span>
+          </div>
           <Field
             label="Description (optional)"
             value={cfg.description ?? ''}
@@ -832,7 +847,12 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
         >
           <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-2">
             <div className="flex items-center justify-between gap-2">
-              <p className="text-xs font-semibold text-slate-800">Webhook URL</p>
+              <div className="flex items-center gap-2">
+                <p className="text-xs font-semibold text-slate-800">Webhook URL</p>
+                <span className="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-2 py-0.5 text-[11px] font-semibold text-red-700">
+                  POST
+                </span>
+              </div>
               <button
                 type="button"
                 onClick={() => copyToClipboard(webhookUrl, 'url')}
@@ -857,6 +877,16 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
             >
               {testing ? 'Testing…' : 'Test webhook'}
             </button>
+            {(lastExecutionLoading || lastExecution) && (
+              <div className="rounded-xl border border-slate-200 bg-white px-3 py-2">
+                <p className="text-xs text-slate-600">
+                  Last test:{' '}
+                  <span className="font-semibold text-slate-900">
+                    {lastExecutionLoading ? 'running…' : (lastExecution?.status ?? '—')}
+                  </span>
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
