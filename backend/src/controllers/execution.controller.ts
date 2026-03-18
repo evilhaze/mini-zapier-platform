@@ -10,7 +10,7 @@ const listQuerySchema = z.object({
   workflowId: z.string().uuid().optional(),
   status: z.enum(['pending', 'running', 'success', 'failed', 'paused']).optional(),
   page: z.coerce.number().int().min(1).optional(),
-  limit: z.coerce.number().int().min(1).max(100).optional(),
+  limit: z.coerce.number().int().min(1).max(200).optional(),
 });
 
 const workflowIdParamSchema = z.object({
@@ -24,6 +24,11 @@ export const executionController = {
   async list(req: Request, res: Response) {
     const parsed = listQuerySchema.safeParse(req.query);
     if (!parsed.success) {
+      console.warn('[executions] Bad request', {
+        url: req.originalUrl,
+        query: req.query,
+        issues: parsed.error.flatten(),
+      });
       return res.status(400).json({ error: parsed.error.flatten().fieldErrors });
     }
     const { workflowId, status, page, limit } = parsed.data;
@@ -59,6 +64,12 @@ export const executionController = {
     }
     const queryParsed = listQuerySchema.safeParse(req.query);
     if (!queryParsed.success) {
+      console.warn('[executions] Bad request (by workflow)', {
+        url: req.originalUrl,
+        params: req.params,
+        query: req.query,
+        issues: queryParsed.error.flatten(),
+      });
       return res.status(400).json({ error: queryParsed.error.flatten().fieldErrors });
     }
     const { status, page, limit } = queryParsed.data;

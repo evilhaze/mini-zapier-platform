@@ -223,7 +223,7 @@ Executions are queued (BullMQ) and run asynchronously; use GET /executions to in
             { name: 'id', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Workflow ID' },
             { name: 'status', in: 'query', schema: { type: 'string', enum: ['pending', 'running', 'success', 'failed', 'paused'] }, description: 'Filter by execution status' },
             { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, default: 1 } },
-            { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 20 } },
+            { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 200, default: 20 } },
           ],
           responses: {
             200: {
@@ -243,7 +243,7 @@ Executions are queued (BullMQ) and run asynchronously; use GET /executions to in
             { name: 'workflowId', in: 'query', schema: { type: 'string', format: 'uuid' }, description: 'Filter by workflow' },
             { name: 'status', in: 'query', schema: { type: 'string', enum: ['pending', 'running', 'success', 'failed', 'paused'] }, description: 'Filter by status' },
             { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1 }, description: 'Page number (default 1)' },
-            { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100 }, description: 'Items per page (default 20)' },
+            { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 200 }, description: 'Items per page (default 20)' },
           ],
           responses: {
             200: {

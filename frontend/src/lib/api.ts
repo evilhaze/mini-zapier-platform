@@ -36,7 +36,25 @@ export async function api<T>(
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error((err as { error?: string }).error || res.statusText);
+    const payload = err as { error?: unknown; message?: unknown };
+    const maybeError = payload.error;
+    const maybeMessage = payload.message;
+
+    const msg =
+      typeof maybeError === 'string'
+        ? maybeError
+        : typeof maybeMessage === 'string'
+          ? maybeMessage
+          : typeof res.statusText === 'string'
+            ? res.statusText
+            : 'Request failed';
+
+    // If backend returns structured validation errors, prefer a readable string.
+    if (typeof maybeError !== 'string' && maybeError != null) {
+      return Promise.reject(new Error(JSON.stringify(maybeError)));
+    }
+
+    throw new Error(msg);
   }
   return res.json() as Promise<T>;
 }

@@ -2,7 +2,7 @@ import { prisma } from '../utils/prisma.js';
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
-const MAX_LIMIT = 100;
+const MAX_LIMIT = 200;
 
 export type ExecutionListFilters = {
   workflowId?: string;
