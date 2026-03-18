@@ -16,4 +16,4 @@ RUN npm run build
 
 EXPOSE 3001
 
-CMD ["npm", "run", "start"]
+CMD ["sh", "-c", "npm run db:generate && npm run db:deploy && npm run start"]

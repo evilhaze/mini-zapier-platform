@@ -9,6 +9,8 @@
     "prebuild": "npm run db:generate",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
+    "db:deploy": "npm run db:push",
+    "start:prod": "npm start",
     "db:studio": "prisma studio"
   },
   "dependencies": {
