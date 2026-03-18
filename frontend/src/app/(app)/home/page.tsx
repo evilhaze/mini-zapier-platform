@@ -1,36 +1,8 @@
 import Link from 'next/link';
-import { API_BASE } from '@/lib/api';
-import { StatisticsCards } from '@/components/dashboard/StatisticsCards';
-import type { OverviewStats } from '@/components/dashboard/StatisticsCards';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { AIGenerateBlock } from '@/components/home/AIGenerateBlock';
-import { GitBranch, ListChecks, LayoutDashboard } from 'lucide-react';
-
-async function getStats(): Promise<OverviewStats> {
-  try {
-    const res = await fetch(`${API_BASE}/statistics/overview`, {
-      next: { revalidate: 30 },
-    });
-    if (!res.ok) throw new Error('Failed to fetch stats');
-    return res.json();
-  } catch {
-    return {
-      totalWorkflows: 0,
-      activeWorkflows: 0,
-      pausedWorkflows: 0,
-      totalExecutions: 0,
-      successfulExecutions: 0,
-      failedExecutions: 0,
-      pausedExecutions: 0,
-      successRate: 0,
-      recentExecutionsCount: 0,
-    };
-  }
-}
+import { GitBranch, LayoutDashboard } from 'lucide-react';
 
 export default async function HomePage() {
-  const stats = await getStats();
-
   return (
     <div className="space-y-10">
       {/* Hero / main CTA */}
@@ -185,29 +157,6 @@ export default async function HomePage() {
             </div>
           </Link>
         </div>
-      </section>
-
-      {/* Stats block */}
-      <section>
-        <h2 className="sr-only">Statistics</h2>
-        {stats.totalWorkflows === 0 && stats.totalExecutions === 0 ? (
-          <EmptyState
-            icon={<LayoutDashboard className="h-6 w-6" />}
-            title="No activity yet"
-            description="As you create and run workflows, execution analytics will appear here."
-            action={
-              <Link
-                href="/workflows?create=1"
-                className="inline-flex items-center gap-2 rounded-btn bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-red-700 transition-colors"
-              >
-                <GitBranch className="h-4 w-4" />
-                Create workflow
-              </Link>
-            }
-          />
-        ) : (
-          <StatisticsCards stats={stats} />
-        )}
       </section>
     </div>
   );

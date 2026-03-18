@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   GitBranch,
   ListChecks,
+  BarChart3,
   Zap,
   Plus,
   X,
@@ -13,6 +14,7 @@ import {
 
 const nav = [
   { href: '/home', label: 'Home', icon: LayoutDashboard },
+  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/workflows', label: 'Workflows', icon: GitBranch },
   { href: '/executions', label: 'Executions', icon: ListChecks },
 ] as const;
