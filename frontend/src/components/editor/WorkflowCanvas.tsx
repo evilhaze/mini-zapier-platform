@@ -367,7 +367,7 @@ function WorkflowCanvasInner({
                   <span className="text-lg leading-none">×</span>
                 </button>
               </div>
-              <div className="max-h-[calc(100vh-6rem)] overflow-auto p-3">
+              <div className="max-h-[calc(100vh-6rem)] overflow-auto overflow-x-hidden p-3">
                 <SettingsPanel
                   node={selectedNode}
                   onUpdate={handleUpdateNode}

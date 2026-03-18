@@ -387,7 +387,7 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
           {nodeDescription}
         </p>
       </div>
-      <div className="flex-1 overflow-auto px-6 py-5 space-y-5">
+      <div className="flex-1 overflow-auto overflow-x-hidden px-6 py-5 space-y-5">
         {/* Status / Result */}
         {(lastExecutionLoading || lastExecution) && (
           <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
@@ -444,9 +444,9 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
 
         {/* --- Webhook trigger: basic info --- */}
         {type === 'webhook' && (
-          <div className="space-y-3 rounded-lg border border-slate-200 bg-white p-3">
+          <div className="space-y-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm">
             <div className="flex items-center justify-between gap-3">
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-700">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-700">
                 Webhook
               </p>
               <span className="inline-flex items-center rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[11px] font-semibold text-slate-700">
@@ -454,13 +454,13 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
               </span>
             </div>
 
-            <p className="text-xs text-slate-600">
+            <p className="text-sm leading-relaxed text-slate-600">
               Webhook is the entry point of your workflow. External systems can call this URL.
             </p>
 
-            <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-2">
+            <div className="rounded-2xl border border-slate-200/80 bg-slate-50/50 p-4 space-y-2">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-medium text-slate-700">Webhook URL</p>
+                <p className="text-xs font-semibold text-slate-800">Webhook URL</p>
                 <button
                   type="button"
                   onClick={() => copyToClipboard(webhookUrl, 'url')}
@@ -472,20 +472,20 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
               <input
                 readOnly
                 value={webhookUrl}
-                className="w-full rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900"
+                className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-900 shadow-sm"
               />
-              <p className="text-xs text-slate-600">
+              <p className="text-sm leading-relaxed text-slate-600">
                 Send an HTTP POST request to this URL to trigger the workflow.
               </p>
               <button
                 type="button"
                 onClick={handleTestWebhook}
                 disabled={testing}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-red-600 px-3 py-2 text-xs font-semibold text-white hover:bg-red-700 disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-red-600 px-3 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-red-700 disabled:opacity-60"
               >
                 {testing ? 'Testing…' : 'Test webhook'}
               </button>
-              <p className="text-xs text-slate-600">
+              <p className="text-sm leading-relaxed text-slate-600">
                 Tip: If your workflow is connected to Telegram, this test should send the message.
               </p>
             </div>
@@ -498,9 +498,9 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
               helper="Optional context for what this webhook represents."
             />
 
-            <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-2">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-medium text-slate-700">Sample payload</p>
+                <p className="text-xs font-semibold text-slate-800">Sample payload</p>
                 <button
                   type="button"
                   onClick={() => copyToClipboard(samplePayloadText, 'payload')}
@@ -509,14 +509,14 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
                   {copiedKey === 'payload' ? 'Copied' : 'Copy example'}
                 </button>
               </div>
-              <pre className="overflow-auto rounded-md border border-slate-200 bg-slate-50 p-2 text-xs text-slate-800">
+              <pre className="overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 whitespace-pre-wrap break-words">
                 {samplePayloadText}
               </pre>
             </div>
 
-            <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-2">
+            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-2">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs font-medium text-slate-700">cURL</p>
+                <p className="text-xs font-semibold text-slate-800">cURL</p>
                 <button
                   type="button"
                   onClick={() => copyToClipboard(curlExample, 'curl')}
@@ -525,7 +525,7 @@ export function SettingsPanel({ node, onUpdate, workflowId }: Props) {
                   {copiedKey === 'curl' ? 'Copied' : 'Copy curl'}
                 </button>
               </div>
-              <pre className="overflow-auto rounded-md border border-slate-200 bg-slate-50 p-2 text-xs text-slate-800">
+              <pre className="overflow-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-800 whitespace-pre-wrap break-words">
                 {curlExample}
               </pre>
             </div>
