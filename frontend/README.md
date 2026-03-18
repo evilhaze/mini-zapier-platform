@@ -50,3 +50,23 @@ Set `NEXT_PUBLIC_API_URL` (e.g. `http://localhost:3001/api`) or it defaults to `
 ## Backend
 
 Run backend on port 3001. For dev, run both: `npm run dev` (frontend) and backend `npm run dev`; use frontend for UI and it will call the API.
+
+## Troubleshooting: `next dev` / `next build` exit immediately (no error)
+
+If the dev server or build exits right away with no message (on Windows you may see exit code `-1073741795` / ACCESS_VIOLATION), the cause is usually the **project path containing non-ASCII characters** (e.g. Cyrillic like «Работа»). Next.js/Node can crash when resolving such paths.
+
+**Fix:** run the frontend from a path that uses only ASCII:
+
+- **Option A – Directory junction (no copy):**  
+  Open PowerShell **as Administrator** and run once:
+  ```powershell
+  New-Item -ItemType Junction -Path "D:\zapier-frontend" -Target "D:\Работа MST\Zapier\frontend"
+  ```
+  Then use that path for dev/build:
+  ```powershell
+  cd D:\zapier-frontend
+  npm run dev
+  ```
+  (Adjust `Target` to your real frontend path.)
+
+- **Option B – Move or clone the repo** to a path without special characters (e.g. `D:\work\Zapier`).

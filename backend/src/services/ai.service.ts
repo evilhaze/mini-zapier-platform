@@ -42,7 +42,11 @@ function detectActions(prompt: string): (typeof ACTIONS)[number][] {
   if (/\b(http|api|request|endpoint|url)\b/.test(prompt) && !list.includes('http')) list.push('http');
   if (/\b(telegram|tg)\b/.test(prompt)) list.push('telegram');
   if (/\b(database|db|store|save.*to|persist)\b/.test(prompt)) list.push('db');
-  if (/\b(send.*email|email.*send|mail)\b/.test(prompt)) list.push('email');
+  // Email action: be generous in detection so prompts like "Email action" don't fall back to HTTP.
+  // We still avoid matching inbound "email trigger" phrasing here.
+  if (/\b(send.*email|email.*send|mail|email)\b/.test(prompt) && !/\b(email trigger|inbound email|email arrives)\b/.test(prompt)) {
+    list.push('email');
+  }
   if (/\b(transform|map|convert|parse)\b/.test(prompt)) list.push('transform');
   if (list.length === 0) list.push('http');
   return list;

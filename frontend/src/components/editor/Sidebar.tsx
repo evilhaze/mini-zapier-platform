@@ -57,20 +57,30 @@ function SidebarItem({
       onClick={onClick}
       onKeyDown={(e) => e.key === 'Enter' && onClick()}
       className={`
-        flex cursor-grab items-center gap-3 rounded-btn border-2 border-dashed px-3 py-2.5 text-left transition-colors
+        group flex cursor-grab items-center gap-3 rounded-xl border border-slate-200/80 bg-white px-3 py-3 text-left shadow-sm transition
+        hover:-translate-y-[1px] hover:border-slate-300 hover:shadow-md
         active:cursor-grabbing
-        ${variant === 'trigger' ? 'border-[#EFC7D6] bg-[#FDF2F7]/90 hover:border-[#E8B9CA] hover:bg-[#FDF2F7]' : 'border-red-200 bg-[#FEF2F2]/80 hover:border-red-300 hover:bg-red-50'}
+        ${variant === 'trigger'
+          ? 'hover:bg-[#FDF2F7] focus-visible:ring-2 focus-visible:ring-[#DEA5B5]/30'
+          : 'hover:bg-red-50 focus-visible:ring-2 focus-visible:ring-red-200'}
       `}
     >
       <div
         className={`
-          flex h-8 w-8 shrink-0 items-center justify-center rounded-lg
-          ${variant === 'trigger' ? 'bg-[#F6E3EA] text-[#B86B7C]' : 'bg-[#FEF2F2] text-[#EF4444]'}
+          flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1 ring-black/5
+          ${variant === 'trigger'
+            ? 'bg-[#F6E3EA] text-[#B86B7C] group-hover:bg-[#F3D7E2]'
+            : 'bg-[#FEF2F2] text-[#EF4444] group-hover:bg-red-100/60'}
         `}
       >
         <Icon className="h-4 w-4" />
       </div>
-      <span className="text-sm font-medium text-slate-800">{label}</span>
+      <div className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-semibold text-slate-900">{label}</span>
+        <span className="mt-0.5 block text-xs text-slate-500">
+          {variant === 'trigger' ? 'Starts the workflow' : 'Runs after previous step'}
+        </span>
+      </div>
     </div>
   );
 }
@@ -81,19 +91,26 @@ type SidebarProps = {
 
 export function Sidebar({ onAddNode }: SidebarProps) {
   return (
-    <aside className="flex w-56 shrink-0 flex-col border-r border-slate-200/80 bg-white">
-      <div className="border-b border-slate-200/80 px-4 py-3">
-        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+    <aside className="flex w-60 shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-soft">
+      <div className="border-b border-slate-200/80 px-4 py-4">
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
           Add node
         </h3>
-        <p className="mt-1 text-xs text-slate-400">
-          Drag onto canvas or click to add
+        <p className="mt-2 text-sm font-semibold text-slate-900">
+          Triggers & actions
+        </p>
+        <p className="mt-1 text-xs leading-relaxed text-slate-600">
+          Drag onto the canvas or click to add.
         </p>
       </div>
-      <div className="flex-1 overflow-auto p-3">
+      <div className="flex-1 overflow-auto p-4">
         <section className="mb-4">
-          <h4 className="mb-2 text-xs font-medium text-[#B86B7C]">Triggers</h4>
-          <div className="space-y-1.5">
+          <div className="mb-2 flex items-center justify-between">
+            <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-[#B86B7C]">
+              Triggers
+            </h4>
+          </div>
+          <div className="space-y-2">
             {TRIGGER_TYPES.map((type) => (
               <SidebarItem
                 key={type}
@@ -107,8 +124,12 @@ export function Sidebar({ onAddNode }: SidebarProps) {
           </div>
         </section>
         <section>
-          <h4 className="mb-2 text-xs font-medium text-red-600">Actions</h4>
-          <div className="space-y-1.5">
+          <div className="mb-2 flex items-center justify-between">
+            <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-red-600">
+              Actions
+            </h4>
+          </div>
+          <div className="space-y-2">
             {ACTION_TYPES.map((type) => (
               <SidebarItem
                 key={type}

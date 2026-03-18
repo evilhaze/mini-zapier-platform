@@ -119,8 +119,10 @@ function TriggerNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
     <div
       className={`
         relative min-w-[200px] max-w-[220px] overflow-hidden rounded-card bg-white text-left shadow-soft
-        ring-1 ring-slate-200/80
-        ${selected ? 'ring-2 ring-[#DEA5B5] shadow-card-hover' : 'hover:ring-[#EFC7D6]'}
+        ring-1 ring-slate-200/80 transition
+        ${selected
+          ? 'ring-2 ring-[#C97B8C] shadow-card-hover -translate-y-[1px]'
+          : 'hover:ring-[#EFC7D6] hover:-translate-y-[1px]'}
       `}
     >
       {/* Top handle */}

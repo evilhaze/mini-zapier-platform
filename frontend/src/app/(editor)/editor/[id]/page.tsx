@@ -14,6 +14,9 @@ export default function EditorPage() {
   const [definition, setDefinition] = useState<DefinitionJson | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [baselineSig, setBaselineSig] = useState<string>('');
   const getDefinitionRef = useRef<(() => DefinitionJson) | null>(null);
 
   useEffect(() => {
@@ -38,6 +41,8 @@ export default function EditorPage() {
             def = null;
           }
           setDefinition(def);
+          setBaselineSig(JSON.stringify(def ?? { nodes: [], edges: [] }));
+          setDirty(false);
         }
       } catch (e) {
         if (!cancelled) {
@@ -57,6 +62,7 @@ export default function EditorPage() {
     if (!getDefinitionRef.current) return;
     const nextDef = getDefinitionRef.current();
     try {
+      setSaving(true);
       const res = await fetch(`${API_BASE}/workflows/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -64,8 +70,14 @@ export default function EditorPage() {
       });
       if (!res.ok) throw new Error('Failed to save workflow');
       toast.success('Workflow saved');
+      const sig = JSON.stringify(nextDef ?? { nodes: [], edges: [] });
+      setBaselineSig(sig);
+      setDirty(false);
     } catch (e) {
       console.error(e);
+      toast.error(e instanceof Error ? e.message : 'Save failed');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -104,19 +116,35 @@ export default function EditorPage() {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <span
+              className={`hidden sm:inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+                dirty
+                  ? 'border-amber-200 bg-amber-50 text-amber-800'
+                  : 'border-emerald-200 bg-emerald-50 text-emerald-800'
+              }`}
+            >
+              {dirty ? 'Unsaved changes' : 'Saved'}
+            </span>
             <button
               type="button"
               onClick={handleSave}
-              className="inline-flex items-center gap-2 rounded-btn bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-soft hover:bg-red-700"
+              disabled={!dirty || saving}
+              className="inline-flex items-center gap-2 rounded-btn bg-red-600 px-4 py-2 text-xs font-semibold text-white shadow-soft hover:bg-red-700 disabled:opacity-60"
             >
-              Save
+              {saving ? 'Saving…' : 'Save'}
             </button>
           </div>
         </div>
 
         {/* Canvas workspace - full area */}
         <div className="flex-1 min-h-0 flex">
-          <WorkflowCanvas initialDefinition={definition} getDefinitionRef={getDefinitionRef} />
+          <WorkflowCanvas
+            workflowId={String(id)}
+            initialDefinition={definition}
+            getDefinitionRef={getDefinitionRef}
+            baselineSignature={baselineSig}
+            onDirtyChange={setDirty}
+          />
         </div>
       </div>
     </div>

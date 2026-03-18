@@ -31,13 +31,19 @@ const proOptions = { hideAttribution: true };
 
 type WorkflowCanvasProps = {
   initialDefinition: DefinitionJson | null;
+  workflowId: string;
   /** Ref that will be set to a function returning current definition (for Save). */
   getDefinitionRef?: React.MutableRefObject<(() => DefinitionJson) | null>;
+  baselineSignature?: string;
+  onDirtyChange?: (dirty: boolean) => void;
 };
 
 function WorkflowCanvasInner({
   initialDefinition,
+  workflowId,
   getDefinitionRef,
+  baselineSignature,
+  onDirtyChange,
 }: WorkflowCanvasProps) {
   const { screenToFlowPosition } = useReactFlow();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
@@ -62,6 +68,13 @@ function WorkflowCanvasInner({
       if (getDefinitionRef) getDefinitionRef.current = null;
     };
   }, [nodes, edges, getDefinitionRef]);
+
+  // Notify outer editor when definition changes (for Saved/Unsaved UX).
+  useEffect(() => {
+    if (!onDirtyChange) return;
+    const sig = JSON.stringify(flowToDefinition(nodes, edges));
+    onDirtyChange(baselineSignature ? sig !== baselineSignature : true);
+  }, [nodes, edges, baselineSignature, onDirtyChange]);
 
   const onConnect = useCallback(
     (connection: Connection) => setEdges((eds) => addEdge(connection, eds)),
@@ -178,8 +191,29 @@ function WorkflowCanvasInner({
   );
 
   useEffect(() => {
+    const isTypingInFormField = (event: KeyboardEvent) => {
+      const targetEl =
+        (event.target instanceof HTMLElement ? event.target : null) ??
+        (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+
+      if (!targetEl) return false;
+
+      // If focus is inside any form control / editable element, do not run canvas hotkeys.
+      // This protects all node settings fields (Label, Description, Telegram, Email, etc.).
+      const editable = targetEl.closest(
+        'input, textarea, select, [contenteditable="true"], [role="textbox"]'
+      );
+      if (editable) return true;
+
+      // Some browsers set isContentEditable on nested elements inside a contenteditable container.
+      if (targetEl.isContentEditable) return true;
+
+      return false;
+    };
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!selectedNodeId) return;
+      if (isTypingInFormField(event)) return;
       if (event.key === 'Delete' || event.key === 'Backspace') {
         event.preventDefault();
         handleDeleteNode(selectedNodeId);
@@ -266,9 +300,9 @@ function WorkflowCanvasInner({
           >
             <Background
               variant={BackgroundVariant.Dots}
-              gap={20}
+              gap={24}
               size={1}
-              color="#cbd5e1"
+              color="#e2e8f0"
             />
             <Controls className="!border-slate-200/80 !rounded-btn !bg-white !shadow-soft" />
             <MiniMap
@@ -316,23 +350,29 @@ function WorkflowCanvasInner({
 
         {/* Floating settings inspector with close button */}
         {selectedNode && settingsOpen && (
-          <div className="pointer-events-auto absolute inset-y-4 right-4 z-30 flex max-w-sm">
-            <div className="w-80 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
-              <div className="flex items-center justify-between border-b border-slate-200 px-4 py-2">
-                <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Node settings
-                </span>
+          <div className="pointer-events-auto absolute inset-y-4 right-4 z-30 flex">
+            <div className="w-[420px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl">
+              <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-3">
+                <div className="min-w-0">
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    Node settings
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={() => setSettingsOpen(false)}
-                  className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900"
                   aria-label="Close settings"
                 >
-                  ×
+                  <span className="text-lg leading-none">×</span>
                 </button>
               </div>
-              <div className="max-h-[calc(100vh-6rem)] overflow-auto p-2">
-                <SettingsPanel node={selectedNode} onUpdate={handleUpdateNode} />
+              <div className="max-h-[calc(100vh-6rem)] overflow-auto p-3">
+                <SettingsPanel
+                  node={selectedNode}
+                  onUpdate={handleUpdateNode}
+                  workflowId={workflowId}
+                />
               </div>
             </div>
           </div>
@@ -346,6 +386,38 @@ export function WorkflowCanvas(props: WorkflowCanvasProps) {
   return (
     <ReactFlowProvider>
       <div className="relative flex h-full min-h-[600px] w-full bg-slate-50">
+        {/* Polished canvas background (soft + subtle structure) */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            // Variant C: subtle dots + faint large grid (no images, lightweight).
+            backgroundColor: '#f8fafc', // slate-50-ish but slightly softer
+            backgroundImage: [
+              // Tiny dots
+              'radial-gradient(circle at 1px 1px, rgba(148,163,184,0.22) 1px, transparent 1px)',
+              // Large grid
+              'linear-gradient(rgba(148,163,184,0.07) 1px, transparent 1px)',
+              'linear-gradient(90deg, rgba(148,163,184,0.07) 1px, transparent 1px)',
+              // Soft color wash (very subtle)
+              'radial-gradient(800px 420px at 10% 0%, rgba(248,113,113,0.08), transparent 60%)',
+              'radial-gradient(700px 380px at 95% 35%, rgba(167,139,250,0.08), transparent 60%)',
+            ].join(','),
+            backgroundSize: [
+              '18px 18px',
+              '120px 120px',
+              '120px 120px',
+              '100% 100%',
+              '100% 100%',
+            ].join(','),
+            backgroundPosition: [
+              '0 0',
+              '0 0',
+              '0 0',
+              '0 0',
+              '0 0',
+            ].join(','),
+          }}
+        />
         <WorkflowCanvasInner {...props} />
       </div>
     </ReactFlowProvider>

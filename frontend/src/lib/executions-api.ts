@@ -45,3 +45,38 @@ export async function fetchExecutions(
   if (!res.ok) throw new Error('Failed to fetch executions');
   return res.json();
 }
+
+export type ExecutionStep = {
+  id: string;
+  executionId: string;
+  nodeId: string;
+  nodeName: string | null;
+  nodeType: string;
+  status: string;
+  inputData: unknown;
+  outputData: unknown;
+  errorMessage: string | null;
+  retryCount: number;
+  startedAt: string;
+  finishedAt: string | null;
+};
+
+export type ExecutionDetail = {
+  id: string;
+  workflowId: string;
+  triggerType: string;
+  status: string;
+  startedAt: string;
+  finishedAt: string | null;
+  errorMessage: string | null;
+  steps?: ExecutionStep[];
+};
+
+export async function fetchExecutionById(id: string): Promise<ExecutionDetail> {
+  const res = await fetch(`${API_BASE}/executions/${id}`, {
+    cache: 'no-store',
+    headers: { Accept: 'application/json' },
+  });
+  if (!res.ok) throw new Error('Failed to fetch execution');
+  return res.json();
+}

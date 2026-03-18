@@ -15,10 +15,28 @@ export const telegramHandler: ActionHandler = async (config, input) => {
   }
   if (!text) throw new Error('telegram action: text is required (in config or input)');
 
+  const parseModeRaw = config.parseMode as string | undefined;
+  const parseMode =
+    parseModeRaw === 'Markdown' || parseModeRaw === 'MarkdownV2' || parseModeRaw === 'HTML'
+      ? parseModeRaw
+      : undefined;
+
+  const disablePreviewRaw = config.disableWebPreview as unknown;
+  const disable_web_page_preview =
+    disablePreviewRaw === true ||
+    disablePreviewRaw === 'true' ||
+    disablePreviewRaw === 1 ||
+    disablePreviewRaw === '1';
+
   const res = await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: chatId, text }),
+    body: JSON.stringify({
+      chat_id: chatId,
+      text,
+      ...(parseMode ? { parse_mode: parseMode } : {}),
+      ...(disable_web_page_preview ? { disable_web_page_preview: true } : {}),
+    }),
   });
   const data = (await res.json()) as Record<string, unknown>;
   if (!res.ok) {
