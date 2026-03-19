@@ -445,9 +445,9 @@ function WorkflowCanvasInner({
 
             {/* Floating settings inspector with close button */}
             {selectedNodeForPanel && settingsOpen && (
-              <div className="pointer-events-auto absolute inset-y-4 right-4 z-30 flex">
-                <div className="w-[420px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-slate-600 dark:bg-slate-800">
-                  <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-3 dark:border-slate-600">
+              <div className="pointer-events-auto absolute inset-y-4 right-4 z-30 flex h-[calc(100vh-2rem)] max-h-[calc(100vh-2rem)]">
+                <div className="flex min-h-0 w-[420px] flex-col rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-slate-600 dark:bg-slate-800">
+                  <div className="shrink-0 flex items-center justify-between border-b border-slate-200/80 px-5 py-3 dark:border-slate-600">
                     <div className="min-w-0">
                       <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
                         Node settings
@@ -462,7 +462,7 @@ function WorkflowCanvasInner({
                       <span className="text-lg leading-none">×</span>
                     </button>
                   </div>
-                  <div className="max-h-[calc(100vh-6rem)] overflow-auto overflow-x-hidden p-3">
+                  <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden p-3">
                     <SettingsPanel
                       node={selectedNodeForPanel as unknown as Node<FlowNodeData>}
                       onUpdate={handleUpdateNode}

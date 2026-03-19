@@ -1126,8 +1126,8 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
   ]);
 
   return (
-    <div className="flex w-full flex-col bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
-      <div className="border-b border-slate-200/80 dark:border-slate-600 px-6 py-5">
+    <div className="flex min-h-0 w-full flex-col bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
+      <div className="shrink-0 border-b border-slate-200/80 dark:border-slate-600 px-6 py-5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
           Node settings
         </p>
@@ -1138,7 +1138,7 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
           {nodeDescription}
         </p>
       </div>
-      <div className="flex-1 overflow-auto overflow-x-hidden px-6 py-5 space-y-5">
+      <div className="min-h-0 shrink-0 px-6 py-5 space-y-5">
         {/* Status / Result */}
         {(lastExecutionLoading || lastExecution) && (
           <SectionCard title="Status / Result">
