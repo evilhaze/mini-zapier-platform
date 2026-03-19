@@ -88,7 +88,7 @@ export function AIDraftPreviewModal({ open, onClose, draft }: Props) {
                   {NODE_LABELS[trigger.type] ?? trigger.type}
                 </span>
               )}
-              {actions.map((n, i) => (
+              {actions.map((n) => (
                 <span key={n.id} className="flex items-center gap-1.5">
                   <ChevronRight className="h-4 w-4 text-slate-400" />
                   <span className="rounded-md bg-red-50 px-2 py-1 text-red-700 font-medium">
@@ -98,6 +98,25 @@ export function AIDraftPreviewModal({ open, onClose, draft }: Props) {
               ))}
             </div>
           </div>
+          {draft.summary && (
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Summary</p>
+              <p className="mt-1 text-sm text-slate-700">{draft.summary}</p>
+            </div>
+          )}
+          {draft.missingFields && draft.missingFields.length > 0 && (
+            <div>
+              <p className="text-xs font-medium uppercase tracking-wider text-amber-600">To fill manually</p>
+              <ul className="mt-1 list-inside list-disc text-sm text-slate-600 space-y-0.5">
+                {draft.missingFields.map((m, i) => (
+                  <li key={i}>
+                    <span className="font-medium">{m.nodeLabel ?? m.nodeId}</span>: {m.field}
+                    {m.hint ? ` — ${m.hint}` : ''}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {error && (
             <p className="text-sm text-red-600" role="alert">
               {error}

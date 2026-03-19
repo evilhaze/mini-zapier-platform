@@ -66,3 +66,23 @@ export function flowToDefinition(
 function isTrigger(type: string): boolean {
   return ['webhook', 'schedule', 'email', 'manual'].includes(type);
 }
+
+/**
+ * Convert a single node definition (e.g. from AI add_node op) to React Flow node.
+ */
+export function nodeDefToFlowNode(
+  nodeDef: { id: string; type: string; config?: Record<string, unknown>; name?: string; position?: { x: number; y: number } }
+): Node<FlowNodeData> {
+  const type = nodeDef.type ?? 'http';
+  return {
+    id: nodeDef.id,
+    type: isTrigger(type) ? 'trigger' : 'action',
+    position: nodeDef.position ?? { x: 80, y: 80 },
+    data: {
+      type,
+      label: nodeDef.name ?? type,
+      config: nodeDef.config ?? {},
+      name: nodeDef.name,
+    },
+  };
+}

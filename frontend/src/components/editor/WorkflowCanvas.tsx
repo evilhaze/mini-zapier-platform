@@ -19,8 +19,10 @@ import {
 import '@xyflow/react/dist/style.css';
 import { nodeTypes } from './nodes';
 import type { FlowNodeData } from './utils';
-import { definitionToFlow, flowToDefinition } from './utils';
+import { definitionToFlow, flowToDefinition, nodeDefToFlowNode } from './utils';
 import type { DefinitionJson } from './types';
+import type { EditorOperation } from '@/lib/ai-api';
+import { EditorAIPanel } from './EditorAIPanel';
 import { DRAG_TYPE_APPLICATION, Sidebar } from './Sidebar';
 import { isTriggerType } from './types';
 import { SettingsPanel } from './SettingsPanel';
@@ -204,6 +206,47 @@ function WorkflowCanvasInner({
       setNodes((nds) => nds.filter((n) => n.id !== nodeId));
       setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId));
       setSelectedNodeId((current) => (current === nodeId ? null : current));
+    },
+    [setNodes, setEdges]
+  );
+
+  const applyEditorOperations = useCallback(
+    (operations: EditorOperation[]) => {
+      operations.forEach((op) => {
+        if (op.op === 'add_node') {
+          const flowNode = nodeDefToFlowNode(op.node);
+          setNodes((nds) => [...nds, flowNode]);
+          if (op.connectFrom) {
+            setEdges((eds) => {
+              const exists = eds.some((e) => e.source === op.connectFrom && e.target === op.node.id);
+              if (exists) return eds;
+              return [...eds, { id: `e-${op.connectFrom}-${op.node.id}-${Date.now()}`, source: op.connectFrom, target: op.node.id }];
+            });
+          }
+        } else if (op.op === 'update_node') {
+          setNodes((nds) =>
+            nds.map((n) => {
+              if (n.id !== op.nodeId) return n;
+              const nextData = { ...n.data };
+              if (op.config != null) nextData.config = { ...(nextData.config ?? {}), ...op.config };
+              if (op.name != null) nextData.name = op.name;
+              return { ...n, data: nextData };
+            })
+          );
+        } else if (op.op === 'connect_nodes') {
+          setEdges((eds) => {
+            const exists = eds.some((e) => e.source === op.source && e.target === op.target);
+            if (exists) return eds;
+            return [...eds, { id: `e-${op.source}-${op.target}-${Date.now()}`, source: op.source, target: op.target }];
+          });
+        } else if (op.op === 'delete_node') {
+          setNodes((nds) => nds.filter((n) => n.id !== op.nodeId));
+          setEdges((eds) => eds.filter((e) => e.source !== op.nodeId && e.target !== op.nodeId));
+          setSelectedNodeId((cur) => (cur === op.nodeId ? null : cur));
+        } else if (op.op === 'delete_edge') {
+          setEdges((eds) => eds.filter((e) => !(e.source === op.source && e.target === op.target)));
+        }
+      });
     },
     [setNodes, setEdges]
   );
@@ -411,6 +454,17 @@ function WorkflowCanvasInner({
               />
             </ReactFlow>
           </NodeActionsContext.Provider>
+
+          {/* AI Assistant — top-right, always available */}
+          <div className="pointer-events-none absolute inset-0 flex justify-end items-start pt-4 pr-4">
+            <div className="pointer-events-auto relative">
+              <EditorAIPanel
+                getDefinition={() => flowToDefinition(nodes, edges)}
+                selectedNodeId={selectedNodeId}
+                onApplyOperations={applyEditorOperations}
+              />
+            </div>
+          </div>
 
           {/* Overlay layer for panels and hints (canvas area only) */}
           <div className="pointer-events-none absolute inset-0">
