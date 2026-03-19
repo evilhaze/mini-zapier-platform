@@ -1,6 +1,41 @@
 import nodemailer from 'nodemailer';
 import type { ActionHandler } from '../types.js';
 
+function parseBoolean(value: unknown): boolean | undefined {
+  if (typeof value !== 'string') return undefined;
+  const v = value.trim().toLowerCase();
+  if (v === 'true') return true;
+  if (v === 'false') return false;
+  return undefined;
+}
+
+function parsePort(value: unknown): number | undefined {
+  if (typeof value !== 'string' || value.trim().length === 0) return undefined;
+  const n = Number(value);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+function mapSmtpErrorMessage(err: unknown): string {
+  const msg = err instanceof Error ? err.message : String(err);
+  const withCode = err as { code?: unknown };
+  const code = typeof withCode?.code === 'string' ? withCode.code : '';
+
+  if (code === 'ECONNREFUSED' || msg.includes('ECONNREFUSED')) {
+    return 'SMTP connection failed: server refused connection. Check SMTP_HOST/SMTP_PORT and provider firewall rules.';
+  }
+  if (code === 'ENOTFOUND' || msg.includes('ENOTFOUND')) {
+    return 'SMTP connection failed: host not found. Verify SMTP_HOST.';
+  }
+  if (code === 'EAUTH' || msg.toLowerCase().includes('auth')) {
+    return 'SMTP authentication failed. Verify SMTP_USER/SMTP_PASS.';
+  }
+  if (msg.toLowerCase().includes('timed out')) {
+    return 'SMTP connection timed out. Check SMTP_HOST/SMTP_PORT and network access.';
+  }
+
+  return `Email sending failed: ${msg}`;
+}
+
 /**
  * Email action: to, subject, text/html.
  * Uses nodemailer. Config can include transport options (host, port, secure, auth).
@@ -25,35 +60,56 @@ export const emailHandler: ActionHandler = async (config, _input, context) => {
 
   if (!text && !html) throw new Error('email action: text/html (or body) is required');
 
-  const envUrl = process.env.SMTP_URL;
-  const envHost = process.env.SMTP_HOST;
-  const envPort = process.env.SMTP_PORT ? Number(process.env.SMTP_PORT) : undefined;
-  const envSecure = process.env.SMTP_SECURE ? process.env.SMTP_SECURE === 'true' : undefined;
-  const envUser = process.env.SMTP_USER;
-  const envPass = process.env.SMTP_PASS;
-  const envFrom = process.env.EMAIL_FROM;
+  const envUrl = process.env.SMTP_URL?.trim();
+  const envHost = process.env.SMTP_HOST?.trim();
+  const envPort = parsePort(process.env.SMTP_PORT);
+  const envSecure = parseBoolean(process.env.SMTP_SECURE);
+  const envUser = process.env.SMTP_USER?.trim();
+  const envPass = process.env.SMTP_PASS?.trim();
+  const envFrom = process.env.SMTP_FROM?.trim() ?? process.env.EMAIL_FROM?.trim();
+
+  const cfgHost = typeof config.host === 'string' ? config.host.trim() : undefined;
+  const cfgPort = config.port != null ? Number(config.port) : undefined;
+  const cfgSecure =
+    config.secure === true ? true : config.secure === false ? false : undefined;
+  const cfgSmtpUrl = typeof config.smtpUrl === 'string' ? config.smtpUrl.trim() : undefined;
+  const cfgAuth =
+    config.auth && typeof config.auth === 'object'
+      ? {
+          user: (config.auth as { user?: string }).user,
+          pass: (config.auth as { pass?: string }).pass,
+        }
+      : undefined;
+
+  const hasStructuredTransport = Boolean(cfgHost ?? envHost ?? cfgPort ?? envPort);
+
+  if (!cfgSmtpUrl && !envUrl && !hasStructuredTransport) {
+    throw new Error(
+      'SMTP is not configured. Set SMTP_URL or SMTP_HOST/SMTP_PORT (and optionally SMTP_USER/SMTP_PASS, SMTP_FROM).'
+    );
+  }
+
+  if (!cfgSmtpUrl && !envUrl) {
+    const missing: string[] = [];
+    if (!(cfgHost ?? envHost)) missing.push('SMTP_HOST');
+    if (!Number.isFinite(cfgPort ?? envPort)) missing.push('SMTP_PORT');
+    if (missing.length > 0) {
+      throw new Error(
+        `SMTP is not configured: missing ${missing.join(', ')}. Set SMTP_URL or required SMTP env vars.`
+      );
+    }
+  }
 
   const transportOptions =
-    typeof config.smtpUrl === 'string'
-      ? (config.smtpUrl as string)
-      : typeof envUrl === 'string' && envUrl.length > 0
+    cfgSmtpUrl && cfgSmtpUrl.length > 0
+      ? cfgSmtpUrl
+      : envUrl && envUrl.length > 0
         ? envUrl
         : {
-            host: (config.host as string | undefined) ?? envHost ?? 'localhost',
-            port: (config.port != null ? Number(config.port) : undefined) ?? envPort ?? 587,
-            secure:
-              (config.secure === true ? true : config.secure === false ? false : undefined) ??
-              envSecure ??
-              false,
-            auth:
-              config.auth && typeof config.auth === 'object'
-                ? {
-                    user: (config.auth as { user?: string }).user,
-                    pass: (config.auth as { pass?: string }).pass,
-                  }
-                : envUser && envPass
-                  ? { user: envUser, pass: envPass }
-                  : undefined,
+            host: cfgHost ?? envHost,
+            port: cfgPort ?? envPort,
+            secure: cfgSecure ?? envSecure ?? false,
+            auth: cfgAuth ?? (envUser && envPass ? { user: envUser, pass: envPass } : undefined),
           };
 
   const transporter = nodemailer.createTransport(transportOptions as Parameters<typeof nodemailer.createTransport>[0]);
@@ -71,8 +127,8 @@ export const emailHandler: ActionHandler = async (config, _input, context) => {
     console.log(`${logPrefix} sent successfully -> messageId=${info.messageId}`);
     return { sent: true, messageId: info.messageId };
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error(`${logPrefix} send failed: ${msg}`);
-    throw err;
+    const humanMessage = mapSmtpErrorMessage(err);
+    console.error(`${logPrefix} send failed: ${humanMessage}`);
+    throw new Error(humanMessage);
   }
 };
