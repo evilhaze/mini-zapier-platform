@@ -1,10 +1,15 @@
-function normalizeApiBaseUrl(rawUrl: string): string {
+function normalizeBackendBaseUrl(rawUrl: string): string {
   const trimmed = rawUrl.trim().replace(/\/+$/, '');
-  return trimmed.endsWith('/api') ? trimmed : `${trimmed}/api`;
+  return trimmed.endsWith('/api') ? trimmed.slice(0, -4) : trimmed;
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const isProduction = process.env.NODE_ENV === 'production';
+const BACKEND_BASE_URL = API_URL
+  ? normalizeBackendBaseUrl(API_URL)
+  : isProduction
+    ? ''
+    : 'http://localhost:3001';
 
 /**
  * API base URL for backend.
@@ -12,11 +17,8 @@ const isProduction = process.env.NODE_ENV === 'production';
  * - In production: ONLY use `NEXT_PUBLIC_API_URL` (no localhost fallbacks).
  * - In dev: allow fallback to localhost for local development.
  */
-export const API_BASE = API_URL
-  ? normalizeApiBaseUrl(API_URL)
-  : isProduction
-    ? ''
-    : 'http://localhost:3001/api';
+export const API_BASE = BACKEND_BASE_URL ? `${BACKEND_BASE_URL}/api` : '';
+export const API_DOCS_URL = BACKEND_BASE_URL ? `${BACKEND_BASE_URL}/api-docs` : '';
 
 export async function api<T>(
   path: string,

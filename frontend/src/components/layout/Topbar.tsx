@@ -6,14 +6,14 @@ import { Menu, User, LogOut, ChevronDown } from 'lucide-react';
 import Link from '@/components/ui/Link';
 import { useAuth } from '@/contexts/AuthContext';
 import { ThemeToggleButton } from './ThemeToggleButton';
+import { API_DOCS_URL } from '@/lib/api';
 
 type TopbarProps = {
   onMenuClick: () => void;
 };
 
 export function Topbar({ onMenuClick }: TopbarProps) {
-  const apiDocsUrl =
-    process.env.NEXT_PUBLIC_API_DOCS_URL ?? 'http://localhost:3001/api-docs';
+  const apiDocsUrl = API_DOCS_URL;
   const { isLoggedIn, user, logout, hydrated } = useAuth();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -72,14 +72,20 @@ export function Topbar({ onMenuClick }: TopbarProps) {
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
-        <a
-          href={apiDocsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm font-medium text-slate-500 hover:text-accent transition-colors dark:text-slate-300"
-        >
-          API Docs
-        </a>
+        {apiDocsUrl ? (
+          <a
+            href={apiDocsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm font-medium text-slate-500 hover:text-accent transition-colors dark:text-slate-300"
+          >
+            API Docs
+          </a>
+        ) : (
+          <span className="text-sm font-medium text-slate-400 dark:text-slate-500">
+            API Docs
+          </span>
+        )}
         <ThemeToggleButton className="border-none bg-transparent shadow-none dark:border-none dark:bg-transparent" />
         {!hydrated ? (
           <div className="h-9 w-24 rounded-xl bg-slate-100 dark:bg-slate-900" aria-hidden />
