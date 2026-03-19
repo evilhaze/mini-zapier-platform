@@ -97,6 +97,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             ? 'min-h-screen bg-slate-950 text-slate-100'
             : 'min-h-screen bg-slate-50 text-slate-900'
         }
+        data-theme={theme}
       >
         {children}
       </div>

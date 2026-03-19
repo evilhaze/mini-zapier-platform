@@ -49,7 +49,7 @@ function WorkflowCanvasInner({
   onDirtyChange,
 }: WorkflowCanvasProps) {
   const { theme } = useTheme();
-  const backgroundDotColor = theme === 'dark' ? '#334155' : '#e2e8f0';
+  const backgroundDotColor = theme === 'dark' ? '#475569' : '#e2e8f0'; /* softer dots in dark */
   const { screenToFlowPosition } = useReactFlow();
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
   const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
@@ -399,15 +399,15 @@ function WorkflowCanvasInner({
                 color={backgroundDotColor}
               />
               <Controls
-                className="!border-slate-200/80 !rounded-btn !bg-white !shadow-soft dark:!border-slate-800/80 dark:!bg-slate-950"
+                className="rounded-btn border border-slate-200/80 bg-white shadow-soft dark:border-slate-600 dark:bg-slate-800 dark:shadow-none"
               />
               <MiniMap
                 nodeColor={(n) =>
                   typeof n.data?.type === 'string' && isTriggerType(n.data.type)
-                    ? '#8b5cf6'
-                    : '#059669'
+                    ? '#a78bfa'
+                    : '#34d399'
                 }
-                className="!bg-white !border !border-slate-200/80 !rounded-card dark:!bg-slate-950 dark:!border-slate-800/80"
+                className="rounded-card border border-slate-200/80 bg-white dark:!bg-slate-800 dark:border-slate-600 minimap-dark"
               />
             </ReactFlow>
           </NodeActionsContext.Provider>
@@ -420,7 +420,7 @@ function WorkflowCanvasInner({
                 className="pointer-events-none absolute inset-0 flex items-center justify-center p-4 sm:p-6"
                 aria-hidden
               >
-                <div className="pointer-events-none max-w-sm rounded-2xl border border-[#FECACA] bg-[#FEF2F2]/95 px-6 py-6 text-center shadow-lg backdrop-blur-sm dark:bg-slate-900/60">
+                <div className="pointer-events-none max-w-sm rounded-2xl border border-[#FECACA] bg-[#FEF2F2]/95 px-6 py-6 text-center shadow-lg backdrop-blur-sm dark:border-slate-600 dark:bg-slate-800/95">
                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#FCA5A5]/20 text-[#EF4444]">
                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                       <path
@@ -446,8 +446,8 @@ function WorkflowCanvasInner({
             {/* Floating settings inspector with close button */}
             {selectedNodeForPanel && settingsOpen && (
               <div className="pointer-events-auto absolute inset-y-4 right-4 z-30 flex">
-                <div className="w-[420px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-slate-800/80 dark:bg-slate-950">
-                  <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-3 dark:border-slate-800/80">
+                <div className="w-[420px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-slate-600 dark:bg-slate-800">
+                  <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-3 dark:border-slate-600">
                     <div className="min-w-0">
                       <span className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
                         Node settings
@@ -456,7 +456,7 @@ function WorkflowCanvasInner({
                     <button
                       type="button"
                       onClick={() => setSettingsOpen(false)}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-slate-100"
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100"
                       aria-label="Close settings"
                     >
                       <span className="text-lg leading-none">×</span>
@@ -497,39 +497,46 @@ function WorkflowCanvasInner({
 }
 
 export function WorkflowCanvas(props: WorkflowCanvasProps) {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   return (
     <ReactFlowProvider>
-      <div className="relative h-full min-h-[600px] w-full bg-slate-50">
+      <div className="relative h-full min-h-[600px] w-full bg-slate-50 dark:bg-slate-900 editor-canvas-wrapper">
         {/* Polished canvas background (soft + subtle structure) */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{
-            // Variant C: subtle dots + faint large grid (no images, lightweight).
-            backgroundColor: '#f8fafc', // slate-50-ish but slightly softer
-            backgroundImage: [
-              // Tiny dots
-              'radial-gradient(circle at 1px 1px, rgba(148,163,184,0.22) 1px, transparent 1px)',
-              // Large grid
-              'linear-gradient(rgba(148,163,184,0.07) 1px, transparent 1px)',
-              'linear-gradient(90deg, rgba(148,163,184,0.07) 1px, transparent 1px)',
-              // Soft color wash (very subtle)
-              'radial-gradient(800px 420px at 10% 0%, rgba(248,113,113,0.08), transparent 60%)',
-              'radial-gradient(700px 380px at 95% 35%, rgba(167,139,250,0.08), transparent 60%)',
-            ].join(','),
-            backgroundSize: [
-              '18px 18px',
-              '120px 120px',
-              '120px 120px',
-              '100% 100%',
-              '100% 100%',
-            ].join(','),
-            backgroundPosition: [
-              '0 0',
-              '0 0',
-              '0 0',
-              '0 0',
-              '0 0',
-            ].join(','),
+            // Subtle dots + faint large grid with theme-aware opacity.
+            // This prevents the editor canvas from looking “light / washed out” in dark mode.
+            backgroundColor: isDark ? '#0f172a' : '#f8fafc',
+            backgroundImage: (
+              isDark
+                ? [
+                    // Tiny dots (softer in dark)
+                    'radial-gradient(circle at 1px 1px, rgba(100,116,139,0.2) 1px, transparent 1px)',
+                    // Large grid (low contrast)
+                    'linear-gradient(rgba(71,85,105,0.06) 1px, transparent 1px)',
+                    'linear-gradient(90deg, rgba(71,85,105,0.06) 1px, transparent 1px)',
+                    // Very subtle premium “ambient” wash (brand-friendly)
+                    'radial-gradient(900px 480px at 10% 0%, rgba(248,113,113,0.04), transparent 60%)',
+                    'radial-gradient(800px 420px at 95% 35%, rgba(167,139,250,0.04), transparent 60%)',
+                  ].join(',')
+                : [
+                    // Tiny dots
+                    'radial-gradient(circle at 1px 1px, rgba(148,163,184,0.22) 1px, transparent 1px)',
+                    // Large grid
+                    'linear-gradient(rgba(148,163,184,0.07) 1px, transparent 1px)',
+                    'linear-gradient(90deg, rgba(148,163,184,0.07) 1px, transparent 1px)',
+                    // Soft color wash (very subtle)
+                    'radial-gradient(800px 420px at 10% 0%, rgba(248,113,113,0.08), transparent 60%)',
+                    'radial-gradient(700px 380px at 95% 35%, rgba(167,139,250,0.08), transparent 60%)',
+                  ].join(',')
+            ),
+            backgroundSize: isDark
+              ? ['18px 18px', '120px 120px', '120px 120px', '100% 100%', '100% 100%'].join(',')
+              : ['18px 18px', '120px 120px', '120px 120px', '100% 100%', '100% 100%'].join(','),
+            backgroundPosition: '0 0,0 0,0 0,0 0,0 0',
           }}
         />
         <WorkflowCanvasInner {...props} />

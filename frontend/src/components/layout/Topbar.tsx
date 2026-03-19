@@ -55,14 +55,14 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
   return (
     <header
-      className="flex h-[var(--topbar-h)] shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-white px-4 md:px-6 dark:border-slate-800/80 dark:bg-slate-950"
+      className="flex h-[var(--topbar-h)] shrink-0 items-center justify-between gap-4 border-b border-slate-200/80 bg-white px-4 md:px-6 dark:border-slate-700 dark:bg-slate-900"
       role="banner"
     >
       <button
         type="button"
         aria-label="Open menu"
         onClick={onMenuClick}
-        className="rounded-btn p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 md:hidden dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-200"
+        className="rounded-btn p-2 text-slate-500 hover:bg-slate-50 hover:text-slate-700 md:hidden dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
       >
         <Menu className="h-5 w-5" />
       </button>
@@ -82,17 +82,17 @@ export function Topbar({ onMenuClick }: TopbarProps) {
         </a>
         <ThemeToggleButton className="border-none bg-transparent shadow-none dark:border-none dark:bg-transparent" />
         {!hydrated ? (
-          <div className="h-9 w-24 rounded-xl bg-slate-100" aria-hidden />
+          <div className="h-9 w-24 rounded-xl bg-slate-100 dark:bg-slate-900" aria-hidden />
         ) : isLoggedIn ? (
           <div className="relative" ref={menuRef}>
             <button
               type="button"
               onClick={() => setOpen((v) => !v)}
-              className="group inline-flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white px-2 py-1.5 shadow-sm transition hover:bg-slate-50 dark:border-slate-800/80 dark:bg-slate-950 dark:hover:bg-slate-900"
+              className="group inline-flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white px-2 py-1.5 shadow-sm transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700"
               aria-haspopup="menu"
               aria-expanded={open}
             >
-              <span className="relative inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-slate-50 to-slate-100 text-sm font-semibold text-slate-800 ring-1 ring-black/5">
+              <span className="relative inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-xl bg-gradient-to-b from-slate-50 to-slate-100 text-sm font-semibold text-slate-800 ring-1 ring-black/5 dark:from-slate-800 dark:to-slate-900 dark:text-slate-100 dark:ring-white/10">
                 {user?.avatarUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={user.avatarUrl} alt="" className="h-full w-full object-cover" />
@@ -109,9 +109,9 @@ export function Topbar({ onMenuClick }: TopbarProps) {
             {open && (
               <div
                 role="menu"
-                className="absolute right-0 mt-2 w-[320px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-slate-800/80 dark:bg-slate-950"
+                className="absolute right-0 mt-2 w-[320px] overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-2xl dark:border-slate-600 dark:bg-slate-800"
               >
-                <div className="flex items-start gap-3 border-b border-slate-200/80 px-4 py-4 dark:border-slate-800/80">
+                <div className="flex items-start gap-3 border-b border-slate-200/80 px-4 py-4 dark:border-slate-600">
                   <div className="inline-flex h-10 w-10 items-center justify-center overflow-hidden rounded-2xl bg-slate-100 text-base font-semibold text-slate-800 ring-1 ring-black/5 dark:bg-slate-900 dark:text-slate-200 dark:ring-black/20">
                     {user?.avatarUrl ? (
                       // eslint-disable-next-line @next/next/no-img-element
@@ -133,7 +133,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                   <Link
                     href="/account"
                     onClick={() => setOpen(false)}
-                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-900"
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700"
                     role="menuitem"
                   >
                     <User className="h-4 w-4 text-slate-500 dark:text-slate-400" />
@@ -142,7 +142,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
                   <button
                     type="button"
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-900"
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-700"
                     role="menuitem"
                   >
                     <LogOut className="h-4 w-4 text-slate-500 dark:text-slate-400" />
@@ -156,7 +156,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
           <div className="flex items-center gap-2">
             <Link
               href="/login"
-              className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-slate-100"
+              className="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
             >
               Log in
             </Link>

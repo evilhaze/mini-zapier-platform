@@ -24,46 +24,46 @@ export function ExecutionsTable({
 }) {
   if (executions.length === 0) {
     return (
-      <div className="rounded-xl border border-slate-200 bg-white p-12 text-center text-slate-500">
+      <div className="rounded-xl border border-slate-200 bg-white p-12 text-center text-slate-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-300">
         No executions yet.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card">
-      <table className="min-w-full divide-y divide-slate-200" role="table">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-card dark:border-slate-600 dark:bg-slate-800">
+      <table className="min-w-full divide-y divide-slate-200 dark:divide-slate-600" role="table">
         <thead>
-          <tr className="bg-slate-50/80">
+          <tr className="bg-slate-50/80 dark:bg-slate-700">
             <th
               scope="col"
-              className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+              className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-300"
             >
               Execution
             </th>
             {showWorkflow && (
               <th
                 scope="col"
-                className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+                className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-300"
               >
                 Workflow
               </th>
             )}
             <th
               scope="col"
-              className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+              className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-300"
             >
               Trigger
             </th>
             <th
               scope="col"
-              className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+              className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-300"
             >
               Status
             </th>
             <th
               scope="col"
-              className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+              className="px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-300"
             >
               Started
             </th>
@@ -72,24 +72,24 @@ export function ExecutionsTable({
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-200 bg-white">
+        <tbody className="divide-y divide-slate-200 bg-white dark:divide-slate-600 dark:bg-slate-800">
           {executions.map((e) => (
-            <tr key={e.id} className="hover:bg-slate-50/50">
-              <td className="whitespace-nowrap px-6 py-4 font-mono text-sm text-slate-600">
+            <tr key={e.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-700/50">
+              <td className="whitespace-nowrap px-6 py-4 font-mono text-sm text-slate-600 dark:text-slate-300">
                 {e.id.slice(0, 8)}…
               </td>
               {showWorkflow && (
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-700">
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-700 dark:text-slate-200">
                   {e.workflow?.name ?? e.workflowId}
                 </td>
               )}
-              <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600">
+              <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-600 dark:text-slate-300">
                 {e.triggerType}
               </td>
               <td className="whitespace-nowrap px-6 py-4">
                 <StatusBadge status={e.status} />
               </td>
-              <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-500">
+              <td className="whitespace-nowrap px-6 py-4 text-sm text-slate-500 dark:text-slate-300">
                 {new Date(e.startedAt).toLocaleString()}
               </td>
               <td className="whitespace-nowrap px-6 py-4 text-right">

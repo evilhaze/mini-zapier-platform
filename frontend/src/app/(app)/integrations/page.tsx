@@ -48,7 +48,7 @@ function IntegrationCard({ item }: { item: Integration }) {
       className={`
         group relative flex w-full items-start gap-3 rounded-2xl border bg-white px-4 py-4 text-left shadow-sm transition
         ${locked ? 'border-slate-200/80 hover:border-slate-300 hover:shadow-md' : 'border-emerald-200'}
-        dark:bg-slate-950 dark:border-slate-800/80
+        dark:bg-slate-800 dark:border-slate-600
       `}
     >
       <div
@@ -70,7 +70,7 @@ function IntegrationCard({ item }: { item: Integration }) {
         </div>
         <div className="mt-1 truncate text-xs text-slate-500 dark:text-slate-300">{item.subtitle}</div>
       </div>
-      <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-600 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-300">
+      <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-[11px] font-semibold text-slate-600 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-300">
         <Lock className="h-3.5 w-3.5" />
         Coming soon
       </span>

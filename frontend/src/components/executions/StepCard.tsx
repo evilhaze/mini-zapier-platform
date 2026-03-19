@@ -49,7 +49,7 @@ export function StepCard({ step, index, isLast }: Props) {
               ? 'border-red-300 bg-red-50 text-red-600'
               : success
                 ? 'border-emerald-300 bg-emerald-50 text-emerald-600'
-                  : 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400'
+                  : 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400'
           }`}
         >
           <StatusIcon
@@ -65,16 +65,15 @@ export function StepCard({ step, index, isLast }: Props) {
       {/* Card content */}
       <div className="flex-1 min-w-0 pb-8">
         <div
-          className={`rounded-card border-2 bg-white shadow-soft overflow-hidden dark:bg-slate-950/60 dark:border-slate-800/80 ${
+          className={`rounded-card border-2 bg-white shadow-soft overflow-hidden dark:bg-slate-800 dark:border-slate-600 ${
             failed
-              ? 'border-red-200'
+              ? 'border-red-200 dark:border-red-800/60'
               : success
-                ? 'border-emerald-100'
+                ? 'border-emerald-100 dark:border-emerald-800/50'
                 : 'border-slate-200'
           }`}
         >
-          {/* Step header */}
-          <div className="flex flex-wrap items-center gap-2 gap-y-1.5 border-b border-slate-100 px-4 py-3 bg-slate-50/50 dark:border-slate-800/80 dark:bg-slate-900/40">
+          <div className="flex flex-wrap items-center gap-2 gap-y-1.5 border-b border-slate-100 px-4 py-3 bg-slate-50/50 dark:border-slate-600 dark:bg-slate-700/50">
             <span className="font-mono text-xs font-semibold text-slate-500">
               Step {index + 1}
             </span>

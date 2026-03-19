@@ -119,29 +119,28 @@ function TriggerNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
     <div
       className={`
         relative min-w-[200px] max-w-[220px] overflow-hidden rounded-card bg-white text-left shadow-soft
-        ring-1 ring-slate-200/80 transition dark:bg-slate-900 dark:ring-slate-800/80 dark:text-slate-100
+        ring-1 ring-slate-200/80 transition
+        dark:bg-slate-800 dark:ring-slate-600 dark:text-slate-100 dark:shadow-lg dark:shadow-black/20
         ${selected
-          ? 'ring-2 ring-[#C97B8C] shadow-card-hover -translate-y-[1px]'
-          : 'hover:ring-[#EFC7D6] hover:-translate-y-[1px]'}
+          ? 'ring-2 ring-[#C97B8C] shadow-card-hover -translate-y-[1px] dark:ring-[#E8A5B8]'
+          : 'hover:ring-[#EFC7D6] hover:-translate-y-[1px] dark:hover:ring-slate-500'}
       `}
     >
-      {/* Top handle */}
       <Handle
         type="target"
         position={Position.Top}
-        className="!left-1/2 !-top-1.5 !h-3 !w-3 !-translate-x-1/2 !border-2 !border-white !bg-[#C97B8C] !shadow"
+        className="!left-1/2 !-top-1.5 !h-3 !w-3 !-translate-x-1/2 !border-2 !border-white dark:!border-slate-800 !bg-[#C97B8C] !shadow"
       />
 
-      {/* Left accent bar — trigger = soft pastel pink */}
-      <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#EFC7D6] to-[#C97B8C]" />
+      <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#EFC7D6] to-[#C97B8C] dark:from-[#E8A5B8] dark:to-[#B86B7C]" />
 
       <div className="pl-4 pr-3 py-3">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#F6E3EA] text-[#B86B7C]">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#F6E3EA] text-[#B86B7C] dark:bg-pink-500/15 dark:text-[#F9A8D4]">
             <Icon className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1 pt-0.5">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#C97B8C]">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-[#C97B8C] dark:text-[#F9A8D4]">
               Trigger · {subtype}
             </p>
             {isRenaming ? (
@@ -174,7 +173,7 @@ function TriggerNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
           <button
             ref={triggerRef}
             type="button"
-            className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-[#FDF2F7] hover:text-[#B86B7C] dark:text-slate-300 dark:hover:bg-[#0f172a] dark:hover:text-[#C97B8C]"
+            className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-[#FDF2F7] hover:text-[#B86B7C] dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-[#C97B8C]"
             title="Node actions"
             aria-label="Node actions"
             onPointerDown={(e) => {
@@ -194,7 +193,7 @@ function TriggerNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
         ? createPortal(
             <div
               ref={menuRef}
-              className="fixed z-[1000] w-44 rounded-lg border border-slate-200 bg-white py-1 text-sm shadow-lg dark:border-slate-800 dark:bg-slate-950"
+              className="fixed z-[1000] w-44 rounded-lg border border-slate-200 bg-white py-1 text-sm shadow-lg dark:border-slate-600 dark:bg-slate-800"
               style={{ top: menuPosition.top, left: menuPosition.left }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -235,7 +234,7 @@ function TriggerNode({ id, data, selected }: NodeProps<Node<FlowNodeData>>) {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="!left-1/2 !-bottom-1.5 !h-3 !w-3 !-translate-x-1/2 !border-2 !border-white !bg-[#C97B8C] !shadow"
+        className="!left-1/2 !-bottom-1.5 !h-3 !w-3 !-translate-x-1/2 !border-2 !border-white dark:!border-slate-800 !bg-[#C97B8C] !shadow"
       />
     </div>
   );

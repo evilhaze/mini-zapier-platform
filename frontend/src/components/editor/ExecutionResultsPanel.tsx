@@ -65,10 +65,13 @@ function stepSummary(nodeType: string, status: string, outputData: unknown) {
 }
 
 function statusPill(status: string) {
-  if (status === 'success') return 'border-emerald-200 bg-emerald-50 text-emerald-800';
-  if (status === 'failed') return 'border-red-200 bg-red-50 text-red-700';
-  if (status === 'skipped') return 'border-slate-200 bg-slate-50 text-slate-700';
-  return 'border-slate-200 bg-slate-50 text-slate-700';
+  if (status === 'success')
+    return 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-200';
+  if (status === 'failed')
+    return 'border-red-200 bg-red-50 text-red-700 dark:border-red-800/50 dark:bg-red-950/30 dark:text-red-200';
+  if (status === 'skipped')
+    return 'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-200';
+  return 'border-slate-200 bg-slate-50 text-slate-700 dark:border-slate-700 dark:bg-slate-900/50 dark:text-slate-200';
 }
 
 export function ExecutionResultsPanel({
@@ -147,8 +150,8 @@ export function ExecutionResultsPanel({
   if (!execution && !loading) return null;
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 bg-white/95 backdrop-blur-sm shadow-lg overflow-hidden transition-opacity duration-200 dark:border-slate-800/80 dark:bg-slate-950/80">
-      <div className="border-b border-slate-200/80 bg-white px-5 py-4 dark:border-slate-800/80 dark:bg-slate-950">
+    <div className="rounded-2xl border border-slate-200/80 bg-white/95 backdrop-blur-sm shadow-lg overflow-hidden transition-opacity duration-200 dark:border-slate-600 dark:bg-slate-800/95">
+      <div className="border-b border-slate-200/80 bg-white px-5 py-4 dark:border-slate-600 dark:bg-slate-800">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
@@ -170,7 +173,7 @@ export function ExecutionResultsPanel({
                 type="button"
                 onClick={onClose}
                 aria-label="Close panel"
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 hover:border-slate-200 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-red-500/30"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-transparent text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 hover:border-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 dark:hover:text-slate-100 focus:outline-none focus:ring-2 focus:ring-red-500/30"
               >
                 <X className="h-4 w-4" aria-hidden />
               </button>
@@ -181,7 +184,7 @@ export function ExecutionResultsPanel({
 
       <div className="p-5 space-y-3">
         {merged.trigger && (
-          <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 px-4 py-3 dark:border-slate-800/80 dark:bg-slate-900/50">
+          <div className="rounded-xl border border-slate-200/80 bg-slate-50/60 px-4 py-3 dark:border-slate-600 dark:bg-slate-700/50">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-sm font-semibold text-slate-900 truncate dark:text-slate-50">{merged.trigger.title}</p>
@@ -210,12 +213,12 @@ export function ExecutionResultsPanel({
             return (
                 <div
                   key={s.nodeId}
-                  className="rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden dark:border-slate-800/80 dark:bg-slate-950"
+                  className="rounded-2xl border border-slate-200/80 bg-white shadow-sm overflow-hidden dark:border-slate-600 dark:bg-slate-800"
                 >
                 <button
                   type="button"
                   onClick={() => onToggleStep?.(s.nodeId)}
-                  className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50/60 transition-colors"
+                  className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left hover:bg-slate-50/60 dark:hover:bg-slate-700/60 transition-colors"
                 >
                   <div className="flex items-start gap-3 min-w-0">
                     <Icon className={`h-5 w-5 shrink-0 ${iconClass}`} />
@@ -237,15 +240,15 @@ export function ExecutionResultsPanel({
                       {s.status}
                     </span>
                     {open ? (
-                      <ChevronDown className="h-4 w-4 text-slate-500" />
+                      <ChevronDown className="h-4 w-4 text-slate-500 dark:text-slate-300" />
                     ) : (
-                      <ChevronRight className="h-4 w-4 text-slate-500" />
+                      <ChevronRight className="h-4 w-4 text-slate-500 dark:text-slate-300" />
                     )}
                   </div>
                 </button>
 
                 {open && (
-                  <div className="border-t border-slate-200/80 p-4 space-y-3 bg-white dark:border-slate-800/80 dark:bg-slate-950">
+                  <div className="border-t border-slate-200/80 p-4 space-y-3 bg-white dark:border-slate-600 dark:bg-slate-800">
                     {s.status === 'skipped' ? (
                       <p className="text-sm text-slate-600 dark:text-slate-300">
                         Этот шаг не был выполнен, потому что выполнение остановилось раньше.

@@ -48,7 +48,7 @@ export function ExecutionsHistoryTable({ executions }: { executions: ExecutionRo
         action={
           <Link
             href="/workflows"
-            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
           >
             View workflows
           </Link>
@@ -59,44 +59,44 @@ export function ExecutionsHistoryTable({ executions }: { executions: ExecutionRo
   }
 
   return (
-    <div className="overflow-hidden rounded-card border border-slate-200/80 bg-white shadow-card">
+    <div className="overflow-hidden rounded-card border border-slate-200/80 bg-white shadow-card dark:border-slate-600 dark:bg-slate-800">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-200/80" role="table">
+        <table className="min-w-full divide-y divide-slate-200/80 dark:divide-slate-600" role="table">
           <thead>
-            <tr className="bg-slate-50/90">
+            <tr className="bg-slate-50/90 dark:bg-slate-700">
               <th
                 scope="col"
-                className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+                className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-300"
               >
                 Workflow
               </th>
               <th
                 scope="col"
-                className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+                className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-300"
               >
                 Trigger
               </th>
               <th
                 scope="col"
-                className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+                className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-300"
               >
                 Status
               </th>
               <th
                 scope="col"
-                className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+                className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-300"
               >
                 Started
               </th>
               <th
                 scope="col"
-                className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+                className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-300"
               >
                 Finished
               </th>
               <th
                 scope="col"
-                className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+                className="px-5 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-300"
               >
                 Duration
               </th>
@@ -105,13 +105,13 @@ export function ExecutionsHistoryTable({ executions }: { executions: ExecutionRo
               </th>
             </tr>
           </thead>
-        <tbody className="divide-y divide-slate-200/80 bg-white">
+        <tbody className="divide-y divide-slate-200/80 bg-white dark:bg-slate-800 dark:divide-slate-600">
           {executions.map((e) => (
-            <tr key={e.id} className="hover:bg-slate-50/70 transition-colors">
+            <tr key={e.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-700/50 transition-colors">
                 <td className="whitespace-nowrap px-5 py-3.5">
                   <Link
                     href={`/workflows/${e.workflowId}`}
-                    className="font-medium text-slate-900 hover:text-accent focus:outline-none focus:ring-2 focus:ring-accent/40 rounded"
+                    className="font-medium text-slate-900 hover:text-accent dark:text-slate-50 focus:outline-none focus:ring-2 focus:ring-accent/40 rounded"
                   >
                     {e.workflow?.name ?? e.workflowId}
                   </Link>
@@ -128,13 +128,13 @@ export function ExecutionsHistoryTable({ executions }: { executions: ExecutionRo
                 <td className="whitespace-nowrap px-5 py-3.5 text-sm text-slate-600 tabular-nums">
                   {e.finishedAt ? formatDate(e.finishedAt) : '—'}
                 </td>
-                <td className="whitespace-nowrap px-5 py-3.5 text-sm font-mono text-slate-600">
+                <td className="whitespace-nowrap px-5 py-3.5 text-sm font-mono text-slate-600 dark:text-slate-300">
                   {formatDuration(e.startedAt, e.finishedAt)}
                 </td>
                 <td className="whitespace-nowrap px-5 py-3.5 text-right">
                   <Link
                     href={`/executions/${e.id}`}
-                    className="inline-flex items-center gap-1 rounded-btn border border-slate-200/80 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-soft hover:bg-slate-50 hover:border-slate-300 transition-colors"
+                    className="inline-flex items-center gap-1 rounded-btn border border-slate-200/80 bg-white px-3 py-2 text-sm font-medium text-slate-700 shadow-soft hover:bg-slate-50 hover:border-slate-300 transition-colors dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
                     aria-label={`View execution ${e.id}`}
                   >
                     Details

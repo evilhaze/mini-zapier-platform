@@ -46,12 +46,12 @@ export function Sidebar({ open, onClose }: SidebarProps) {
           fixed inset-y-0 left-0 z-50 flex w-[var(--sidebar-w)] shrink-0 flex-col border-r border-slate-200/80 bg-white shadow-soft transition-transform duration-200 ease-out
           md:relative md:translate-x-0 md:shadow-none
           ${open ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
-          dark:border-slate-800/80 dark:bg-slate-950
+          dark:border-slate-700 dark:bg-slate-900
         `}
         aria-label="Main navigation"
       >
         {/* Logo row */}
-        <div className="flex h-[var(--topbar-h)] items-center justify-between border-b border-slate-200/80 px-4 md:px-5 dark:border-slate-800/80">
+        <div className="flex h-[var(--topbar-h)] items-center justify-between border-b border-slate-200/80 px-4 md:px-5 dark:border-slate-700">
           <Link
             href="/home"
             className="flex items-center gap-2.5 font-semibold text-slate-900 dark:text-slate-50"
@@ -68,7 +68,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             type="button"
             aria-label="Close menu"
             onClick={onClose}
-            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 md:hidden dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-200"
+            className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 md:hidden dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
           >
             <X className="h-5 w-5" />
           </button>
@@ -84,7 +84,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <Plus className="h-4 w-4 shrink-0" aria-hidden />
             Create workflow
           </Link>
-          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 px-1">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500 px-1">
             Navigation
           </div>
           {nav.map(({ href, label, icon: Icon }) => {
@@ -98,15 +98,18 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 href={href}
                 onClick={() => onClose()}
                 className={`
-                  flex items-center gap-3 rounded-btn px-3 py-2.5 text-sm font-medium transition-colors
+                  group flex items-center gap-3 rounded-btn px-3 py-2.5 text-sm font-medium transition-colors border
                   ${isActive
-                    ? 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/20 dark:text-red-200 dark:border-red-800/60'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-slate-100'
+                    ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/15 dark:text-red-200 dark:border-red-500/40'
+                    : 'border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100'
                   }
                 `}
                 aria-current={isActive ? 'page' : undefined}
               >
-                <Icon className="h-5 w-5 shrink-0 opacity-80" aria-hidden />
+                <Icon
+                  className={`h-5 w-5 shrink-0 transition-opacity ${isActive ? 'opacity-100' : 'opacity-80 dark:opacity-90 group-hover:opacity-100'}`}
+                  aria-hidden
+                />
                 {label}
               </Link>
             );

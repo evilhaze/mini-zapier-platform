@@ -6,7 +6,7 @@ export default async function HomePage() {
   return (
     <div className="space-y-10">
       {/* Hero / main CTA */}
-      <section className="rounded-2xl border border-red-100 bg-rose-50/60 px-6 py-6 shadow-sm sm:px-8 sm:py-8 lg:flex lg:items-center lg:justify-between lg:gap-10">
+      <section className="rounded-2xl border border-red-100 bg-rose-50/60 px-6 py-6 shadow-sm dark:border-slate-600 dark:bg-slate-800/80 sm:px-8 sm:py-8 lg:flex lg:items-center lg:justify-between lg:gap-10">
         <div className="max-w-xl">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-red-500">
             Welcome to Zyper
@@ -36,8 +36,8 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <div className="mt-6 grid w-full max-w-md gap-3 rounded-xl border border-red-100 bg-white/70 p-4 text-sm text-slate-700 dark:border-slate-800/80 dark:bg-slate-950/60 dark:text-slate-200 lg:mt-0">
-          <div className="flex items-start gap-3 rounded-lg bg-rose-50 px-3 py-2.5">
+        <div className="mt-6 grid w-full max-w-md gap-3 rounded-xl border border-red-100 bg-white/70 p-4 text-sm text-slate-700 dark:border-slate-600 dark:bg-slate-800/90 dark:text-slate-200 lg:mt-0">
+          <div className="flex items-start gap-3 rounded-lg bg-rose-50 px-3 py-2.5 dark:bg-slate-700/60">
             <span className="mt-0.5 h-2 w-2 rounded-full bg-red-500" aria-hidden />
             <div>
               <p className="font-medium text-slate-900 dark:text-slate-50">Monitor executions in real time</p>
@@ -46,7 +46,7 @@ export default async function HomePage() {
               </p>
             </div>
           </div>
-          <div className="flex items-start gap-3 rounded-lg bg-slate-50 px-3 py-2.5">
+          <div className="flex items-start gap-3 rounded-lg bg-slate-50 px-3 py-2.5 dark:bg-slate-700/60">
             <span className="mt-0.5 h-2 w-2 rounded-full bg-emerald-500" aria-hidden />
             <div>
               <p className="font-medium text-slate-900 dark:text-slate-50">Start with a trigger</p>
@@ -65,14 +65,14 @@ export default async function HomePage() {
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-2">
           <div>
-            <h2 className="text-sm font-semibold text-slate-900">Quick start</h2>
-            <p className="mt-1 text-xs text-slate-500">
+            <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-50">Quick start</h2>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
               Use a starter workflow and customize it in the editor.
             </p>
           </div>
           <Link
             href="/workflows"
-            className="text-xs font-medium text-red-600 hover:text-red-700"
+            className="text-xs font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
           >
             View all workflows
           </Link>
@@ -81,10 +81,10 @@ export default async function HomePage() {
         <div className="grid gap-3 md:grid-cols-3">
           <Link
             href="/workflows?create=1&template=webhook-to-http"
-            className="group flex flex-col justify-between rounded-xl border border-slate-200/80 bg-white p-4 text-sm shadow-card hover:border-red-200 hover:shadow-card-hover transition-all dark:border-slate-800/80 dark:bg-slate-950"
+            className="group flex flex-col justify-between rounded-xl border border-slate-200/80 bg-white p-4 text-sm shadow-card hover:border-red-200 hover:shadow-card-hover transition-all dark:border-slate-600 dark:bg-slate-800"
           >
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
                 Recommended
               </p>
               <h3 className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -95,11 +95,11 @@ export default async function HomePage() {
               </p>
             </div>
             <div className="mt-3 flex items-center gap-1 text-[11px] font-medium text-slate-500">
-              <span className="rounded-full bg-rose-50 px-2 py-0.5 text-red-600">
+              <span className="rounded-full bg-rose-50 px-2 py-0.5 text-red-600 dark:bg-red-500/20 dark:text-red-300">
                 Webhook
               </span>
-              <span>→</span>
-              <span className="rounded-full bg-slate-50 px-2 py-0.5">
+              <span className="dark:text-slate-500">→</span>
+              <span className="rounded-full bg-slate-50 px-2 py-0.5 dark:bg-slate-700 dark:text-slate-300">
                 HTTP request
               </span>
             </div>
@@ -107,10 +107,10 @@ export default async function HomePage() {
 
           <Link
             href="/workflows?create=1&template=schedule-report"
-            className="group flex flex-col justify-between rounded-xl border border-slate-200/80 bg-white p-4 text-sm shadow-card hover:border-red-200 hover:shadow-card-hover transition-all dark:border-slate-800/80 dark:bg-slate-950"
+            className="group flex flex-col justify-between rounded-xl border border-slate-200/80 bg-white p-4 text-sm shadow-card hover:border-red-200 hover:shadow-card-hover transition-all dark:border-slate-600 dark:bg-slate-800"
           >
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
                 Time based
               </p>
               <h3 className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -121,11 +121,11 @@ export default async function HomePage() {
               </p>
             </div>
             <div className="mt-3 flex items-center gap-1 text-[11px] font-medium text-slate-500">
-              <span className="rounded-full bg-rose-50 px-2 py-0.5 text-red-600">
+              <span className="rounded-full bg-rose-50 px-2 py-0.5 text-red-600 dark:bg-red-500/20 dark:text-red-300">
                 Schedule
               </span>
-              <span>→</span>
-              <span className="rounded-full bg-slate-50 px-2 py-0.5">
+              <span className="dark:text-slate-500">→</span>
+              <span className="rounded-full bg-slate-50 px-2 py-0.5 dark:bg-slate-700 dark:text-slate-300">
                 Email
               </span>
             </div>
@@ -133,10 +133,10 @@ export default async function HomePage() {
 
           <Link
             href="/workflows?create=1&template=manual-test"
-            className="group flex flex-col justify-between rounded-xl border border-slate-200/80 bg-white p-4 text-sm shadow-card hover:border-red-200 hover:shadow-card-hover transition-all dark:border-slate-800/80 dark:bg-slate-950"
+            className="group flex flex-col justify-between rounded-xl border border-slate-200/80 bg-white p-4 text-sm shadow-card hover:border-red-200 hover:shadow-card-hover transition-all dark:border-slate-600 dark:bg-slate-800"
           >
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400 dark:text-slate-500">
                 For testing
               </p>
               <h3 className="mt-2 text-sm font-semibold text-slate-900 dark:text-slate-50">
@@ -147,11 +147,11 @@ export default async function HomePage() {
               </p>
             </div>
             <div className="mt-3 flex items-center gap-1 text-[11px] font-medium text-slate-500">
-              <span className="rounded-full bg-rose-50 px-2 py-0.5 text-red-600">
+              <span className="rounded-full bg-rose-50 px-2 py-0.5 text-red-600 dark:bg-red-500/20 dark:text-red-300">
                 Manual
               </span>
-              <span>→</span>
-              <span className="rounded-full bg-slate-50 px-2 py-0.5">
+              <span className="dark:text-slate-500">→</span>
+              <span className="rounded-full bg-slate-50 px-2 py-0.5 dark:bg-slate-700 dark:text-slate-300">
                 Any actions
               </span>
             </div>

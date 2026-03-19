@@ -25,7 +25,7 @@ function SectionCard({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-3 dark:border-slate-800/80 dark:bg-slate-950">
+    <section className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm space-y-3 dark:border-slate-600 dark:bg-slate-800">
       <div className="space-y-1">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-700 dark:text-slate-300">
           {title}
@@ -967,8 +967,8 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
         title="Preview / Test"
         subtitle="Run this workflow from the trigger node to see results here."
       >
-        <p className="text-sm text-slate-600">
-          Tip: Use <span className="font-semibold text-slate-900">Test webhook</span> (Webhook trigger) to execute your workflow and see per-node status.
+        <p className="text-sm text-slate-600 dark:text-slate-300">
+          Tip: Use <span className="font-semibold text-slate-900 dark:text-slate-50">Test webhook</span> (Webhook trigger) to execute your workflow and see per-node status.
         </p>
       </SectionCard>
     );
@@ -989,15 +989,15 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
   ]);
 
   return (
-    <div className="flex w-full flex-col bg-white">
-      <div className="border-b border-slate-200/80 px-6 py-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+    <div className="flex w-full flex-col bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
+      <div className="border-b border-slate-200/80 dark:border-slate-600 px-6 py-5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400 dark:text-slate-300">
           Node settings
         </p>
-        <h3 className="mt-2 text-lg font-semibold tracking-tight text-slate-900">
+        <h3 className="mt-2 text-lg font-semibold tracking-tight text-slate-900 dark:text-slate-50">
           {typeLabel}
         </h3>
-        <p className="mt-1 text-sm leading-relaxed text-slate-600">
+        <p className="mt-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
           {nodeDescription}
         </p>
       </div>
@@ -1019,7 +1019,7 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
               <div className="space-y-1">
                 <p className="text-sm text-slate-700">
                   Last execution:{' '}
-                  <span className="font-semibold text-slate-900">
+                      <span className="font-semibold text-slate-900 dark:text-slate-50">
                     {lastExecution.status}
                   </span>
                 </p>
@@ -1029,7 +1029,7 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
                 {currentStep && (
                   <p className="text-sm text-slate-700">
                     This node:{' '}
-                    <span className="font-semibold text-slate-900">
+                    <span className="font-semibold text-slate-900 dark:text-slate-50">
                       {currentStep.status}
                     </span>
                   </p>

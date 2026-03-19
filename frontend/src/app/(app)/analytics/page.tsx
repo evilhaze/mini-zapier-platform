@@ -226,7 +226,7 @@ function KpiCard({
   };
   return (
     <div
-      className={`group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:-translate-y-[1px] hover:shadow-card-hover dark:border-slate-800/80 dark:bg-slate-950 ${
+      className={`group relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition-all hover:-translate-y-[1px] hover:shadow-card-hover dark:border-slate-600 dark:bg-slate-800 ${
         featured ? 'lg:col-span-2' : ''
       }`}
     >
@@ -354,7 +354,7 @@ export default function AnalyticsPage() {
         <div className="absolute left-1/3 -bottom-52 h-[520px] w-[520px] rounded-full bg-emerald-200/15 blur-3xl" />
       </div>
 
-      <header className="rounded-2xl border border-slate-200/80 bg-white/70 backdrop-blur-sm p-6 shadow-sm dark:border-slate-800/80 dark:bg-slate-950/60">
+      <header className="rounded-2xl border border-slate-200/80 bg-white/70 backdrop-blur-sm p-6 shadow-sm dark:border-slate-600 dark:bg-slate-800/90">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
@@ -368,7 +368,7 @@ export default function AnalyticsPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white p-1 shadow-sm dark:border-slate-800/80 dark:bg-slate-900/60">
+          <div className="flex items-center gap-2 rounded-2xl border border-slate-200/80 bg-white p-1 shadow-sm dark:border-slate-600 dark:bg-slate-700">
             {(['24h', '7d', '30d', 'all'] as Period[]).map((p) => (
               <button
                 key={p}
@@ -432,7 +432,7 @@ export default function AnalyticsPage() {
 
       {/* Charts */}
       <section className="grid gap-4 lg:grid-cols-3">
-        <div className="lg:col-span-2 rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm p-6 shadow-sm hover:shadow-card-hover transition-shadow dark:border-slate-800/80 dark:bg-slate-950/60">
+        <div className="lg:col-span-2 rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm p-6 shadow-sm hover:shadow-card-hover transition-shadow dark:border-slate-600 dark:bg-slate-800/90">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
@@ -455,7 +455,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm p-6 shadow-sm hover:shadow-card-hover transition-shadow dark:border-slate-800/80 dark:bg-slate-950/60">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm p-6 shadow-sm hover:shadow-card-hover transition-shadow dark:border-slate-600 dark:bg-slate-800/90">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
             Status breakdown
           </p>
@@ -493,7 +493,7 @@ export default function AnalyticsPage() {
 
       {/* Top workflows + recent executions */}
       <section className="grid gap-4 lg:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm p-6 shadow-sm hover:shadow-card-hover transition-shadow dark:border-slate-800/80 dark:bg-slate-950/60">
+        <div className="rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm p-6 shadow-sm hover:shadow-card-hover transition-shadow dark:border-slate-600 dark:bg-slate-800/90">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
             Top workflows
           </p>
@@ -521,7 +521,7 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
-        <div className="lg:col-span-2 rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm p-6 shadow-sm hover:shadow-card-hover transition-shadow dark:border-slate-800/80 dark:bg-slate-950/60">
+        <div className="lg:col-span-2 rounded-2xl border border-slate-200/80 bg-white/80 backdrop-blur-sm p-6 shadow-sm hover:shadow-card-hover transition-shadow dark:border-slate-600 dark:bg-slate-800/90">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">

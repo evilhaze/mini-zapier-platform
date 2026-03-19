@@ -27,13 +27,32 @@ body {
   @apply bg-surface-100;
 }
 
-/* Dark mode for React Flow primitives inside editor */
+/* Dark mode for React Flow — same palette as editor (slate-800/700) */
 .dark .react-flow__node {
-  border-color: rgb(51 65 85) !important; /* slate-700 */
+  border-color: rgb(51 65 85) !important;
 }
 .dark .react-flow__handle {
-  background-color: rgb(15 23 42) !important; /* slate-900 */
+  background-color: rgb(30 41 59) !important;
+  border-color: rgb(248 113 113) !important;
 }
 .dark .react-flow__background {
-  background-color: rgb(15 23 42) !important; /* slate-900 */
+  background-color: transparent !important; /* canvas wrapper provides bg */
+}
+.dark .react-flow__controls {
+  background-color: rgb(30 41 59) !important;
+  border-color: rgb(71 85 105) !important;
+}
+.dark .react-flow__controls button {
+  background-color: transparent !important;
+  color: rgb(226 232 240) !important;
+}
+.dark .react-flow__controls button:hover {
+  background-color: rgb(51 65 85) !important;
+}
+.dark .react-flow__minimap {
+  background-color: rgb(30 41 59) !important;
+  border-color: rgb(71 85 105) !important;
+}
+.dark .minimap-dark {
+  background-color: rgb(30 41 59) !important;
 }

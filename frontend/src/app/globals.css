@@ -13,6 +13,29 @@
   --radius-input: 0.5rem;
 }
 
+/* Dark theme semantic tokens — single source for SaaS dark mode */
+.dark {
+  --bg-app: 15 23 42;           /* slate-900 — main app background */
+  --bg-page: 15 23 42;          /* same as app */
+  --bg-panel: 30 41 59;         /* slate-800 — cards, panels */
+  --bg-elevated: 51 65 85;      /* slate-700 — raised surfaces */
+  --bg-muted: 30 41 59;         /* slate-800 — muted blocks */
+  --border-default: 51 65 85;   /* slate-700 */
+  --border-subtle: 51 65 85;   /* slate-700, low opacity for soft lines */
+  --text-primary: 241 245 249;  /* slate-100 */
+  --text-secondary: 148 163 184; /* slate-400 */
+  --text-muted: 100 116 139;   /* slate-500 */
+  --accent-red: 248 113 113;   /* red-400 for dark */
+  --accent-blush: 251 207 232;  /* pink-200 for trigger */
+  --success: 52 211 153;       /* emerald-400 */
+  --warning: 251 191 36;       /* amber-400 */
+  --destructive: 248 113 113;  /* red-400 */
+  /* Editor canvas — graphite / dark blue-gray */
+  --editor-canvas: 15 23 42;
+  --editor-canvas-dots: 71 85 105; /* slate-600, softer */
+  --editor-panel: 30 41 59;
+}
+
 @media (min-width: 768px) {
   :root {
     --page-x: 1.5rem;
@@ -31,60 +54,72 @@ body {
   @apply bg-slate-50 text-slate-800 antialiased;
 }
 
-/* Ensure overall page background switches too (not only cards/components). */
 .dark body {
-  background-color: rgb(15 23 42) !important; /* slate-900 */
-  color: rgb(241 245 249) !important; /* slate-100 */
+  background-color: rgb(var(--bg-app)) !important;
+  color: rgb(var(--text-primary)) !important;
 }
 
 html {
   scroll-behavior: smooth;
 }
 
-/* Fallback dark theme overrides.
-   These keep the UI readable even when some components still use light-only Tailwind colors.
-   Note: landing pages are outside ThemeProvider, so `.dark` class won't be present there. */
+/* Fallback dark overrides — components that use light-only Tailwind get corrected */
 .dark .bg-white {
-  background-color: rgb(15 23 42) !important; /* slate-900 */
+  background-color: rgb(var(--bg-panel)) !important;
 }
 .dark .bg-white\/70 {
-  background-color: rgba(15, 23, 42, 0.7) !important;
+  background-color: rgb(var(--bg-panel) / 0.9) !important;
 }
 .dark .bg-white\/80 {
-  background-color: rgba(15, 23, 42, 0.8) !important;
+  background-color: rgb(var(--bg-panel) / 0.95) !important;
 }
 .dark .bg-white\/95 {
-  background-color: rgba(15, 23, 42, 0.95) !important;
+  background-color: rgb(var(--bg-panel)) !important;
 }
 .dark .bg-slate-50 {
-  background-color: rgb(15 23 42) !important; /* slate-900 */
+  background-color: rgb(var(--bg-app)) !important;
 }
 .dark .bg-slate-50\/60 {
-  background-color: rgba(15, 23, 42, 0.6) !important;
+  background-color: rgb(var(--bg-panel) / 0.6) !important;
 }
 .dark .bg-slate-50\/50 {
-  background-color: rgba(15, 23, 42, 0.5) !important;
+  background-color: rgb(var(--bg-panel) / 0.5) !important;
+}
+.dark .bg-slate-50\/70 {
+  background-color: rgb(var(--bg-panel) / 0.7) !important;
+}
+.dark .bg-slate-50\/80 {
+  background-color: rgb(var(--bg-panel) / 0.8) !important;
+}
+.dark .bg-slate-50\/90 {
+  background-color: rgb(var(--bg-panel) / 0.9) !important;
+}
+.dark .bg-slate-50\/95 {
+  background-color: rgb(var(--bg-panel) / 0.95) !important;
+}
+.dark .bg-slate-100 {
+  background-color: rgb(var(--bg-panel)) !important;
 }
 .dark .text-slate-900 {
-  color: rgb(241 245 249) !important; /* slate-100 */
+  color: rgb(var(--text-primary)) !important;
 }
 .dark .text-slate-800 {
-  color: rgb(226 232 240) !important; /* slate-200 */
+  color: rgb(226 232 240) !important;
 }
 .dark .text-slate-700 {
-  color: rgb(226 232 240) !important; /* slate-200 */
+  color: rgb(226 232 240) !important;
 }
 .dark .text-slate-600 {
-  color: rgb(148 163 184) !important; /* slate-400 */
+  color: rgb(var(--text-secondary)) !important;
 }
 .dark .text-slate-500 {
-  color: rgb(148 163 184) !important; /* slate-400 */
+  color: rgb(var(--text-secondary)) !important;
 }
 .dark .border-slate-200 {
-  border-color: rgb(51 65 85) !important; /* slate-700 */
+  border-color: rgb(var(--border-default)) !important;
 }
 .dark .border-slate-200\/80 {
-  border-color: rgba(51, 65, 85, 0.8) !important;
+  border-color: rgb(var(--border-default) / 0.9) !important;
 }
 
 @layer utilities {
