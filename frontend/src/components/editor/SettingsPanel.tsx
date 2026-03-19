@@ -184,7 +184,7 @@ function nextRunPreview(freq: string, time: string): { preview: string; nextRun:
 }
 
 export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: Props) {
-  const [copiedKey, setCopiedKey] = useState<null | 'url' | 'payload' | 'curl'>(null);
+  const [copiedKey, setCopiedKey] = useState<null | 'url' | 'payload' | 'curl' | 'emailDirect' | 'emailPostmark'>(null);
   const [testing, setTesting] = useState(false);
   const [runningNow, setRunningNow] = useState(false);
   const [showTelegramToken, setShowTelegramToken] = useState(false);
@@ -231,7 +231,7 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
       case 'email':
         return nodeKind === 'action'
           ? 'Sends an outgoing email to the recipient you specify.'
-          : 'Triggers the workflow when an email arrives (MVP: not fully implemented).';
+          : 'Triggers the workflow when an email arrives via webhook (direct JSON or Postmark inbound).';
       case 'telegram':
         return 'Sends a message to a Telegram chat, group, or channel.';
       case 'http':
@@ -251,6 +251,15 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
     return `${API_BASE}/triggers/webhook/${workflowId}`;
   }, [workflowId]);
 
+  const emailDirectUrl = useMemo(
+    () => `${API_BASE}/triggers/email/${workflowId}`,
+    [workflowId]
+  );
+  const emailPostmarkUrl = useMemo(
+    () => `${API_BASE}/triggers/email/postmark/${workflowId}`,
+    [workflowId]
+  );
+
   const samplePayload = useMemo(() => ({ message: 'Hello from webhook' }), []);
   const samplePayloadText = useMemo(
     () => JSON.stringify(samplePayload, null, 2),
@@ -261,7 +270,7 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
     return `curl -X POST "${webhookUrl}" -H "Content-Type: application/json" -d "${escaped}"`;
   }, [samplePayload, webhookUrl]);
 
-  const copyToClipboard = useCallback(async (text: string, key: 'url' | 'payload' | 'curl') => {
+  const copyToClipboard = useCallback(async (text: string, key: 'url' | 'payload' | 'curl' | 'emailDirect' | 'emailPostmark') => {
     try {
       await navigator.clipboard.writeText(text);
       setCopiedKey(key);
@@ -297,6 +306,42 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
       setTesting(false);
     }
   }, [webhookUrl]);
+
+  const handleTestEmailTrigger = useCallback(async () => {
+    setTesting(true);
+    try {
+      const res = await fetch(emailDirectUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'test@example.com',
+          to: 'inbox@you.com',
+          subject: 'Test from UI',
+          text: 'Plain body',
+          html: '<p>HTML body</p>',
+        }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        const msg = (body as { error?: string }).error || `Failed (${res.status})`;
+        throw new Error(msg);
+      }
+      const data = (await res.json().catch(() => ({}))) as { executionId?: string; skipped?: boolean; reason?: string };
+      if (data.executionId) {
+        setLastExecutionId(data.executionId);
+        onNewExecutionId?.(data.executionId);
+        toast.success('Email trigger test queued');
+      } else if (data.skipped) {
+        toast.info(`Skipped: ${data.reason ?? 'filter'}`);
+      } else {
+        toast.success('Email trigger test sent');
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Email trigger test failed');
+    } finally {
+      setTesting(false);
+    }
+  }, [emailDirectUrl, onNewExecutionId]);
 
   const handleRunNow = useCallback(async () => {
     setRunningNow(true);
@@ -786,25 +831,32 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
 
     if (nodeKind === 'trigger' && type === 'email') {
       return (
-        <SectionCard
-          title="Configuration"
-          subtitle="MVP note: inbound email trigger is not fully implemented yet."
-        >
-          <Field
-            label="From (filter)"
-            value={cfg.from ?? ''}
-            onChange={(v) => updateConfig({ from: v })}
-            placeholder="optional (e.g. billing@company.com)"
-            helper="Only trigger when the sender matches."
-          />
-          <Field
-            label="Subject contains"
-            value={cfg.subjectFilter ?? ''}
-            onChange={(v) => updateConfig({ subjectFilter: v })}
-            placeholder="optional (e.g. Invoice)"
-            helper="Only trigger when the subject contains this text."
-          />
-        </SectionCard>
+        <>
+          <SectionCard
+            title="Configuration"
+            subtitle="This trigger runs when an inbound email is received via webhook. Configure filters below; use the endpoints in Preview to send test requests or connect Postmark."
+          >
+            <Field
+              label="From (filter)"
+              value={cfg.from ?? ''}
+              onChange={(v) => updateConfig({ from: v })}
+              placeholder="optional (e.g. billing@company.com)"
+              helper="If set, the workflow runs only when the sender email matches (case-insensitive)."
+            />
+            <Field
+              label="Subject contains"
+              value={cfg.subjectFilter ?? ''}
+              onChange={(v) => updateConfig({ subjectFilter: v })}
+              placeholder="optional (e.g. Invoice)"
+              helper="If set, the workflow runs only when the subject contains this text (case-insensitive)."
+            />
+            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 text-xs text-slate-700 dark:border-slate-600 dark:bg-slate-800/50 dark:text-slate-300">
+              <p className="font-semibold text-slate-800 dark:text-slate-200">Supported payload fields</p>
+              <p className="mt-1"><code className="rounded bg-slate-200 px-1 dark:bg-slate-700">from</code>, <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">to</code>, <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">subject</code>, <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">text</code>, <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">html</code> (all optional). From filter and Subject contains apply when set; leave them empty to accept any email.
+              </p>
+            </div>
+          </SectionCard>
+        </>
       );
     }
 
@@ -962,6 +1014,73 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
       );
     }
 
+    if (nodeKind === 'trigger' && type === 'email') {
+      return (
+        <SectionCard
+          title="Webhook endpoints"
+          subtitle="Use one of these URLs to trigger the workflow with an inbound email payload. Direct endpoint expects JSON; Postmark endpoint expects Postmark inbound JSON."
+        >
+          <div className="space-y-4">
+            <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-2 dark:border-slate-700 dark:bg-slate-800/40">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">Direct (JSON)</p>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(emailDirectUrl, 'emailDirect')}
+                  className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  {copiedKey === 'emailDirect' ? 'Copied' : 'Copy'}
+                </button>
+              </div>
+              <input
+                readOnly
+                value={emailDirectUrl}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+              />
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                POST JSON with <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">from</code>, <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">to</code>, <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">subject</code>, <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">text</code>, <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">html</code>. Use for curl or manual tests.
+              </p>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-2 dark:border-slate-700 dark:bg-slate-800/40">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">Postmark inbound</p>
+                <button
+                  type="button"
+                  onClick={() => copyToClipboard(emailPostmarkUrl, 'emailPostmark')}
+                  className="inline-flex items-center rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                >
+                  {copiedKey === 'emailPostmark' ? 'Copied' : 'Copy'}
+                </button>
+              </div>
+              <input
+                readOnly
+                value={emailPostmarkUrl}
+                className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+              />
+              <p className="text-xs text-slate-600 dark:text-slate-400">
+                Set this URL as the Inbound Webhook URL in your Postmark Inbound stream. We map From, To, Subject, TextBody, HtmlBody to the same format.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleTestEmailTrigger}
+            disabled={testing}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-3 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-amber-700 disabled:opacity-60"
+          >
+            {testing ? 'Sending…' : 'Test email trigger'}
+          </button>
+          {(lastExecutionLoading || lastExecution) && (
+            <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900/60">
+              <p className="text-xs text-slate-600 dark:text-slate-300">
+                Last test: <span className="font-semibold text-slate-900 dark:text-slate-50">{lastExecutionLoading ? 'running…' : (lastExecution?.status ?? '—')}</span>
+              </p>
+            </div>
+          )}
+        </SectionCard>
+      );
+    }
+
     return (
       <SectionCard
         title="Preview / Test"
@@ -974,14 +1093,20 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
     );
   }, [
     type,
+    nodeKind,
     cfg.frequency,
     cfg.time,
     cfg.cron,
     copiedKey,
     copyToClipboard,
     curlExample,
+    emailDirectUrl,
+    emailPostmarkUrl,
+    handleTestEmailTrigger,
     handleTestWebhook,
     handleRunNow,
+    lastExecution,
+    lastExecutionLoading,
     samplePayloadText,
     runningNow,
     testing,

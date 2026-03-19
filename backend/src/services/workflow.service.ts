@@ -187,11 +187,69 @@ export const workflowService = {
   async triggerBySchedule(workflowId: string): Promise<{ executionId: string; status: 'queued' }> {
     return enqueueExecution(workflowId, 'schedule', undefined);
   },
+
+  /**
+   * Email trigger (inbound webhook): load workflow, find email trigger node, apply from/subject
+   * filters. If filters pass, enqueue execution with email payload. If filters fail, return skipped.
+   */
+  async triggerByEmailInbound(
+    workflowId: string,
+    emailPayload: { from?: string; to?: string; subject?: string; text?: string; html?: string }
+  ): Promise<{ executionId: string; status: 'queued' } | { skipped: true; reason: string }> {
+    const workflow = await prisma.workflow.findUnique({
+      where: { id: workflowId },
+      select: { id: true, isPaused: true, definitionJson: true },
+    });
+    if (!workflow) {
+      const notFound = new Error('Workflow not found') as Error & { code?: string };
+      notFound.code = 'WORKFLOW_NOT_FOUND';
+      throw notFound;
+    }
+    if (workflow.isPaused) {
+      const paused = new Error('Workflow is paused') as Error & { code?: string };
+      paused.code = 'WORKFLOW_PAUSED';
+      throw paused;
+    }
+
+    const def = workflow.definitionJson as { nodes?: Array<{ type: string; config?: { from?: string; subjectFilter?: string } }> } | null;
+    const nodes = def?.nodes ?? [];
+    const emailTrigger = nodes.find((n) => String(n.type) === 'email');
+    if (!emailTrigger) {
+      const bad = new Error('Workflow does not have an email trigger') as Error & { code?: string };
+      bad.code = 'WORKFLOW_NO_EMAIL_TRIGGER';
+      throw bad;
+    }
+
+    const configFrom = typeof emailTrigger.config?.from === 'string' ? emailTrigger.config.from.trim() : '';
+    const configSubjectFilter = typeof emailTrigger.config?.subjectFilter === 'string' ? emailTrigger.config.subjectFilter.trim() : '';
+
+    if (configFrom) {
+      const from = emailPayload.from != null ? String(emailPayload.from).trim() : '';
+      if (!from || from.toLowerCase() !== configFrom.toLowerCase()) {
+        return { skipped: true, reason: 'from_filter' };
+      }
+    }
+    if (configSubjectFilter) {
+      const subject = emailPayload.subject != null ? String(emailPayload.subject) : '';
+      if (!subject || !subject.toLowerCase().includes(configSubjectFilter.toLowerCase())) {
+        return { skipped: true, reason: 'subject_filter' };
+      }
+    }
+
+    const inputPayload: Prisma.InputJsonValue = {
+      from: emailPayload.from ?? null,
+      to: emailPayload.to ?? null,
+      subject: emailPayload.subject ?? null,
+      text: emailPayload.text ?? null,
+      html: emailPayload.html ?? null,
+    };
+    return enqueueExecution(workflowId, 'email', inputPayload);
+  },
 };
 
 async function enqueueExecution(
   workflowId: string,
-  triggerType: 'manual' | 'webhook' | 'schedule',
+  triggerType: 'manual' | 'webhook' | 'schedule' | 'email',
   inputPayload?: Prisma.InputJsonValue
 ): Promise<{ executionId: string; status: 'queued' }> {
   const workflow = await prisma.workflow.findUnique({
@@ -209,6 +267,11 @@ async function enqueueExecution(
     throw paused;
   }
   if (triggerType === 'schedule' && workflow.isPaused) {
+    const paused = new Error('Workflow is paused') as Error & { code?: string };
+    paused.code = 'WORKFLOW_PAUSED';
+    throw paused;
+  }
+  if (triggerType === 'email' && workflow.isPaused) {
     const paused = new Error('Workflow is paused') as Error & { code?: string };
     paused.code = 'WORKFLOW_PAUSED';
     throw paused;

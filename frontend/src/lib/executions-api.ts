@@ -69,6 +69,7 @@ export type ExecutionDetail = {
   startedAt: string;
   finishedAt: string | null;
   errorMessage: string | null;
+  inputPayload?: Record<string, unknown> | null;
   steps?: ExecutionStep[];
 };
 

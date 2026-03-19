@@ -336,6 +336,87 @@ Executions are queued (BullMQ) and run asynchronously; use GET /executions to in
           },
         },
       },
+      '/triggers/email/{workflowId}': {
+        post: {
+          summary: 'Email trigger (inbound webhook)',
+          description: 'Trigger a workflow by inbound email payload. Body must be JSON with optional from, to, subject, text, html. Workflow must have an email trigger node; config.from and config.subjectFilter are applied. If filters do not match, returns 200 with skipped: true.',
+          tags: ['Triggers'],
+          parameters: [
+            { name: 'workflowId', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Workflow ID (must have an email trigger node)' },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    from: { type: 'string', description: 'Sender email' },
+                    to: { type: 'string', description: 'Recipient' },
+                    subject: { type: 'string', description: 'Subject line' },
+                    text: { type: 'string', description: 'Plain text body' },
+                    html: { type: 'string', description: 'HTML body' },
+                  },
+                },
+                example: { from: 'alice@example.com', to: 'inbox@you.com', subject: 'Hello', text: 'Plain body', html: '<p>HTML body</p>' },
+              },
+            },
+          },
+          responses: {
+            202: {
+              description: 'Execution queued',
+              content: { 'application/json': { schema: { $ref: '#/components/schemas/WebhookTriggerResponse' } } },
+            },
+            200: {
+              description: 'Filtered out (from or subject did not match trigger config)',
+              content: { 'application/json': { schema: { type: 'object', properties: { skipped: { type: 'boolean' }, reason: { type: 'string' } } } } },
+            },
+            400: { description: 'Invalid workflow id or workflow has no email trigger', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+            404: { description: 'Workflow not found', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+            423: { description: 'Workflow is paused', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+            503: { description: 'Queue unavailable', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          },
+        },
+      },
+      '/triggers/email/postmark/{workflowId}': {
+        post: {
+          summary: 'Email trigger via Postmark inbound webhook',
+          description: 'Accepts Postmark inbound webhook JSON, maps to internal format (from, to, subject, text, html), then runs the same email trigger logic as POST /triggers/email/:workflowId. Optional: set POSTMARK_INBOUND_SECRET and pass ?secret=... or header X-Postmark-Inbound-Secret.',
+          tags: ['Triggers'],
+          parameters: [
+            { name: 'workflowId', in: 'path', required: true, schema: { type: 'string', format: 'uuid' }, description: 'Workflow ID (must have an email trigger node)' },
+            { name: 'secret', in: 'query', required: false, schema: { type: 'string' }, description: 'Optional webhook secret (must match POSTMARK_INBOUND_SECRET if set)' },
+          ],
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  description: 'Postmark inbound webhook payload',
+                  properties: {
+                    From: { type: 'string' },
+                    To: { type: 'string' },
+                    ToFull: { type: 'array', items: { type: 'object', properties: { Email: { type: 'string' } } } },
+                    Subject: { type: 'string' },
+                    TextBody: { type: 'string' },
+                    HtmlBody: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          responses: {
+            202: { description: 'Execution queued', content: { 'application/json': { schema: { $ref: '#/components/schemas/WebhookTriggerResponse' } } } },
+            200: { description: 'Filtered out', content: { 'application/json': { schema: { type: 'object', properties: { skipped: { type: 'boolean' }, reason: { type: 'string' } } } } } },
+            400: { description: 'Invalid workflow id or body', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+            403: { description: 'Invalid or missing webhook secret', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+            404: { description: 'Workflow not found', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+            423: { description: 'Workflow is paused', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+            503: { description: 'Queue unavailable', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
+          },
+        },
+      },
     },
     components: {
       schemas: {
