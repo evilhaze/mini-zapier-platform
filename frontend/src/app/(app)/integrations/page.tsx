@@ -1,8 +1,11 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Lock, PlugZap, Sparkles, Star } from 'lucide-react';
 import { toast } from 'sonner';
+
+/** Logo: URL to SVG/image, or Simple Icons slug (e.g. "slack") for cdn.simpleicons.org */
+const SIMPLE_ICONS_CDN = 'https://cdn.simpleicons.org';
 
 type Integration = {
   id: string;
@@ -10,35 +13,41 @@ type Integration = {
   subtitle: string;
   initials: string;
   color: string; // css color
+  /** Simple Icons slug (lowercase, no spaces) for logo. Fallback: initials. */
+  logoSlug?: string;
   comingSoon?: boolean;
   popular?: boolean;
 };
 
 const INTEGRATIONS: Integration[] = [
-  { id: 'gsheets', name: 'Google Sheets', subtitle: 'Spreadsheets', initials: 'G', color: '#16a34a', comingSoon: true, popular: true },
-  { id: 'gdrive', name: 'Google Drive', subtitle: 'Files and folders', initials: 'G', color: '#2563eb', comingSoon: true, popular: true },
-  { id: 'gmail', name: 'Gmail', subtitle: 'Email inbox', initials: 'G', color: '#ef4444', comingSoon: true, popular: true },
-  { id: 'notion', name: 'Notion', subtitle: 'Docs & databases', initials: 'N', color: '#0f172a', comingSoon: true, popular: true },
-  { id: 'slack', name: 'Slack', subtitle: 'Team messaging', initials: 'S', color: '#7c3aed', comingSoon: true, popular: true },
-  { id: 'discord', name: 'Discord', subtitle: 'Communities', initials: 'D', color: '#5865F2', comingSoon: true, popular: true },
-  { id: 'github', name: 'GitHub', subtitle: 'Code & issues', initials: 'GH', color: '#111827', comingSoon: true, popular: true },
-  { id: 'airtable', name: 'Airtable', subtitle: 'Bases & views', initials: 'A', color: '#f59e0b', comingSoon: true, popular: true },
-  { id: 'trello', name: 'Trello', subtitle: 'Boards', initials: 'T', color: '#0ea5e9', comingSoon: true },
-  { id: 'dropbox', name: 'Dropbox', subtitle: 'Cloud storage', initials: 'D', color: '#2563eb', comingSoon: true },
-  { id: 'outlook', name: 'Outlook', subtitle: 'Mail & calendar', initials: 'O', color: '#1d4ed8', comingSoon: true },
-  { id: 'stripe', name: 'Stripe', subtitle: 'Payments', initials: 'S', color: '#635bff', comingSoon: true, popular: true },
-  { id: 'webflow', name: 'Webflow', subtitle: 'CMS & sites', initials: 'W', color: '#146ef5', comingSoon: true },
-  { id: 'shopify', name: 'Shopify', subtitle: 'E-commerce', initials: 'S', color: '#16a34a', comingSoon: true },
-  { id: 'hubspot', name: 'HubSpot', subtitle: 'CRM', initials: 'H', color: '#f97316', comingSoon: true },
-  { id: 'linear', name: 'Linear', subtitle: 'Product issues', initials: 'L', color: '#111827', comingSoon: true },
-  { id: 'asana', name: 'Asana', subtitle: 'Task management', initials: 'A', color: '#f43f5e', comingSoon: true },
-  { id: 'clickup', name: 'ClickUp', subtitle: 'Tasks', initials: 'C', color: '#7c3aed', comingSoon: true },
-  { id: 'openai', name: 'OpenAI', subtitle: 'AI', initials: 'AI', color: '#0f766e', comingSoon: true, popular: true },
-  { id: 'calendly', name: 'Calendly', subtitle: 'Scheduling', initials: 'C', color: '#2563eb', comingSoon: true },
+  { id: 'gsheets', name: 'Google Sheets', subtitle: 'Spreadsheets', initials: 'G', color: '#16a34a', logoSlug: 'googlesheets', comingSoon: true, popular: true },
+  { id: 'gdrive', name: 'Google Drive', subtitle: 'Files and folders', initials: 'G', color: '#2563eb', logoSlug: 'googledrive', comingSoon: true, popular: true },
+  { id: 'gmail', name: 'Gmail', subtitle: 'Email inbox', initials: 'G', color: '#ef4444', logoSlug: 'gmail', comingSoon: true, popular: true },
+  { id: 'notion', name: 'Notion', subtitle: 'Docs & databases', initials: 'N', color: '#0f172a', logoSlug: 'notion', comingSoon: true, popular: true },
+  { id: 'slack', name: 'Slack', subtitle: 'Team messaging', initials: 'S', color: '#7c3aed', logoSlug: 'slack', comingSoon: true, popular: true },
+  { id: 'discord', name: 'Discord', subtitle: 'Communities', initials: 'D', color: '#5865F2', logoSlug: 'discord', comingSoon: true, popular: true },
+  { id: 'github', name: 'GitHub', subtitle: 'Code & issues', initials: 'GH', color: '#111827', logoSlug: 'github', comingSoon: true, popular: true },
+  { id: 'airtable', name: 'Airtable', subtitle: 'Bases & views', initials: 'A', color: '#f59e0b', logoSlug: 'airtable', comingSoon: true, popular: true },
+  { id: 'trello', name: 'Trello', subtitle: 'Boards', initials: 'T', color: '#0ea5e9', logoSlug: 'trello', comingSoon: true },
+  { id: 'dropbox', name: 'Dropbox', subtitle: 'Cloud storage', initials: 'D', color: '#2563eb', logoSlug: 'dropbox', comingSoon: true },
+  { id: 'outlook', name: 'Outlook', subtitle: 'Mail & calendar', initials: 'O', color: '#1d4ed8', logoSlug: 'microsoftoutlook', comingSoon: true },
+  { id: 'stripe', name: 'Stripe', subtitle: 'Payments', initials: 'S', color: '#635bff', logoSlug: 'stripe', comingSoon: true, popular: true },
+  { id: 'webflow', name: 'Webflow', subtitle: 'CMS & sites', initials: 'W', color: '#146ef5', logoSlug: 'webflow', comingSoon: true },
+  { id: 'shopify', name: 'Shopify', subtitle: 'E-commerce', initials: 'S', color: '#16a34a', logoSlug: 'shopify', comingSoon: true },
+  { id: 'hubspot', name: 'HubSpot', subtitle: 'CRM', initials: 'H', color: '#f97316', logoSlug: 'hubspot', comingSoon: true },
+  { id: 'linear', name: 'Linear', subtitle: 'Product issues', initials: 'L', color: '#111827', logoSlug: 'linear', comingSoon: true },
+  { id: 'asana', name: 'Asana', subtitle: 'Task management', initials: 'A', color: '#f43f5e', logoSlug: 'asana', comingSoon: true },
+  { id: 'clickup', name: 'ClickUp', subtitle: 'Tasks', initials: 'C', color: '#7c3aed', logoSlug: 'clickup', comingSoon: true },
+  { id: 'openai', name: 'OpenAI', subtitle: 'AI', initials: 'AI', color: '#0f766e', logoSlug: 'openai', comingSoon: true, popular: true },
+  { id: 'calendly', name: 'Calendly', subtitle: 'Scheduling', initials: 'C', color: '#2563eb', logoSlug: 'calendly', comingSoon: true },
 ];
 
 function IntegrationCard({ item }: { item: Integration }) {
   const locked = item.comingSoon ?? true;
+  const [logoError, setLogoError] = useState(false);
+  const logoUrl = item.logoSlug && !logoError
+    ? `${SIMPLE_ICONS_CDN}/${item.logoSlug}/FFFFFF`
+    : null;
   return (
     <button
       type="button"
@@ -52,17 +61,28 @@ function IntegrationCard({ item }: { item: Integration }) {
       `}
     >
       <div
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-sm font-semibold text-white ring-1 ring-black/10"
+        className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-2xl text-sm font-semibold text-white ring-1 ring-black/10 dark:ring-white/10"
         style={{ background: item.color }}
         aria-hidden
       >
-        {item.initials}
+        {logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={logoUrl}
+            alt=""
+            className="h-6 w-6 object-contain"
+            loading="lazy"
+            onError={() => setLogoError(true)}
+          />
+        ) : (
+          item.initials
+        )}
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
           <div className="truncate text-sm font-semibold text-slate-900 dark:text-slate-50">{item.name}</div>
           {item.popular ? (
-            <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800">
+            <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800 dark:border-amber-500/40 dark:bg-amber-500/20 dark:text-amber-200">
               <Star className="h-3 w-3" />
               Popular
             </span>
