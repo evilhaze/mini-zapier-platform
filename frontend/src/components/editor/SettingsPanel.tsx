@@ -191,6 +191,7 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
   const [lastExecutionId, setLastExecutionId] = useState<string | null>(null);
   const [lastExecution, setLastExecution] = useState<ExecutionDetail | null>(null);
   const [lastExecutionLoading, setLastExecutionLoading] = useState(false);
+  const [lastEmailTestStatus, setLastEmailTestStatus] = useState<null | 'queued' | 'skipped' | 'error'>(null);
 
   const updateConfig = useCallback(
     (patch: Record<string, unknown>) => {
@@ -309,6 +310,7 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
 
   const handleTestEmailTrigger = useCallback(async () => {
     setTesting(true);
+    setLastEmailTestStatus(null);
     try {
       const res = await fetch(emailDirectUrl, {
         method: 'POST',
@@ -324,19 +326,24 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         const msg = (body as { error?: string }).error || `Failed (${res.status})`;
+        setLastEmailTestStatus('error');
         throw new Error(msg);
       }
       const data = (await res.json().catch(() => ({}))) as { executionId?: string; skipped?: boolean; reason?: string };
       if (data.executionId) {
         setLastExecutionId(data.executionId);
+        setLastEmailTestStatus('queued');
         onNewExecutionId?.(data.executionId);
         toast.success('Email trigger test queued');
       } else if (data.skipped) {
+        setLastEmailTestStatus('skipped');
         toast.info(`Skipped: ${data.reason ?? 'filter'}`);
       } else {
+        setLastEmailTestStatus('queued');
         toast.success('Email trigger test sent');
       }
     } catch (e) {
+      setLastEmailTestStatus('error');
       toast.error(e instanceof Error ? e.message : 'Email trigger test failed');
     } finally {
       setTesting(false);
@@ -1015,13 +1022,17 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
     }
 
     if (nodeKind === 'trigger' && type === 'email') {
+      const lastTestStatus = lastExecutionLoading
+        ? 'running…'
+        : lastExecution?.status ?? lastEmailTestStatus ?? null;
       return (
         <SectionCard
           title="Webhook endpoints"
           subtitle="Use one of these URLs to trigger the workflow with an inbound email payload. Direct endpoint expects JSON; Postmark endpoint expects Postmark inbound JSON."
         >
           <div className="space-y-4">
-            <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-2 dark:border-slate-700 dark:bg-slate-800/40">
+            {/* Direct (JSON) — URL, Copy, Test button and status in one block so they're visible without scroll */}
+            <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-3 dark:border-slate-700 dark:bg-slate-800/40">
               <div className="flex items-center justify-between gap-2">
                 <p className="text-xs font-semibold text-slate-800 dark:text-slate-200">Direct (JSON)</p>
                 <button
@@ -1040,6 +1051,21 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
               <p className="text-xs text-slate-600 dark:text-slate-400">
                 POST JSON with <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">from</code>, <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">to</code>, <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">subject</code>, <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">text</code>, <code className="rounded bg-slate-200 px-1 dark:bg-slate-700">html</code>. Use for curl or manual tests.
               </p>
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={handleTestEmailTrigger}
+                  disabled={testing}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-3 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-amber-700 disabled:opacity-60"
+                >
+                  {testing ? 'Sending…' : 'Test email trigger'}
+                </button>
+                {lastTestStatus && (
+                  <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">
+                    Last test: <span className="font-semibold text-slate-900 dark:text-slate-50">{lastTestStatus}</span>
+                  </p>
+                )}
+              </div>
             </div>
             <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-4 space-y-2 dark:border-slate-700 dark:bg-slate-800/40">
               <div className="flex items-center justify-between gap-2">
@@ -1062,21 +1088,6 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
               </p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleTestEmailTrigger}
-            disabled={testing}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-amber-600 px-3 py-2.5 text-sm font-semibold text-white shadow-soft hover:bg-amber-700 disabled:opacity-60"
-          >
-            {testing ? 'Sending…' : 'Test email trigger'}
-          </button>
-          {(lastExecutionLoading || lastExecution) && (
-            <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900/60">
-              <p className="text-xs text-slate-600 dark:text-slate-300">
-                Last test: <span className="font-semibold text-slate-900 dark:text-slate-50">{lastExecutionLoading ? 'running…' : (lastExecution?.status ?? '—')}</span>
-              </p>
-            </div>
-          )}
         </SectionCard>
       );
     }
@@ -1105,6 +1116,7 @@ export function SettingsPanel({ node, onUpdate, workflowId, onNewExecutionId }: 
     handleTestEmailTrigger,
     handleTestWebhook,
     handleRunNow,
+    lastEmailTestStatus,
     lastExecution,
     lastExecutionLoading,
     samplePayloadText,
