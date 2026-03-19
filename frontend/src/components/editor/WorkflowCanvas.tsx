@@ -217,10 +217,12 @@ function WorkflowCanvasInner({
           const flowNode = nodeDefToFlowNode(op.node);
           setNodes((nds) => [...nds, flowNode]);
           if (op.connectFrom) {
+            const connectFrom = op.connectFrom;
+            const targetId = op.node.id;
             setEdges((eds) => {
-              const exists = eds.some((e) => e.source === op.connectFrom && e.target === op.node.id);
+              const exists = eds.some((e) => e.source === connectFrom && e.target === targetId);
               if (exists) return eds;
-              return [...eds, { id: `e-${op.connectFrom}-${op.node.id}-${Date.now()}`, source: op.connectFrom, target: op.node.id }];
+              return [...eds, { id: `e-${connectFrom}-${targetId}-${Date.now()}`, source: connectFrom, target: targetId }];
             });
           }
         } else if (op.op === 'update_node') {
