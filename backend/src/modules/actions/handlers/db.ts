@@ -66,7 +66,7 @@ export const dbHandler: ActionHandler = async (config, input, context) => {
   }
 
   const data: Prisma.InputJsonValue =
-    payload !== undefined && payload !== null ? (payload as Prisma.InputJsonValue) : null;
+    payload !== undefined && payload !== null ? (payload as Prisma.InputJsonValue) : {};
 
   try {
     const record = await withTimeout(
