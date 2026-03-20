@@ -32,7 +32,7 @@ if (connection) {
     skipWaitingForReady: true,
     defaultJobOptions: {
       attempts: 3,
-      backoff: { type: 'exponential', delay: 1000 },
+      backoff: { type: 'exponential', delay: 2000 },
       removeOnComplete: { count: 1000 },
       removeOnFail: { count: 500 },
     },
@@ -56,9 +56,10 @@ export function getWorker(
   processor: (job: Job<WorkflowRunJobPayload>) => Promise<void>
 ) {
   if (!connection) return null;
+  const concurrency = Number(process.env.WORKFLOW_WORKER_CONCURRENCY ?? '5');
   return new Worker<WorkflowRunJobPayload>('workflow-execution', processor, {
     connection,
-    concurrency: 5,
+    concurrency: Number.isFinite(concurrency) && concurrency > 0 ? concurrency : 5,
     skipWaitingForReady: true,
   });
 }

@@ -293,5 +293,8 @@ async function enqueueExecution(
     triggerType,
     inputPayload: inputPayload ?? undefined,
   });
+  console.log(
+    `[workflowService] enqueued execution ex=${execution.id} wf=${workflowId} triggerType=${triggerType}`
+  );
   return { executionId: execution.id, status: 'queued' };
 }

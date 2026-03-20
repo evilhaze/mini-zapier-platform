@@ -83,8 +83,28 @@ export async function runWorkflowExecution(params: {
   workflowId: string;
   triggerType: string;
   inputPayload?: unknown;
+  /** BullMQ job id is usually set to executionId */
+  jobId?: string | number;
+  /** BullMQ attemptsMade is 0-based; pass "attempt #1..N" for logs */
+  jobAttempt?: number;
 }): Promise<void> {
-  const { executionId, workflowId, inputPayload } = params;
+  const { executionId, workflowId, inputPayload, jobAttempt, jobId } = params;
+
+  const EXECUTION_TIMEOUT_MS = Number(process.env.WORKFLOW_EXECUTION_TIMEOUT_MS ?? '300000'); // 5m default
+  const STEP_TIMEOUT_MS = Number(process.env.WORKFLOW_STEP_TIMEOUT_MS ?? '60000'); // 60s default
+
+  const withTimeout = async <T,>(
+    promise: Promise<T>,
+    ms: number,
+    label: string
+  ): Promise<T> => {
+    return Promise.race([
+      promise,
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`${label} timed out after ${ms / 1000}s`)), ms)
+      ),
+    ]);
+  };
 
   const [workflow, execution] = await Promise.all([
     prisma.workflow.findUnique({
@@ -98,6 +118,20 @@ export async function runWorkflowExecution(params: {
   ]);
 
   if (!workflow || !execution) return;
+
+  const executionStatus = execution.status;
+  console.log(
+    `[workflowRunner] start ex=${executionId} wf=${workflowId} status=${executionStatus} job=${String(
+      jobId ?? executionId
+    )} attempt=${jobAttempt ?? '?'} triggerType=${params.triggerType}`
+  );
+
+  // Idempotency for BullMQ retries: don't re-run finished executions.
+  if (executionStatus === 'success' || executionStatus === 'failed' || executionStatus === 'paused') {
+    console.log(`[workflowRunner] skip ex=${executionId} (already ${executionStatus})`);
+    return;
+  }
+
   if (workflow.isPaused) {
     await executionLogService.failExecutionEarly(executionId, 'Workflow is paused');
     return;
@@ -114,7 +148,35 @@ export async function runWorkflowExecution(params: {
   }
 
   const actionNodes = getOrderedActionNodes(nodes, edges, trigger.id);
-  await executionLogService.startExecution(executionId);
+  const executionDeadline = Date.now() + (Number.isFinite(EXECUTION_TIMEOUT_MS) && EXECUTION_TIMEOUT_MS > 0 ? EXECUTION_TIMEOUT_MS : 300000);
+
+  // Transition pending -> running only once. If we can't, another worker/job already took ownership.
+  if (executionStatus === 'pending') {
+    const started = await executionLogService.startExecution(executionId);
+    if (!started) {
+      console.warn(`[workflowRunner] skip ex=${executionId} (not pending anymore)`);
+      return;
+    }
+  }
+
+  // Resume chaining: skip nodes that already have status=success and reuse outputData as input for next nodes.
+  const actionNodeIds = actionNodes.map((n) => n.id);
+  const existingSteps = await prisma.executionStep.findMany({
+    where: { executionId, nodeId: { in: actionNodeIds } },
+    orderBy: { startedAt: 'desc' },
+    select: { id: true, nodeId: true, status: true, outputData: true },
+  });
+
+  const stepByNodeId = new Map<
+    string,
+    { id: string; nodeId: string; status: string; outputData: unknown }
+  >();
+  for (const s of existingSteps) {
+    // In case historical duplicates exist, keep the latest.
+    if (!stepByNodeId.has(s.nodeId)) {
+      stepByNodeId.set(s.nodeId, s);
+    }
+  }
 
   let previousOutput: unknown = inputPayload ?? {};
 
@@ -123,6 +185,30 @@ export async function runWorkflowExecution(params: {
     const maxRetries = getNodeRetryCount(node);
     const pauseOnError =
       def?.pauseOnError === true || node.config?.pauseOnError === true;
+
+    if (Date.now() > executionDeadline) {
+      const err = new Error(
+        `Workflow execution timed out after ${Math.round(EXECUTION_TIMEOUT_MS / 1000)}s`
+      );
+      await executionLogService.finishExecution(executionId, { status: 'failed', errorMessage: err.message });
+      await onExecutionFailed({
+        workflowId,
+        workflowName: workflow.name,
+        executionId,
+        status: 'failed',
+        errorMessage: err.message,
+        definitionJson: def,
+      });
+      return;
+    }
+
+    const existingStep = stepByNodeId.get(node.id);
+    if (existingStep?.status === 'success') {
+      previousOutput = existingStep.outputData ?? previousOutput;
+      continue;
+    }
+
+    console.log(`[workflowRunner] step start ex=${executionId} node=${node.id} type=${node.type}`);
 
     const step = await executionLogService.createStep(executionId, {
       nodeId: node.id,
@@ -136,16 +222,40 @@ export async function runWorkflowExecution(params: {
 
     while (retryCount <= maxRetries) {
       try {
-        const output = await executeAction(node, previousOutput, { workflowId, executionId });
+        const output = await withTimeout(
+          executeAction(node, previousOutput, { workflowId, executionId }),
+          STEP_TIMEOUT_MS,
+          `Action step node=${node.id}`
+        );
         await executionLogService.completeStepSuccess(step.id, {
           outputData: output as Prisma.InputJsonValue,
           retryCount,
         });
         previousOutput = output;
+        stepByNodeId.set(node.id, {
+          id: step.id,
+          nodeId: node.id,
+          status: 'success',
+          outputData: output,
+        });
         lastError = null;
         break;
       } catch (err) {
         lastError = err instanceof Error ? err : new Error(String(err));
+        const isTimeout = lastError.message.includes('timed out after');
+
+        // Safety: our step timeout uses Promise.race and doesn't cancel the underlying request,
+        // so retrying on timeouts can cause duplicate side effects (multiple in-flight calls).
+        // For timeouts we mark the step as failed immediately and do not retry.
+        if (isTimeout) {
+          await executionLogService.completeStepFailure(step.id, {
+            errorMessage: lastError.message,
+            retryCount: maxRetries + 1,
+          });
+          retryCount = maxRetries + 1;
+          break;
+        }
+
         retryCount++;
         if (retryCount > maxRetries) {
           await executionLogService.completeStepFailure(step.id, {

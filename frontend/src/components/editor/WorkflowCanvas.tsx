@@ -37,6 +37,7 @@ const proOptions = { hideAttribution: true };
 type WorkflowCanvasProps = {
   initialDefinition: DefinitionJson | null;
   workflowId: string;
+  workflowName?: string;
   /** Ref that will be set to a function returning current definition (for Save). */
   getDefinitionRef?: React.MutableRefObject<(() => DefinitionJson) | null>;
   baselineSignature?: string;
@@ -46,6 +47,7 @@ type WorkflowCanvasProps = {
 function WorkflowCanvasInner({
   initialDefinition,
   workflowId,
+  workflowName,
   getDefinitionRef,
   baselineSignature,
   onDirtyChange,
@@ -457,12 +459,14 @@ function WorkflowCanvasInner({
             </ReactFlow>
           </NodeActionsContext.Provider>
 
-          {/* AI Assistant — top-right, always available */}
-          <div className="pointer-events-none absolute inset-0 flex justify-end items-start pt-4 pr-4">
+          {/* AI Copilot — top-right, prominent pill + floating panel */}
+          <div className="pointer-events-none absolute inset-0 flex justify-end items-start pt-4 pr-4 z-[100]">
             <div className="pointer-events-auto relative">
               <EditorAIPanel
                 getDefinition={() => flowToDefinition(nodes, edges)}
                 selectedNodeId={selectedNodeId}
+                selectedNodeLabel={selectedNode ? (selectedNode.data?.name ?? selectedNode.data?.label ?? selectedNode.id) : null}
+                workflowName={workflowName}
                 onApplyOperations={applyEditorOperations}
               />
             </div>

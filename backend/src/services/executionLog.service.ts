@@ -29,16 +29,47 @@ export type FinishExecutionInput = {
  * All step fields (nodeId, nodeName, nodeType, inputData, outputData, status, errorMessage, retryCount, startedAt, finishedAt) are written here.
  */
 export const executionLogService = {
-  /** Set execution status to running (on start). */
-  async startExecution(executionId: string): Promise<void> {
-    await prisma.execution.update({
-      where: { id: executionId },
+  /**
+   * Transition execution from pending -> running.
+   * Returns `true` when transition happened, `false` when execution was not pending anymore
+   * (already running / already finished), which helps prevent duplicate processing.
+   */
+  async startExecution(executionId: string): Promise<boolean> {
+    const result = await prisma.execution.updateMany({
+      where: { id: executionId, status: 'pending' },
       data: { status: 'running' },
     });
+    return result.count > 0;
   },
 
-  /** Create step with status=running, record inputData, startedAt. Returns step id for later updates. */
+  /**
+   * Create (or reuse) step record for given execution+node.
+   * This prevents uncontrolled duplication when BullMQ retries the same execution job.
+   */
   async createStep(executionId: string, input: StepStartInput): Promise<{ id: string }> {
+    const existing = await prisma.executionStep.findFirst({
+      where: { executionId, nodeId: input.nodeId },
+      orderBy: { startedAt: 'desc' },
+      select: { id: true },
+    });
+
+    if (existing) {
+      await prisma.executionStep.update({
+        where: { id: existing.id },
+        data: {
+          nodeName: input.nodeName ?? null,
+          nodeType: input.nodeType,
+          status: 'running',
+          inputData: input.inputData,
+          retryCount: 0,
+          errorMessage: null,
+          startedAt: new Date(),
+          finishedAt: null,
+        },
+      });
+      return { id: existing.id };
+    }
+
     const step = await prisma.executionStep.create({
       data: {
         executionId,
@@ -64,6 +95,7 @@ export const executionLogService = {
       data: {
         status: 'success',
         outputData: input.outputData,
+        errorMessage: null,
         finishedAt: new Date(),
         retryCount: input.retryCount,
       },

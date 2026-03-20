@@ -159,6 +159,7 @@ export default function EditorPage() {
         <div className="flex-1 min-h-0 flex">
           <WorkflowCanvas
             workflowId={String(id)}
+            workflowName={workflowName}
             initialDefinition={definition}
             getDefinitionRef={getDefinitionRef}
             baselineSignature={baselineSig}

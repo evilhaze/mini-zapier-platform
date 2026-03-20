@@ -29,17 +29,31 @@ async function start() {
         workflowId: job.data.workflowId,
         triggerType: job.data.triggerType,
         inputPayload: job.data.inputPayload,
+        jobId: job.id,
+        jobAttempt: (job.attemptsMade ?? 0) + 1,
       });
     });
 
     if (!worker) {
       console.warn('[worker] Redis is not configured; worker is disabled');
     } else {
+      worker.on('completed', (job) => {
+        console.log(
+          `[worker] completed jobId=${job?.id} attemptsMade=${job?.attemptsMade ?? 0}`
+        );
+      });
       worker.on('failed', (job, err) => {
-        console.error('Workflow job failed', job?.id, err?.message);
+        console.error(
+          `[worker] failed jobId=${job?.id} attemptsMade=${job?.attemptsMade ?? 0} error=${err?.message}`
+        );
       });
       worker.on('error', (err) => {
         console.error('[worker] error:', err?.message ?? err);
+      });
+
+      // Some BullMQ event names might not exist in typings; keep it best-effort.
+      (worker as any).on('stalled', (jobId: string) => {
+        console.warn(`[worker] stalled jobId=${jobId}`);
       });
     }
   } catch (e) {
